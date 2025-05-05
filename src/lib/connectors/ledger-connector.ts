@@ -33,7 +33,7 @@ export class LedgerConnector implements Connector {
       if (version.test_mode) {
         throw new Error("Filecoin app is in test mode.");
       }
-      if (version.minor < 18 || (version.minor === 18 && version.patch < 2)) {
+      if (version.major < 2) {
         throw new Error("Please update the Filecoin app on your Ledger device.");
       }
 

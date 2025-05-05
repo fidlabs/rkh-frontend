@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,11 +23,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CopyIcon, GitBranch, MoreHorizontal } from "lucide-react";
+import { CopyIcon, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "../../../ui/use-toast";
 import { ApplicationStatusBadge } from "./ApplicationStatusBadge";
 import { ApplicationActionButton } from "./ApplicationActionButton";
+import { useAccount } from "@/hooks";
+import { AccountRole } from "@/types/account";
+import { approveKYC } from "@/lib/api";
 
 interface ApplicationsPanelProps {
   applications: Application[];
@@ -44,6 +46,7 @@ export function ApplicationsPanel({
   pageSize,
 }: ApplicationsPanelProps) {
   const { toast } = useToast();
+  const { account } = useAccount()
 
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(startIndex + pageSize - 1, totalCount);
@@ -133,6 +136,11 @@ export function ApplicationsPanel({
                             >
                               View PR
                             </Link>
+                          </DropdownMenuItem>
+                        )}
+                        {application.status === 'KYC_PHASE' && account?.role === AccountRole.GOVERNANCE_TEAM && (
+                          <DropdownMenuItem>
+                            <Button variant="ghost" className="p-0 font-normal" onClick={() => approveKYC(application.id)}>Approve KYC</Button>
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
