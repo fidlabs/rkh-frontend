@@ -25,20 +25,20 @@ const phaseColors: Record<ApplicationStatus, string> = {
 };
 
 const phaseDescriptions: Record<ApplicationStatus, string> = {
-  SUBMISSION_PHASE: 'Initial application submission phase',
-  KYC_PHASE: 'Know Your Customer verification process',
-  GOVERNANCE_REVIEW_PHASE: 'Application review by governance committee',
-  RKH_APPROVAL_PHASE: 'Final approval by RKH',
-  META_APPROVAL_PHASE: 'Final approval on Meta Allocator smart contract',
+  SUBMISSION_PHASE: 'The application has been submitted',
+  KYC_PHASE: 'Awaiting Know Your Customer verification. Go to Github to proceed',
+  GOVERNANCE_REVIEW_PHASE: 'Application in review by governance team',
+  RKH_APPROVAL_PHASE: 'Awaiting Root Key Holder approval',
+  META_APPROVAL_PHASE: 'Awaiting approval on Meta Allocator smart contract',
   APPROVED: 'Application approved',
   REJECTED: 'Application rejected',
 };
 
 const phaseNames: Record<ApplicationStatus, string> = {
-  SUBMISSION_PHASE: 'Submit',
+  SUBMISSION_PHASE: 'Submitted',
   KYC_PHASE: 'KYC',
-  GOVERNANCE_REVIEW_PHASE: 'Review',
-  RKH_APPROVAL_PHASE: 'RKH Approval',
+  GOVERNANCE_REVIEW_PHASE: 'Gov Review',
+  RKH_APPROVAL_PHASE: 'RKH Approval ',
   META_APPROVAL_PHASE: 'MA Approval',
   APPROVED: 'Approved',
   REJECTED: 'Rejected',

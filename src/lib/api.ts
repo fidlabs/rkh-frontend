@@ -57,7 +57,10 @@ export async function fetchApplications(
           try {
             const instructionsLength = allocator?.applicationInstructions?.length;
             const datacap = instructionsLength ? allocator?.applicationInstructions[instructionsLength - 1].amount : 5;
-
+            const githubWebLink = allocator.applicationDetails?.pullRequestUrl ? 
+              allocator.applicationDetails?.pullRequestUrl.replace('api.github.com/repos', 'github.com').replace('/pulls/', '/pull/') :
+              '#'
+              
             return {
               id: allocator.id,
               number: allocator.number,
@@ -72,7 +75,7 @@ export async function fetchApplications(
               createdAt: allocator.createdAt || "2021-09-01T00:00:00.000Z",
               status: allocator.status,
               actorId: allocator.actorId,
-              githubPrLink: allocator.applicationDetails?.pullRequestUrl,
+              githubPrLink: githubWebLink,
               githubPrNumber: allocator.applicationDetails?.pullRequestNumber,
               rkhApprovals: allocator.rkhPhase?.approvals,
               rkhApprovalsThreshold: allocator.rkhPhase?.approvalsThreshold,

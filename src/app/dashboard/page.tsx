@@ -61,7 +61,7 @@ export default function DashboardPage() {
               href="https://airtable.com/appVmASv3V2GIds6v/pagI08VGIVczU97wK/form"
               target="_blank"
             >
-              Apply
+              Apply To Become An Allocator
             </Link>
           </span>
         </Button>
