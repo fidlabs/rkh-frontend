@@ -10,7 +10,7 @@ export interface Application {
   country: string;
   region: string;
   type: string;
-  datacap: string;
+  datacap: number;
 
   actorId?: string;
 
@@ -25,9 +25,10 @@ export interface Application {
   // ---
 
   // GOVERNANCE REVIEW PHASE
-  allocationInstruction?: {
+  applicationInstructions?: {
     method: string[],
-    amount: number[],
+    timestamp: number,
+    datacap_amount: number,
   }
 
   // KHK APPROVAL PHASE

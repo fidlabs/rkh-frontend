@@ -55,8 +55,7 @@ export async function fetchApplications(
       applications: result.data.results
         .map((allocator: any) => {
           try {
-            const instructionsLength = allocator?.applicationInstructions?.length;
-            const datacap = instructionsLength ? allocator?.applicationInstructions[instructionsLength - 1].amount : 5;
+            const datacap = allocator?.applicationInstructions?.amount ? allocator?.applicationInstructions?.amount : allocator?.datacap;
             const githubWebLink = allocator.applicationDetails?.pullRequestUrl ? 
               allocator.applicationDetails?.pullRequestUrl.replace('api.github.com/repos', 'github.com').replace('/pulls/', '/pull/') :
               '#'
@@ -80,7 +79,7 @@ export async function fetchApplications(
               rkhApprovals: allocator.rkhPhase?.approvals,
               rkhApprovalsThreshold: allocator.rkhPhase?.approvalsThreshold,
               rkhMessageId: allocator.rkhPhase?.messageId,
-              allocationInstruction: allocator.allocationInstruction,
+              applicationInstructions: allocator.applicationInstructions,
             };
           } catch (error) {
             console.error("Error processing application:", error);

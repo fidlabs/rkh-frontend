@@ -126,7 +126,7 @@ export const AccountProvider: React.FC<{
     }
   }, [account, currentConnector]);
 
-  const proposeAddVerifier = useCallback(async (verifierAddress: string, datacap: string) => {
+  const proposeAddVerifier = useCallback(async (verifierAddress: string, datacap: number) => {
     if (!account?.wallet) {
       throw new Error("Wallet not connected");
     }
@@ -141,8 +141,7 @@ export const AccountProvider: React.FC<{
       env.useTestData // (false => Mainnet, true => Testnet)
     );
 
-    const dataCap = parseFloat(datacap);
-    const fullDataCap = BigInt(dataCap * 1000000000000);
+    const fullDataCap = BigInt(datacap * 1000000000000);
     let verifierAccountId = verifierAddress;
     if (verifierAccountId.length < 12) {
       verifierAccountId = await api.actorKey(verifierAccountId)
@@ -163,7 +162,7 @@ export const AccountProvider: React.FC<{
     return messageId;
   }, [currentConnector]);
 
-  const acceptVerifierProposal = useCallback(async (verifierAddress: string, datacap: string, fromAccount: string, transactionId: number) => {
+  const acceptVerifierProposal = useCallback(async (verifierAddress: string, datacap: number, fromAccount: string, transactionId: number) => {
     if (!account?.wallet) {
       throw new Error("Wallet not connected");
     }
@@ -178,8 +177,7 @@ export const AccountProvider: React.FC<{
       env.useTestData // (false => Mainnet, true => Testnet)
     );
 
-    const dataCap = parseFloat(datacap);
-    const fullDataCap = BigInt(dataCap * 1000000000000);
+    const fullDataCap = BigInt(datacap * 1000000000000);
     let verifierAccountId = verifierAddress;
     if (verifierAccountId.length < 12) {
       verifierAccountId = await api.actorKey(verifierAccountId)

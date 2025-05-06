@@ -93,7 +93,7 @@ export default function SignMetaAllocatorTransactionButton({ application }: Sign
         }
     }, [isError, isConfirming]);
 
-    const addVerifier = async (verifierAddress: string, datacap: string) => {
+    const addVerifier = async (verifierAddress: string, datacap: number) => {
         writeContract({
             address: env.metaAllocatorContractAddress as `0x${string}`,
             abi: contractAbi,
