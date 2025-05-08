@@ -150,8 +150,8 @@ export async function approveKYC(
     if (!response.ok) {
       throw new Error(`KYC approval failed (status ${response.status})`)
     }
-  } catch (err) {
-    console.error('Failed to approve KYC:', err)
-    throw err
+  } catch (error) {
+    console.error('Failed to approve KYC:', error)
+    throw error
   }
 }
