@@ -138,7 +138,6 @@ export async function approveKYC(
   const encodedAddr    = encodeURIComponent(address)
   const encodedSecret  = encodeURIComponent(sig)
 
-  // single '?' then '&' between params
   const url = `${API_BASE_URL}/applications/${encodedId}/approveKYC` +
               `?address=${encodedAddr}` +
               `&sig=${encodedSecret}`
