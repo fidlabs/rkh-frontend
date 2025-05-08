@@ -142,7 +142,7 @@ export function ApplicationsPanel({
                           <DropdownMenuItem>
                             <Button variant="ghost" className="p-0 font-normal" onClick={async () => {
                             try {
-                              await approveKYC(application.id, AccountRole.GOVERNANCE_TEAM)
+                              await approveKYC(application.id, account?.address)
                             } catch (err) {
                               console.error(err)
                               // handle error (e.g. show an error message)
