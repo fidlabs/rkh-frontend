@@ -117,8 +117,8 @@ export async function fetchRole(address: string): Promise<AccountRole> {
   }
 }
 
-export async function approveKYC(id: string) {
-  const url = `${API_BASE_URL}/applications/${id}/approveKYC`;
+export async function approveKYC(id: string, address: string) {
+  const url = `${API_BASE_URL}/applications/${id}/approveKYC?address=${address}`;
 
   try {
     const response = await fetch(url, {
@@ -135,5 +135,26 @@ export async function approveKYC(id: string) {
   } catch (error) {
     console.error("Failed to approve KYC:", error);
     throw new Error("Failed to approve KYC");
+  }
+}
+
+export async function revokeKYC(id: string, address: string) {
+  const url = `${API_BASE_URL}/applications/${id}/revokeKYC?address=${address}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id })
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+  } catch (error) {
+    console.error("Failed to revoke KYC:", error);
+    throw new Error("Failed to revoke KYC");
   }
 }
