@@ -145,7 +145,6 @@ export function ApplicationsPanel({
                               await approveKYC(application.id, account?.address)
                             } catch (err) {
                               console.error(err)
-                              // handle error (e.g. show an error message)
                             }
                           }}>Approve KYC</Button>
                           </DropdownMenuItem>
