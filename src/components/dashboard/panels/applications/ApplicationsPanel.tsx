@@ -140,7 +140,14 @@ export function ApplicationsPanel({
                         )}
                         {application.status === 'KYC_PHASE' && account?.role === AccountRole.GOVERNANCE_TEAM && (
                           <DropdownMenuItem>
-                            <Button variant="ghost" className="p-0 font-normal" onClick={() => approveKYC(application.id)}>Approve KYC</Button>
+                            <Button variant="ghost" className="p-0 font-normal" onClick={async () => {
+                            try {
+                              await approveKYC(application.id, AccountRole.GOVERNANCE_TEAM)
+                            } catch (err) {
+                              console.error(err)
+                              // handle error (e.g. show an error message)
+                            }
+                          }}>Approve KYC</Button>
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>

@@ -117,23 +117,42 @@ export async function fetchRole(address: string): Promise<AccountRole> {
   }
 }
 
-export async function approveKYC(id: string) {
-  const url = `${API_BASE_URL}/applications/${id}/approveKYC`;
+/**
+ * Triggers the KYC-approved event for a given application.
+ *
+ * @param id       the application ID
+ * @param address  the governance team member role
+ */
+export async function approveKYC(
+  id: string,
+  address: string
+): Promise<void> {
+  const sig = process.env.NEXT_PUBLIC_KYC_SECRET
+  if (!sig) {
+    throw new Error(
+      "Environment variable NEXT_PUBLIC_KYC_SECRET is required but was not provided"
+    )
+  }
+
+  const encodedId      = encodeURIComponent(id)
+  const encodedAddr    = encodeURIComponent(address)
+  const encodedSecret  = encodeURIComponent(sig)
+
+  // single '?' then '&' between params
+  const url = `${API_BASE_URL}/applications/${encodedId}/approveKYC` +
+              `?address=${encodedAddr}` +
+              `&sig=${encodedSecret}`
 
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id })
-    });
+      headers: { 'Content-Type': 'application/json' },
+    })
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`KYC approval failed (status ${response.status})`)
     }
-
-  } catch (error) {
-    console.error("Failed to approve KYC:", error);
-    throw new Error("Failed to approve KYC");
+  } catch (err) {
+    console.error('Failed to approve KYC:', err)
+    throw err
   }
 }
