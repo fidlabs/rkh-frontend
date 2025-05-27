@@ -30,7 +30,7 @@ const phaseDescriptions: Record<ApplicationStatus, string> = {
   RKH_APPROVAL_PHASE: 'Awaiting Root Key Holder approval',
   META_APPROVAL_PHASE: 'Awaiting approval on Meta Allocator smart contract',
   DC_ALLOCATED: 'Datacap Allocated',
-  APPROVED: 'bg-green-600',
+  APPROVED: 'Approved',
   REJECTED: 'Application rejected',
 };
 
