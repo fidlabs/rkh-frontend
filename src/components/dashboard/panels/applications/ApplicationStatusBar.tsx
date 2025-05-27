@@ -39,7 +39,7 @@ const phaseDescriptions: Record<ApplicationStatus, string> = {
   GOVERNANCE_REVIEW_PHASE: 'Application review by governance committee',
   RKH_APPROVAL_PHASE: 'Final approval by RKH',
   META_APPROVAL_PHASE: 'Meta approval phase',
-  DC_ALLOCATED: 'Application approved',
+  DC_ALLOCATED: 'Received DC',
   APPROVED: 'Application approved',
   REJECTED: 'Application rejected',
 };
