@@ -19,6 +19,7 @@ const phaseColors: Record<ApplicationStatus, string> = {
   GOVERNANCE_REVIEW_PHASE: 'bg-yellow-600',
   RKH_APPROVAL_PHASE: 'bg-orange-600',
   META_APPROVAL_PHASE: 'bg-orange-800',
+  DC_ALLOCATED: 'bg-green-600',
   APPROVED: 'bg-green-600',
   REJECTED: 'bg-red-600',
 };
@@ -28,7 +29,8 @@ const phaseDescriptions: Record<ApplicationStatus, string> = {
   GOVERNANCE_REVIEW_PHASE: 'Application in review by governance team',
   RKH_APPROVAL_PHASE: 'Awaiting Root Key Holder approval',
   META_APPROVAL_PHASE: 'Awaiting approval on Meta Allocator smart contract',
-  APPROVED: 'Application approved',
+  DC_ALLOCATED: 'Datacap Allocated',
+  APPROVED: 'Approved',
   REJECTED: 'Application rejected',
 };
 
@@ -37,6 +39,7 @@ const phaseNames: Record<ApplicationStatus, string> = {
   GOVERNANCE_REVIEW_PHASE: 'Gov Review',
   RKH_APPROVAL_PHASE: 'RKH Approval ',
   META_APPROVAL_PHASE: 'MA Approval',
+  DC_ALLOCATED: 'DC Allocated',
   APPROVED: 'Approved',
   REJECTED: 'Rejected',
 };
