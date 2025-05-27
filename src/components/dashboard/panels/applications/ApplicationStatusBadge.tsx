@@ -40,7 +40,7 @@ const phaseNames: Record<ApplicationStatus, string> = {
   RKH_APPROVAL_PHASE: 'RKH Approval ',
   META_APPROVAL_PHASE: 'MA Approval',
   DC_ALLOCATED: 'DC Allocated',
-  APPROVED: 'bg-green-600',
+  APPROVED: 'Approved',
   REJECTED: 'Rejected',
 };
 
