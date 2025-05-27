@@ -26,6 +26,7 @@ const FILTER_LABELS: Record<string, string> = {
   META_APPROVAL_PHASE: "Meta Approval",
   APPROVED: "Approved",
   REJECTED: "Rejected",
+  DC_ALLOCATED: "DC Allocated",
 };
 
 interface DashboardHeaderProps {
@@ -47,6 +48,7 @@ export function DashboardHeader({
     "RKH_APPROVAL_PHASE",
     "META_APPROVAL_PHASE",
     "APPROVED",
+    "DC_ALLOCATED",
     "REJECTED",
   ];
 
