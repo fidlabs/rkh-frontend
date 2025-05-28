@@ -38,7 +38,7 @@ const phaseNames: Record<ApplicationStatus, string> = {
   KYC_PHASE: 'KYC',
   GOVERNANCE_REVIEW_PHASE: 'Gov Review',
   RKH_APPROVAL_PHASE: 'RKH Approval ',
-  META_APPROVAL_PHASE: 'MA Approval',
+  META_APPROVAL_PHASE: 'MDMA Approval',
   DC_ALLOCATED: 'DC Allocated',
   APPROVED: 'Approved',
   REJECTED: 'Rejected',
