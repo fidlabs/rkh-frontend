@@ -141,7 +141,7 @@ export default function ApproveGovernanceReviewButton({
         </div>
 
         <div className="flex justify-center md:px-12">
-          <Label className="text-left w-full">Existing MDMA allocator</Label>
+          <Label className="text-left w-full">Update JSON only, no onchain DC Allocation</Label>
           <Input
             type="checkbox"
             className="w-full rounded-lg bg-background size-5"
