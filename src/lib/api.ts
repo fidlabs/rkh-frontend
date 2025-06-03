@@ -78,7 +78,7 @@ export async function fetchApplications(
               githubPrNumber: allocator.applicationDetails?.pullRequestNumber,
               rkhApprovals: allocator.rkhPhase?.approvals,
               rkhApprovalsThreshold: allocator.rkhPhase?.approvalsThreshold,
-              rkhMessageId: allocator.rkhPhase?.messageId,
+              rkhMessageId: allocator.rkhPhase?.approvalMessageId,
               applicationInstructions: allocator.applicationInstructions,
             };
           } catch (error) {
