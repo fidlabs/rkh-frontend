@@ -1,14 +1,19 @@
-import { FormItem } from '@/components/ui/form-item'
-import { Input } from '@/components/ui/input'
-import { FormFields, validationRules } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules'
-import { DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import React from 'react'
-import { useForm } from 'react-hook-form'
+'use client';
+
+import { FormItem } from '@/components/ui/form-item';
+import { Input } from '@/components/ui/input';
+import {
+  FormFields,
+  validationRules,
+} from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
+import { DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 
 interface RefreshAllocatorFormStepProps {
-  onSubmit: (props: FormFields) => void
-  onCancel: () => void
+  onSubmit: (props: FormFields) => void;
+  onCancel: () => void;
 }
 
 export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocatorFormStepProps) {
@@ -16,13 +21,18 @@ export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocato
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormFields>()
+  } = useForm<FormFields>();
 
   return (
     <>
       <form className="pt-4 pb-6">
         <fieldset className="pb-">
-          <FormItem required name="allocator_address" label="Allocator address" error={errors?.allocatorAddress}>
+          <FormItem
+            required
+            name="allocator_address"
+            label="Allocator address"
+            error={errors?.allocatorAddress}
+          >
             <Input {...register('allocatorAddress', validationRules.allocatorAddress())} />
           </FormItem>
 
@@ -43,5 +53,5 @@ export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocato
         <Button onClick={handleSubmit(onSubmit)}>Approve</Button>
       </DialogFooter>
     </>
-  )
+  );
 }

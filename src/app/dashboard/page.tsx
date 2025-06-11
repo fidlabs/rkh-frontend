@@ -1,53 +1,55 @@
-'use client'
+'use client';
 
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
-import { ApplicationsPanel, DashboardHeader } from '@/components/dashboard'
-import Pagination from '@/components/Pagination'
-import { fetchApplications } from '@/lib/api'
-import Account from '@/components/account/Account'
-import ScaleLoader from 'react-spinners/ScaleLoader'
-import { DashboardBreadcrumb } from '@/components/dashboard/DashboardBreadcrumb'
-import { env } from '@/config/environment'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { RefreshAllocatorSection } from '@/components/refresh/RefreshAllocatorSection'
-import { useAccountRole } from '@/hooks/useAccountRole'
-import { AccountRole } from '@/types/account'
+import { ApplicationsPanel, DashboardHeader } from '@/components/dashboard';
+import Pagination from '@/components/Pagination';
+import { fetchApplications } from '@/lib/api';
+import Account from '@/components/account/Account';
+import ScaleLoader from 'react-spinners/ScaleLoader';
+import { DashboardBreadcrumb } from '@/components/dashboard/DashboardBreadcrumb';
+import { env } from '@/config/environment';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { RefreshAllocatorSection } from '@/components/refresh/RefreshAllocatorSection';
+import { useAccountRole } from '@/hooks/useAccountRole';
+import { AccountRole } from '@/types/account';
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 10;
 
 /**
  * DashboardPage component
  * Renders the main dashboard page with sidebar, header, and applications panel
  */
 export default function DashboardPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeFilters, setActiveFilters] = useState<string[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const role = useAccountRole()
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const role = useAccountRole();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['applications', searchTerm, activeFilters, currentPage],
     queryFn: () => fetchApplications(searchTerm, activeFilters, currentPage, PAGE_SIZE),
     refetchInterval: 1 * 1000, // Refetch every 1 seconds
-  })
+  });
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Applications', href: '/dashboard' },
-  ]
+  ];
 
-  const applications = data?.applications || []
-  const totalCount = data?.totalCount || 0
+  const applications = data?.applications || [];
+  const totalCount = data?.totalCount || 0;
 
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
         <DashboardBreadcrumb items={breadcrumbItems} />
         {env.useTestData && (
-          <div className="bg-yellow-100 p-2 text-yellow-800">Using test data in {env.apiBaseUrl} environment</div>
+          <div className="bg-yellow-100 p-2 text-yellow-800">
+            Using test data in {env.apiBaseUrl} environment
+          </div>
         )}
         <div className="relative ml-auto flex-1 md:grow-0"></div>
 
@@ -57,7 +59,10 @@ export default function DashboardPage() {
 
         <Button variant="outline">
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            <Link href="https://airtable.com/appVmASv3V2GIds6v/pagI08VGIVczU97wK/form" target="_blank">
+            <Link
+              href="https://airtable.com/appVmASv3V2GIds6v/pagI08VGIVczU97wK/form"
+              target="_blank"
+            >
               Apply To Become An Allocator
             </Link>
           </span>
@@ -100,5 +105,5 @@ export default function DashboardPage() {
         )}
       </main>
     </>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-import { X } from 'lucide-react'
-import { DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import React from 'react'
+import { X } from 'lucide-react';
+import { DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import React from 'react';
 
 interface RefreshAllocatorErrorStep {
-  onGoBack: () => void
-  onClose: () => void
+  onGoBack: () => void;
+  onClose: () => void;
 }
 
 export function RefreshAllocatorErrorStep({ onGoBack, onClose }: RefreshAllocatorErrorStep) {
@@ -24,5 +24,5 @@ export function RefreshAllocatorErrorStep({ onGoBack, onClose }: RefreshAllocato
         </Button>
       </DialogFooter>
     </>
-  )
+  );
 }

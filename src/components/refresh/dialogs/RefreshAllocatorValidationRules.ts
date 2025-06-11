@@ -1,9 +1,9 @@
-import { RegisterOptions } from 'react-hook-form'
+import { RegisterOptions } from 'react-hook-form';
 
 export interface FormFields {
-  allocatorAddress: string
-  dataCap: number
-  githubIssue?: number
+  allocatorAddress: string;
+  dataCap: number;
+  githubIssue?: number;
 }
 
 export const validationRules = {
@@ -22,4 +22,4 @@ export const validationRules = {
     min: { value: 1, message: 'Github issue number should be at least 1' },
     max: { value: Number.MAX_SAFE_INTEGER, message: 'Value is too high' },
   }),
-}
+};

@@ -1,7 +1,9 @@
-import { Button } from '@/components/ui/button'
+'use client';
+
+import { Button } from '@/components/ui/button';
 
 interface RefreshAlloactorButtonProps {
-  onClick?: () => void
+  onClick?: () => void;
 }
 
 export function RefreshAlloactorButton({ onClick }: RefreshAlloactorButtonProps) {
@@ -9,5 +11,5 @@ export function RefreshAlloactorButton({ onClick }: RefreshAlloactorButtonProps)
     <Button variant="outline" onClick={onClick}>
       <span className="sm:whitespace-nowrap">Refresh Alloactor</span>
     </Button>
-  )
+  );
 }

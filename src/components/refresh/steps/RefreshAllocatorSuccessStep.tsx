@@ -1,10 +1,10 @@
-import { Check } from 'lucide-react'
-import { DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import React from 'react'
+import { Check } from 'lucide-react';
+import { DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import React from 'react';
 
 interface RefreshAllocatorSuccessStepProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
 export function RefreshAllocatorSuccessStep({ onClose }: RefreshAllocatorSuccessStepProps) {
@@ -20,5 +20,5 @@ export function RefreshAllocatorSuccessStep({ onClose }: RefreshAllocatorSuccess
         </Button>
       </DialogFooter>
     </>
-  )
+  );
 }
