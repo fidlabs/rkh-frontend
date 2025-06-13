@@ -6,7 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 interface RefreshAllocatorSuccessStepProps {
   messageId?: string | null;
-  blockNumber?: string | null;
+  blockNumber?: number | null;
   onClose: () => void;
 }
 
@@ -26,7 +26,7 @@ export function RefreshAllocatorSuccessStep({
   };
 
   const handleCopyBlockNumber = async () => {
-    await navigator.clipboard.writeText(blockNumber || '');
+    await navigator.clipboard.writeText(String(blockNumber || ''));
     toast({
       title: 'Copied to clipboard',
       description: 'Block number has been copied to your clipboard.',
@@ -43,21 +43,22 @@ export function RefreshAllocatorSuccessStep({
       </div>
 
       {messageId ? (
-        <div data-testid="transaction-id-section" className="flex flex-col gap-2 text-sm w-60">
-          <span>Transaction ID:</span>
-          <span className="flex items-center gap-2 text-muted-foreground">
-            {messageId}
+        <div data-testid="transaction-id-section" className="flex flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2">
+            <span>Transaction ID</span>
             <Copy data-testid="copy-transaction-id" size="16px" onClick={handleCopyTransactionId} />
-          </span>
+          </div>
+          <span className="text-muted-foreground break-all">{messageId}</span>
         </div>
       ) : null}
 
       {blockNumber ? (
         <div data-testid="block-number-section" className="flex flex-col gap-2 text-sm">
-          <span>Block number:</span>
-          <span className="flex items-center gap-2 text-muted-foreground">
-            {blockNumber} <Copy data-testid="copy-block-number" onClick={handleCopyBlockNumber} />
-          </span>
+          <div className="flex items-center gap-2">
+            <span>Block number</span>
+            <Copy data-testid="copy-block-number" size="16px" onClick={handleCopyBlockNumber} />
+          </div>
+          <span className="flex items-center gap-2 text-muted-foreground">{blockNumber}</span>
         </div>
       ) : null}
 

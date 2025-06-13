@@ -45,9 +45,26 @@ describe('RefreshAllocatorFormStep', () => {
     await user.click(submitButton);
 
     const alerts = screen.getAllByRole('alert');
-
+    expect(alerts).toHaveLength(2);
     expect(alerts.at(0)).toHaveTextContent('Allocator address is required');
     expect(alerts.at(1)).toHaveTextContent('Data Cap is required');
+  });
+
+  it('should show validation error for invalid address format', async () => {
+    const user = userEvent.setup();
+    render(<RefreshAllocatorFormStep {...mockProps} />);
+
+    const addressInput = screen.getByRole('textbox', { name: /allocator address/i });
+    const dataCapInput = screen.getByRole('textbox', { name: /datacap/i });
+    const submitButton = screen.getByRole('button', { name: /approve/i });
+
+    await user.type(addressInput, 'asdasdasd');
+    await user.type(dataCapInput, '1000');
+    await user.click(submitButton);
+
+    const alerts = screen.getAllByRole('alert');
+    expect(alerts).toHaveLength(1);
+    expect(alerts.at(0)).toHaveTextContent('Allocator address have wrong format');
   });
 
   it('should submit form with valid data', async () => {
@@ -86,7 +103,7 @@ describe('RefreshAllocatorFormStep', () => {
 
     const addressInput = screen.getByRole('textbox', { name: /allocator address/i });
     const dataCapInput = screen.getByRole('textbox', { name: /datacap/i });
-    await user.type(addressInput, 'f1');
+    await user.type(addressInput, 'f123');
     await user.type(dataCapInput, '12');
 
     await waitFor(() => {

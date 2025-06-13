@@ -16,7 +16,7 @@ describe('RefreshAllocatorSuccessStep', () => {
 
   const props = {
     messageId: 'transaction-id-123',
-    blockNumber: '1234',
+    blockNumber: 1234,
     onClose: mockOnClose,
   };
 
@@ -29,9 +29,9 @@ describe('RefreshAllocatorSuccessStep', () => {
 
     expect(screen.getByTestId('success-header')).toHaveTextContent('Success!');
     expect(screen.getByTestId('transaction-id-section')).toHaveTextContent(
-      'Transaction ID:transaction-id-123',
+      'Transaction IDtransaction-id-123',
     );
-    expect(screen.getByTestId('block-number-section')).toHaveTextContent('Block number:1234');
+    expect(screen.getByTestId('block-number-section')).toHaveTextContent('Block number1234');
   });
 
   it('should call onClose when Close button is clicked', async () => {
@@ -75,7 +75,7 @@ describe('RefreshAllocatorSuccessStep', () => {
     await user.click(copyButton);
 
     const clipboardText = await navigator.clipboard.readText();
-    expect(clipboardText).toBe(props.blockNumber);
+    expect(clipboardText).toBe(String(props.blockNumber));
     expect(mockToast).toHaveBeenCalledWith({
       title: 'Copied to clipboard',
       description: 'Block number has been copied to your clipboard.',

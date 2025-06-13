@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { RefreshAllocatorSection } from './RefreshAllocatorSection';
+import { createWrapper } from '@/test-utils';
 
 vi.mock('@/hooks/useRKHTransaction', () => ({
   useRKHTransaction: () => ({
@@ -10,14 +11,16 @@ vi.mock('@/hooks/useRKHTransaction', () => ({
 }));
 
 describe('RefreshAllocatorSection', () => {
+  const wrapper = createWrapper();
+
   it('should not show dialog initially', () => {
-    render(<RefreshAllocatorSection />);
+    render(<RefreshAllocatorSection />, { wrapper });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('should open dialog when button is clicked', async () => {
     const user = userEvent.setup();
-    render(<RefreshAllocatorSection />);
+    render(<RefreshAllocatorSection />, { wrapper });
 
     const button = screen.getByRole('button', { name: /refresh allocator/i });
     await user.click(button);
@@ -27,7 +30,7 @@ describe('RefreshAllocatorSection', () => {
 
   it('should show form fields when dialog is opened', async () => {
     const user = userEvent.setup();
-    render(<RefreshAllocatorSection />);
+    render(<RefreshAllocatorSection />, { wrapper });
 
     const button = screen.getByRole('button', { name: /refresh allocator/i });
     await user.click(button);
@@ -40,7 +43,7 @@ describe('RefreshAllocatorSection', () => {
 
   it('should close dialog when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    render(<RefreshAllocatorSection />);
+    render(<RefreshAllocatorSection />, { wrapper });
 
     const button = screen.getByRole('button', { name: /refresh allocator/i });
     await user.click(button);

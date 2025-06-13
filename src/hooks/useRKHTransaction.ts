@@ -1,52 +1,61 @@
+import { useMutation } from '@tanstack/react-query';
 import { useAccount } from '@/hooks/useAccount';
-import { useCallback, useState } from 'react';
 import { Application } from '@/types/application';
 
 interface UseRKHTransactionProps {
-  onProposeTransaction: () => void;
-  onProposeTransactionFailed: () => void;
-  onProposeTransactionSuccess: () => void;
+  onProposeTransaction?: () => void;
+  onProposeTransactionFailed?: (error: unknown) => void;
+  onProposeTransactionSuccess?: (messageId: string) => void;
+}
+
+interface ProposeTransactionParams {
+  address: string;
+  datacap: number;
 }
 
 export function useRKHTransaction({
   onProposeTransaction,
   onProposeTransactionFailed,
   onProposeTransactionSuccess,
-}: UseRKHTransactionProps) {
+}: UseRKHTransactionProps = {}) {
   const { proposeAddVerifier } = useAccount();
-  const [isPending, setIsPending] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [messageId, setMessageId] = useState<string | null>(null);
 
-  const proposeTransaction = useCallback(
-    async ({ address, datacap }: Pick<Application, 'address' | 'datacap'>) => {
-      setIsPending(true);
-      setErrorMessage(null);
-      setMessageId(null);
-
-      onProposeTransaction();
-
-      try {
-        const messageId = await proposeAddVerifier(address, datacap);
-
-        setMessageId(messageId);
-        onProposeTransactionSuccess();
-      } catch (error) {
-        console.error('Error proposing verifier:', error);
-        if (error instanceof Error) setErrorMessage(error.message);
-
-        onProposeTransactionFailed();
-      } finally {
-        setIsPending(false);
-      }
+  const mutation = useMutation({
+    mutationKey: ['proposeTransaction'],
+    mutationFn: async ({ address, datacap }: ProposeTransactionParams) => {
+      onProposeTransaction?.();
+      const messageId = await proposeAddVerifier(address, datacap);
+      return messageId;
     },
-    [
-      proposeAddVerifier,
-      onProposeTransaction,
-      onProposeTransactionFailed,
-      onProposeTransactionSuccess,
-    ],
-  );
+    onSuccess: (messageId: string) => {
+      onProposeTransactionSuccess?.(messageId);
+    },
+    onError: (error: unknown) => {
+      console.error('Error proposing verifier:', error);
+      onProposeTransactionFailed?.(error);
+    },
+    retry: (failureCount, error) => {
+      if (error instanceof Error && error.message.includes('network')) {
+        return failureCount < 3;
+      }
+      return false;
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 
-  return { proposeTransaction, isPending, messageId, errorMessage };
+  const proposeTransaction = async (params: Pick<Application, 'address' | 'datacap'>) => {
+    return mutation.mutateAsync({
+      address: params.address,
+      datacap: params.datacap,
+    });
+  };
+
+  return {
+    proposeTransaction,
+    isPending: mutation.isPending,
+    messageId: mutation.data || null,
+    error: mutation.error,
+    isError: mutation.isError,
+    isSuccess: mutation.isSuccess,
+  };
 }

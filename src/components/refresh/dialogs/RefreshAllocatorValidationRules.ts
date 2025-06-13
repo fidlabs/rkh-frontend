@@ -1,4 +1,5 @@
 import { RegisterOptions } from 'react-hook-form';
+import { filecoinAddresRegex } from '@/types/filecoin';
 
 export interface FormFields {
   allocatorAddress: string;
@@ -9,7 +10,7 @@ export interface FormFields {
 export const validationRules = {
   allocatorAddress: (): RegisterOptions<FormFields, 'allocatorAddress'> => ({
     required: { value: true, message: 'Allocator address is required' },
-    pattern: { value: /^f[0-4][a-zA-Z0-9]*$/, message: 'Allocator address should start with "f"' },
+    pattern: { value: filecoinAddresRegex, message: 'Allocator address have wrong format' },
   }),
 
   dataCap: (): RegisterOptions<FormFields, 'dataCap'> => ({

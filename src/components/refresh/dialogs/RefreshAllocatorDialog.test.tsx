@@ -1,10 +1,16 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { RefreshAllocatorDialog } from './RefreshAllocatorDialog';
+import { createWrapper } from '@/test-utils';
+import { ApiStateWaitMsgResponse } from '@/types/filecoin-client';
+import { getStateWaitMsg } from '@/lib/glif-api';
 
 const mockProposeAddVerifier = vi.fn();
+const mockGetStateWaitMsg = getStateWaitMsg as Mock;
 const mockToast = vi.fn();
+
+vi.mock('@/lib/glif-api');
 
 vi.mock('@/hooks/useAccount', () => ({
   useAccount: () => ({
@@ -19,23 +25,54 @@ vi.mock('@/components/ui/use-toast', () => ({
 }));
 
 describe('RefreshAllocatorDialog Integration Tests', () => {
+  const wrapper = createWrapper();
   const mockProps = {
     open: true,
     onOpenChange: vi.fn(),
+  };
+  const mockStateWaitResponse: ApiStateWaitMsgResponse = {
+    data: {
+      Height: 12345,
+      Message: { '/': 'message-id-123' },
+      Receipt: {
+        EventsRoot: null,
+        ExitCode: 0,
+        GasUsed: 1000,
+        Return: 'success',
+      },
+      ReturnDec: {
+        Applied: true,
+        Code: 0,
+        Ret: 'success',
+      },
+      TipSet: [{ '/': 'tipset-cid' }],
+    },
+    error: '',
+    success: true,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  it('should render dialog with correct title and description', () => {
+    render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
+
+    const dialog = screen.getByRole('dialog', { name: /Refresh Allocator/i });
+    expect(dialog).toHaveTextContent(
+      'Signing a RKH transaction to assign DataCap to an allocator without the full application process. This will not update the Allocator JSON automatically!',
+    );
+  });
+
   describe('Success flow', () => {
     beforeEach(() => {
       mockProposeAddVerifier.mockResolvedValue('message-id-123');
+      mockGetStateWaitMsg.mockResolvedValue(mockStateWaitResponse);
     });
 
     it('should go through complete success flow', async () => {
       const user = userEvent.setup();
-      render(<RefreshAllocatorDialog {...mockProps} />);
+      render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
 
       expect(screen.getByRole('textbox', { name: /allocator address/i })).toBeInTheDocument();
 
@@ -52,12 +89,15 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
       expect(successHeader).toHaveTextContent('Success!');
 
       const transactionIdSection = screen.getByTestId('transaction-id-section');
-      expect(transactionIdSection).toHaveTextContent('Transaction ID:message-id-123');
+      expect(transactionIdSection).toHaveTextContent('Transaction IDmessage-id-123');
+
+      const blockNumberSection = screen.getByTestId('block-number-section');
+      expect(blockNumberSection).toHaveTextContent('Block number12345');
     });
 
     it('should close dialog from success step', async () => {
       const user = userEvent.setup();
-      render(<RefreshAllocatorDialog {...mockProps} />);
+      render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
 
       await user.type(
         screen.getByRole('textbox', { name: /allocator address/i }),
@@ -82,7 +122,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
     it('should show error step when transaction fails', async () => {
       const user = userEvent.setup();
-      render(<RefreshAllocatorDialog {...mockProps} />);
+      render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
 
       await user.type(
         screen.getByRole('textbox', { name: /allocator address/i }),
@@ -98,7 +138,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
     it('should go back to form from error step', async () => {
       const user = userEvent.setup();
-      render(<RefreshAllocatorDialog {...mockProps} />);
+      render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
 
       await user.type(
         screen.getByRole('textbox', { name: /allocator address/i }),
@@ -120,12 +160,15 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
   describe('Loading state', () => {
     beforeEach(() => {
-      mockProposeAddVerifier.mockImplementation(() => new Promise(() => {}));
+      mockProposeAddVerifier.mockResolvedValue('message-id-123');
+      mockGetStateWaitMsg.mockResolvedValue(mockStateWaitResponse);
     });
 
-    it('should show loading step during transaction', async () => {
+    it('should show loading step during ledger transaction', async () => {
+      mockProposeAddVerifier.mockImplementation(() => new Promise(() => {}));
       const user = userEvent.setup();
-      render(<RefreshAllocatorDialog {...mockProps} />);
+
+      render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
 
       await user.type(
         screen.getByRole('textbox', { name: /allocator address/i }),
@@ -134,7 +177,31 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
       await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
-      expect(screen.getByText('Connecting to Ledger...')).toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.getByTestId('loading-message')).toHaveTextContent(
+          'Proposing transaction. Please check your Ledger.',
+        ),
+      );
+    });
+
+    it('should show loading stat during getStateWaitMsg', async () => {
+      mockGetStateWaitMsg.mockImplementation(() => new Promise(() => {}));
+      const user = userEvent.setup();
+
+      render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
+
+      await user.type(
+        screen.getByRole('textbox', { name: /allocator address/i }),
+        'f1234567890abcdef',
+      );
+      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      await user.click(screen.getByRole('button', { name: /approve/i }));
+
+      await waitFor(() =>
+        expect(screen.getByTestId('loading-message')).toHaveTextContent(
+          'Checking the block number please wait... Do not close this window.',
+        ),
+      );
     });
   });
 });

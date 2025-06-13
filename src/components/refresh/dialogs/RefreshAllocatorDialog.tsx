@@ -17,6 +17,7 @@ import {
   RefreshAllocatorSuccessStep,
 } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
+import { useStateWaitMsg } from '@/hooks';
 
 interface RefreshAllocatorButtonProps {
   open: boolean;
@@ -25,24 +26,52 @@ interface RefreshAllocatorButtonProps {
 
 export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorButtonProps) {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
-  const { proposeTransaction, errorMessage, messageId } = useRKHTransaction({
-    onProposeTransaction: () => setStep(RefreshAllocatorSteps.LOADING),
-    onProposeTransactionFailed: () => setStep(RefreshAllocatorSteps.ERROR),
-    onProposeTransactionSuccess: () => setStep(RefreshAllocatorSteps.SUCCESS),
+  const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { checkTransactionState, stateWaitMsg } = useStateWaitMsg({
+    onGetMessage: () => {
+      setStep(RefreshAllocatorSteps.LOADING);
+      setLoadingMessage('Checking the block number please wait... Do not close this window.');
+    },
+    onGetMessageError: error => {
+      setStep(RefreshAllocatorSteps.ERROR);
+      if (error instanceof Error) setErrorMessage(error.message);
+    },
+    onGetMessageSuccess: () => {
+      setStep(RefreshAllocatorSteps.SUCCESS);
+    },
+  });
+
+  const { proposeTransaction, messageId } = useRKHTransaction({
+    onProposeTransaction: () => {
+      setStep(RefreshAllocatorSteps.LOADING);
+      setLoadingMessage('Proposing transaction. Please check your Ledger.');
+    },
+    onProposeTransactionFailed: error => {
+      setStep(RefreshAllocatorSteps.ERROR);
+      if (error instanceof Error) setErrorMessage(error.message);
+    },
+    onProposeTransactionSuccess: (messageId: string) => checkTransactionState(messageId),
   });
 
   const onSubmit = async ({ allocatorAddress, dataCap }: FormFields) =>
     proposeTransaction({ address: allocatorAddress, datacap: dataCap });
 
+  const getBlockNumber = () => {
+    return typeof stateWaitMsg === 'object' ? stateWaitMsg?.Height : undefined;
+  };
+
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
       <RefreshAllocatorFormStep onSubmit={onSubmit} onCancel={() => onOpenChange(false)} />
     ),
-    [RefreshAllocatorSteps.LOADING]: <RefreshAllocatorLoadingStep />,
+    [RefreshAllocatorSteps.LOADING]: (
+      <RefreshAllocatorLoadingStep loadingMessage={loadingMessage} />
+    ),
     [RefreshAllocatorSteps.SUCCESS]: (
       <RefreshAllocatorSuccessStep
         messageId={messageId}
-        blockNumber="123123123"
+        blockNumber={getBlockNumber()}
         onClose={() => onOpenChange(false)}
       />
     ),
@@ -56,7 +85,11 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
   };
 
   useEffect(() => {
-    if (open) setStep(RefreshAllocatorSteps.FORM);
+    if (open) {
+      setStep(RefreshAllocatorSteps.FORM);
+      setLoadingMessage(null);
+      setErrorMessage(null);
+    }
   }, [open]);
 
   return (
@@ -64,7 +97,7 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
       <DialogContent className="max-w-fit">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">Refresh Allocator</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="max-w-[500px]">
             Signing a RKH transaction to assign DataCap to an allocator without the full application
             process. This will not update the Allocator JSON automatically!
           </DialogDescription>
