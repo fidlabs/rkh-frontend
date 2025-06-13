@@ -20,7 +20,7 @@ describe('Input', () => {
     expect(input).toHaveValue('Hello World');
   });
 
-  it('should applies error styling when error prop is provided', () => {
+  it('should apply error styling when error prop is provided', () => {
     const error = { type: 'required', message: 'Field is required' };
     render(<Input error={error} />);
 

@@ -33,15 +33,11 @@ export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocato
             label="Allocator address"
             error={errors?.allocatorAddress}
           >
-            <Input {...register('allocatorAddress', validationRules.allocatorAddress())} />
+            <Input {...register('allocatorAddress')} />
           </FormItem>
 
           <FormItem required name="data_cap" label="DataCap" error={errors?.dataCap}>
             <Input {...register('dataCap', validationRules.dataCap())} />
-          </FormItem>
-
-          <FormItem name="github_issue" label="GitHub Issue" error={errors?.githubIssue}>
-            <Input {...register('githubIssue', validationRules.githubIssue())} />
           </FormItem>
         </fieldset>
       </form>

@@ -1,4 +1,4 @@
-import { RefreshAlloactorButton } from './RefreshAlloactorButton';
+import { RefreshAllocatorButton } from './RefreshAllocatorButton';
 import { useState } from 'react';
 import { RefreshAllocatorDialog } from '@/components/refresh/dialogs/RefreshAllocatorDialog';
 
@@ -8,7 +8,7 @@ export function RefreshAllocatorSection() {
   return (
     <>
       <RefreshAllocatorDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
-      <RefreshAlloactorButton onClick={() => setIsDialogOpen(true)} />
+      <RefreshAllocatorButton onClick={() => setIsDialogOpen(true)} />
     </>
   );
 }

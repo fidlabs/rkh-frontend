@@ -17,9 +17,4 @@ export const validationRules = {
     min: { value: 1, message: 'Data Cap must be at least 1' },
     max: { value: Number.MAX_SAFE_INTEGER, message: 'Value is too high' },
   }),
-
-  githubIssue: (): RegisterOptions<FormFields, 'githubIssue'> => ({
-    min: { value: 1, message: 'Github issue number should be at least 1' },
-    max: { value: Number.MAX_SAFE_INTEGER, message: 'Value is too high' },
-  }),
 };
