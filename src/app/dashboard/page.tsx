@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { RefreshAllocatorSection } from '@/components/refresh/RefreshAllocatorSection';
 import { useAccountRole } from '@/hooks/useAccountRole';
+import { AccountRole } from '@/types/account';
 
 const PAGE_SIZE = 10;
 
@@ -54,7 +55,7 @@ export default function DashboardPage() {
 
         <Account />
 
-        <RefreshAllocatorSection />
+        {role === AccountRole.ROOT_KEY_HOLDER ? <RefreshAllocatorSection /> : null}
 
         <Button variant="outline">
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
