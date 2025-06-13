@@ -48,24 +48,17 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
       expect(mockProposeAddVerifier).toHaveBeenCalledWith('f1234567890abcdef', '1000');
 
-      await waitFor(() => {
-        expect(mockToast).toHaveBeenCalledWith({
-          title: 'RKH Transaction Proposed',
-          description: 'Transaction proposed with message id: message-id-123',
-        });
-      });
+      const successHeader = await screen.findByTestId('success-header');
+      expect(successHeader).toHaveTextContent('Success!');
 
-      // Should show success step
-      await waitFor(() => {
-        expect(screen.getByText('Allocator refreshed successfully!')).toBeInTheDocument();
-      });
+      const transactionIdSection = screen.getByTestId('transaction-id-section');
+      expect(transactionIdSection).toHaveTextContent('Transaction ID:message-id-123');
     });
 
     it('should close dialog from success step', async () => {
       const user = userEvent.setup();
       render(<RefreshAllocatorDialog {...mockProps} />);
 
-      // Go through form submission
       await user.type(
         screen.getByRole('textbox', { name: /allocator address/i }),
         'f1234567890abcdef',
@@ -73,9 +66,8 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
       await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
-      await waitFor(() => {
-        expect(screen.getByText('Allocator refreshed successfully!')).toBeInTheDocument();
-      });
+      const successHeader = await screen.findByTestId('success-header');
+      expect(successHeader).toHaveTextContent('Success!');
 
       await user.click(screen.getAllByRole('button', { name: /close/i })[0]);
 
@@ -100,16 +92,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
-        expect(mockToast).toHaveBeenCalledWith({
-          title: 'Error',
-          description: 'Failed to propose verifier',
-          variant: 'destructive',
-        });
-      });
-
-      // Should show error step
-      await waitFor(() => {
-        expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
+        expect(screen.getByTestId('error-message')).toHaveTextContent('Transaction failed');
       });
     });
 
@@ -125,7 +108,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
+        expect(screen.getByTestId('error-message')).toHaveTextContent('Transaction failed');
       });
 
       await user.click(screen.getByRole('button', { name: /go back/i }));

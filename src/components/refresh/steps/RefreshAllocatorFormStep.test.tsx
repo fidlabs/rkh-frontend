@@ -18,7 +18,6 @@ describe('RefreshAllocatorFormStep', () => {
 
     expect(screen.getByRole('textbox', { name: /allocator address/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /github issue/i })).toBeInTheDocument();
   });
 
   it('should render approve and cancel buttons', () => {
@@ -68,7 +67,6 @@ describe('RefreshAllocatorFormStep', () => {
         {
           allocatorAddress: 'f1234567890abcdef',
           dataCap: '1000',
-          githubIssue: '',
         },
         expect.anything(),
       );

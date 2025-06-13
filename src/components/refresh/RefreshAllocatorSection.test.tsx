@@ -22,8 +22,7 @@ describe('RefreshAllocatorSection', () => {
     const button = screen.getByRole('button', { name: /refresh allocator/i });
     await user.click(button);
 
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByText('Refresh Allocator')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: /Refresh Allocator/i })).toBeInTheDocument();
   });
 
   it('should show form fields when dialog is opened', async () => {
@@ -34,7 +33,7 @@ describe('RefreshAllocatorSection', () => {
     await user.click(button);
 
     expect(screen.getByRole('textbox', { name: /Allocator address/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /DataCap/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /DataCap in PiB/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Cancel/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Approve/i })).toBeInTheDocument();
   });

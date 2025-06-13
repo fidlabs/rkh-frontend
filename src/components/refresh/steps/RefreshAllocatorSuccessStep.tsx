@@ -35,24 +35,28 @@ export function RefreshAllocatorSuccessStep({
 
   return (
     <>
-      <div className="flex flex-col items-center pt-4 pb-4 min-w-48 text-xl text-green-600">
+      <div
+        data-testid="success-header"
+        className="flex flex-col items-center pt-4 pb-4 min-w-48 text-xl text-green-600"
+      >
         <CircleCheck size="60px" /> Success!
       </div>
 
       {messageId ? (
-        <div className="flex flex-col gap-2 text-sm w-60">
+        <div data-testid="transaction-id-section" className="flex flex-col gap-2 text-sm w-60">
           <span>Transaction ID:</span>
           <span className="flex items-center gap-2 text-muted-foreground">
-            {messageId} <Copy size="16px" onClick={handleCopyTransactionId} />
+            {messageId}
+            <Copy data-testid="copy-transaction-id" size="16px" onClick={handleCopyTransactionId} />
           </span>
         </div>
       ) : null}
 
       {blockNumber ? (
-        <div className="flex flex-col gap-2 text-sm">
+        <div data-testid="block-number-section" className="flex flex-col gap-2 text-sm">
           <span>Block number:</span>
           <span className="flex items-center gap-2 text-muted-foreground">
-            {blockNumber} <Copy onClick={handleCopyBlockNumber} />
+            {blockNumber} <Copy data-testid="copy-block-number" onClick={handleCopyBlockNumber} />
           </span>
         </div>
       ) : null}

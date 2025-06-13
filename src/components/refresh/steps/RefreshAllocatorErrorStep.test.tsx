@@ -5,6 +5,7 @@ import { RefreshAllocatorErrorStep } from './RefreshAllocatorErrorStep';
 
 describe('RefreshAllocatorErrorStep', () => {
   const mockProps = {
+    errorMessage: 'error message',
     onGoBack: vi.fn(),
     onClose: vi.fn(),
   };
@@ -16,7 +17,8 @@ describe('RefreshAllocatorErrorStep', () => {
   it('should render error message', () => {
     render(<RefreshAllocatorErrorStep {...mockProps} />);
 
-    expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
+    expect(screen.getByTestId('error-header')).toHaveTextContent('Error');
+    expect(screen.getByTestId('error-message')).toHaveTextContent(mockProps.errorMessage);
   });
 
   it('should render both action buttons', () => {

@@ -33,10 +33,10 @@ export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocato
             label="Allocator address"
             error={errors?.allocatorAddress}
           >
-            <Input {...register('allocatorAddress')} />
+            <Input {...register('allocatorAddress', validationRules.allocatorAddress())} />
           </FormItem>
 
-          <FormItem required name="data_cap" label="DataCap" error={errors?.dataCap}>
+          <FormItem required name="data_cap" label="DataCap in PiB" error={errors?.dataCap}>
             <Input {...register('dataCap', validationRules.dataCap())} />
           </FormItem>
         </fieldset>
