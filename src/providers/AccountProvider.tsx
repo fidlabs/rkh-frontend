@@ -1,20 +1,24 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback, useEffect } from "react";
-import { useConnect as useWagmiConnect, useDisconnect as useWagmiDisconnect, useAccount as useWagmiAccount, useSwitchChain } from "wagmi";
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  useAccount as useWagmiAccount,
+  useConnect as useWagmiConnect,
+  useDisconnect as useWagmiDisconnect,
+  useSwitchChain,
+} from 'wagmi';
 
-import { AccountContext } from "@/contexts/AccountContext";
+import { AccountContext } from '@/contexts/AccountContext';
 
-import { Connector } from "@/types/connector";
-import { LedgerConnector } from "@/lib/connectors/ledger-connector";
-import { FilsnapConnector } from "@/lib/connectors/filsnap-connector";
-import { Account, AccountRole } from "@/types/account";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { VerifyAPI } from "filecoin-verifier-tools";
-import { env } from "@/config/environment";
-import { injected } from "wagmi/connectors";
-import { Eip1193Provider } from "@safe-global/protocol-kit";
-import { getSafeKit } from "@/lib/safe";
+import { Connector } from '@/types/connector';
+import { LedgerConnector } from '@/lib/connectors/ledger-connector';
+import { FilsnapConnector } from '@/lib/connectors/filsnap-connector';
+import { Account, AccountRole } from '@/types/account';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { VerifyAPI } from 'filecoin-verifier-tools';
+import { env } from '@/config/environment';
+import { injected } from 'wagmi/connectors';
+import { getSafeKit } from '@/lib/safe';
 
 const queryClient = new QueryClient();
 
@@ -22,22 +26,26 @@ export const AccountProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [account, setAccount] = useState<Account | null>(null);
-  
+
   // RKH connectors
   const [currentConnector, setCurrentConnector] = useState<Connector | null>(null);
 
   // MetaAllocator connectors
-  const { address: wagmiAddress, status: wagmiStatus, connector: wagmiConnector } = useWagmiAccount();
-  const { chains, switchChain: wagmiSwitchChain } = useSwitchChain()
-  const { connect: wagmiConnect } = useWagmiConnect()
-  const { disconnect: wagmiDisconnect } = useWagmiDisconnect()
+  const {
+    address: wagmiAddress,
+    status: wagmiStatus,
+    connector: wagmiConnector,
+  } = useWagmiAccount();
+  const { chains, switchChain: wagmiSwitchChain } = useSwitchChain();
+  const { connect: wagmiConnect } = useWagmiConnect();
+  const { disconnect: wagmiDisconnect } = useWagmiDisconnect();
 
   useEffect(() => {
-    if (wagmiStatus === "connected") {
+    if (wagmiStatus === 'connected') {
       wagmiSwitchChain({
-        chainId: chains[0].id
-      })
-      
+        chainId: chains[0].id,
+      });
+
       const setupSafe = async () => {
         try {
           const provider = await wagmiConnector?.getProvider();
@@ -48,19 +56,25 @@ export const AccountProvider: React.FC<{
             address: wagmiAddress,
             index: 0,
             isConnected: true,
-            role: maOwners.includes(wagmiAddress) ? AccountRole.METADATA_ALLOCATOR : AccountRole.GUEST,
+            role: maOwners.includes(wagmiAddress)
+              ? AccountRole.METADATA_ALLOCATOR
+              : AccountRole.GUEST,
             wallet: {
-              type: "metamask",
-              sign: async (_message: any, _indexAccount: number) => "0x00",
-              signArbitrary: async (message: string, indexAccount: number) => { throw new Error("Not implemented") },
-              getPubKey: () => { throw new Error("Not implemented") },
+              type: 'metamask',
+              sign: async (_message: any, _indexAccount: number) => '0x00',
+              signArbitrary: async (message: string, indexAccount: number) => {
+                throw new Error('Not implemented');
+              },
+              getPubKey: () => {
+                throw new Error('Not implemented');
+              },
               getAccounts: async () => {
                 return [wagmiAddress];
-              }
-            }
+              },
+            },
           });
         } catch (error) {
-          console.error("Error setting up Safe connection:", error);
+          console.error('Error setting up Safe connection:', error);
         }
       };
 
@@ -74,7 +88,7 @@ export const AccountProvider: React.FC<{
     filsnap: new FilsnapConnector(),
   };
 
-  const loadPersistedAccount = useCallback(async () => {}, [])
+  const loadPersistedAccount = useCallback(async () => {}, []);
 
   /**
    * Connects using the specified connector.
@@ -85,18 +99,18 @@ export const AccountProvider: React.FC<{
     async (connectorName: string, accountIndex?: number) => {
       try {
         switch (connectorName) {
-          case "metamask":
+          case 'metamask':
             await wagmiConnect({
-              connector: injected()
+              connector: injected(),
             });
             break;
-          case "ledger":
+          case 'ledger':
             const ledgerConnector = new LedgerConnector(accountIndex);
             const ledgerAccount = await ledgerConnector.connect();
             setAccount(ledgerAccount);
             setCurrentConnector(ledgerConnector);
             break;
-          case "filsnap":
+          case 'filsnap':
             const filsSnapConnector = new FilsnapConnector();
             const filsSnapAccount = await filsSnapConnector.connect();
             setAccount(filsSnapAccount);
@@ -107,7 +121,7 @@ export const AccountProvider: React.FC<{
         throw error;
       }
     },
-    [connectors]
+    [connectors],
   );
 
   /**
@@ -119,7 +133,7 @@ export const AccountProvider: React.FC<{
       await wagmiDisconnect();
       setAccount(null);
     }
-    
+
     // handle RKH disconnect
     else if (currentConnector) {
       await currentConnector.disconnect();
@@ -128,75 +142,88 @@ export const AccountProvider: React.FC<{
     }
   }, [account, currentConnector]);
 
-  const proposeAddVerifier = useCallback(async (verifierAddress: string, datacap: number) => {
-    if (!account?.wallet) {
-      throw new Error("Wallet not connected");
-    }
+  const proposeAddVerifier = useCallback(
+    async (verifierAddress: string, datacap: number) => {
+      if (!account?.wallet) {
+        throw new Error('Wallet not connected');
+      }
 
-    const api = new VerifyAPI(
-      VerifyAPI.browserProvider(env.rpcUrl, {}),
-      account.wallet,
-      env.useTestnet
-    );
+      const api = new VerifyAPI(
+        VerifyAPI.browserProvider(env.rpcUrl, {
+          token: async () => env.rpcToken,
+        }),
+        account.wallet,
+        env.useTestnet,
+      );
 
-    // 1PiB is 2^50
-    const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
-    let verifierAccountId = verifierAddress;
-    if (verifierAccountId.length < 12) {
-      verifierAccountId = await api.actorKey(verifierAccountId)
-    }
-    
-    const messageId = await api.proposeVerifier(
-      verifierAddress,
-      fullDataCap,
-      account.index ?? 0,
-      account.wallet
-    );
-    return messageId;
-  }, [currentConnector]);
+      // 1PiB is 2^50
+      const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
+      let verifierAccountId = verifierAddress;
+      if (verifierAccountId.length < 12) {
+        verifierAccountId = await api.actorKey(verifierAccountId);
+      }
 
-  const acceptVerifierProposal = useCallback(async (verifierAddress: string, datacap: number, fromAccount: string, transactionId: number) => {
-    if (!account?.wallet) {
-      throw new Error("Wallet not connected");
-    }
+      const messageId = await api.proposeVerifier(
+        verifierAddress,
+        fullDataCap,
+        account.index ?? 0,
+        account.wallet,
+      );
+      return messageId;
+    },
+    [currentConnector],
+  );
 
-    const api = new VerifyAPI(
-      VerifyAPI.browserProvider(env.rpcUrl, {}),
-      account.wallet,
-      env.useTestnet 
-    );
+  const acceptVerifierProposal = useCallback(
+    async (
+      verifierAddress: string,
+      datacap: number,
+      fromAccount: string,
+      transactionId: number,
+    ) => {
+      if (!account?.wallet) {
+        throw new Error('Wallet not connected');
+      }
 
-    // 1PiB is 2^50
-    const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
-    let verifierAccountId = verifierAddress;
-    if (verifierAccountId.length < 12) {
-      verifierAccountId = await api.actorKey(verifierAccountId)
-    }
+      const api = new VerifyAPI(
+        VerifyAPI.browserProvider(env.rpcUrl, {}),
+        account.wallet,
+        env.useTestnet,
+      );
 
-    const messageId = await api.approveVerifier(
-      account.address,
-      fullDataCap,
-      fromAccount,
-      transactionId,
-      account.index ?? 0,
-      account.wallet
-    )
+      // 1PiB is 2^50
+      const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
+      let verifierAccountId = verifierAddress;
+      if (verifierAccountId.length < 12) {
+        verifierAccountId = await api.actorKey(verifierAccountId);
+      }
 
-    return messageId;
-  }, [account]);
-  
-  const signStateMessage = useCallback(async (message: string) => {
-    if (!account?.wallet) {
-      throw new Error("Wallet not connected");
-    }
+      const messageId = await api.approveVerifier(
+        account.address,
+        fullDataCap,
+        fromAccount,
+        transactionId,
+        account.index ?? 0,
+        account.wallet,
+      );
 
-    const signature = await account?.wallet.signArbitrary(
-        message,
-        account.index || 0
-    )
+      return messageId;
+    },
+    [account],
+  );
 
-    return signature;
-  }, [account, currentConnector]);
+  const signStateMessage = useCallback(
+    async (message: string) => {
+      if (!account?.wallet) {
+        throw new Error('Wallet not connected');
+      }
+
+      const signature = await account?.wallet.signArbitrary(message, account.index || 0);
+
+      return signature;
+    },
+    [account, currentConnector],
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -215,6 +242,5 @@ export const AccountProvider: React.FC<{
         {children}
       </AccountContext.Provider>
     </QueryClientProvider>
-    
   );
 };
