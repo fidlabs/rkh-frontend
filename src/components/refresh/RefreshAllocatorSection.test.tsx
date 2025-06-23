@@ -4,10 +4,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { RefreshAllocatorSection } from './RefreshAllocatorSection';
 import { createWrapper } from '@/test-utils';
 
+const mocks = vi.hoisted(() => ({
+  mockUseRKHTransaction: vi.fn(),
+}));
+
 vi.mock('@/hooks/useRKHTransaction', () => ({
-  useRKHTransaction: () => ({
-    proposeTransaction: vi.fn(),
-  }),
+  useRKHTransaction: mocks.mockUseRKHTransaction.mockReturnValue({ proposeTransaction: vi.fn() }),
 }));
 
 describe('RefreshAllocatorSection', () => {

@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   mockUseAccountRole: vi.fn(),
   mockUseAccount: vi.fn(),
   mockUseStateWaitMsg: vi.fn(),
-  useRKHTransaction: vi.fn(),
+  mockUseRKHTransaction: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -19,6 +19,7 @@ vi.mock('@/hooks', () => ({
   useGetApplications: mocks.mockUseGetApplications,
   useAccountRole: mocks.mockUseAccountRole,
   useStateWaitMsg: mocks.mockUseStateWaitMsg,
+  useRKHTransaction: mocks.mockUseRKHTransaction,
 }));
 
 vi.mock('@/config/environment', () => ({
@@ -57,7 +58,7 @@ describe('DashboardPage', () => {
       checkTransactionState: vi.fn(),
       stateWaitMsg: 'mockMessage',
     });
-    mocks.useRKHTransaction.mockReturnValue({
+    mocks.mockUseRKHTransaction.mockReturnValue({
       proposeTransaction: vi.fn(),
       messageId: 'mock-messageId',
     });
