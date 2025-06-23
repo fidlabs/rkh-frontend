@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useAccount } from "../../hooks/useAccount";
-import { ConnectWalletDialog } from "./ConnectWalletDialog";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useAccount } from '@/hooks';
+import { ConnectWalletDialog } from './ConnectWalletDialog';
 
 export default function ConnectWalletButton() {
   const { account, disconnect } = useAccount();
@@ -26,11 +26,7 @@ export default function ConnectWalletButton() {
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Connect Wallet</Button>
-      <ConnectWalletDialog
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        handleClose={handleClose}
-      />
+      <ConnectWalletDialog isOpen={isOpen} setIsOpen={setIsOpen} handleClose={handleClose} />
     </>
-  )
+  );
 }

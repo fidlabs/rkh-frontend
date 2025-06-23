@@ -1,26 +1,35 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RefreshAllocatorDialog } from './RefreshAllocatorDialog';
 import { createWrapper } from '@/test-utils';
 import { ApiStateWaitMsgResponse } from '@/types/filecoin-client';
-import { getStateWaitMsg } from '@/lib/glif-api';
 
-const mockProposeAddVerifier = vi.fn();
-const mockGetStateWaitMsg = getStateWaitMsg as Mock;
-const mockToast = vi.fn();
+const mocks = vi.hoisted(() => ({
+  mockProposeAddVerifier: vi.fn(),
+  mockCheckTransactionState: vi.fn(),
+  mockToast: vi.fn(),
+}));
 
 vi.mock('@/lib/glif-api');
 
-vi.mock('@/hooks/useAccount', () => ({
-  useAccount: () => ({
-    proposeAddVerifier: mockProposeAddVerifier,
-  }),
-}));
+vi.mock('@/hooks', async () => {
+  const actual = await vi.importActual('@/hooks');
+
+  return {
+    ...actual,
+    useAccount: () => ({
+      proposeAddVerifier: mocks.mockProposeAddVerifier,
+    }),
+    useStateWaitMsg: () => ({
+      checkTransactionState: mocks.mockCheckTransactionState,
+    }),
+  };
+});
 
 vi.mock('@/components/ui/use-toast', () => ({
   useToast: () => ({
-    toast: mockToast,
+    toast: mocks.mockToast,
   }),
 }));
 
@@ -66,8 +75,8 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
   describe('Success flow', () => {
     beforeEach(() => {
-      mockProposeAddVerifier.mockResolvedValue('message-id-123');
-      mockGetStateWaitMsg.mockResolvedValue(mockStateWaitResponse);
+      mocks.mockProposeAddVerifier.mockResolvedValue('message-id-123');
+      mocks.mockCheckTransactionState.mockResolvedValue(mockStateWaitResponse);
     });
 
     it('should go through complete success flow', async () => {
@@ -83,7 +92,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
       await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
-      expect(mockProposeAddVerifier).toHaveBeenCalledWith('f1234567890abcdef', '1000');
+      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith('f1234567890abcdef', '1000');
 
       const successHeader = await screen.findByTestId('success-header');
       expect(successHeader).toHaveTextContent('Success!');
@@ -117,7 +126,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
   describe('Error flow', () => {
     beforeEach(() => {
-      mockProposeAddVerifier.mockRejectedValue(new Error('Transaction failed'));
+      mocks.mockProposeAddVerifier.mockRejectedValue(new Error('Transaction failed'));
     });
 
     it('should show error step when transaction fails', async () => {
@@ -160,12 +169,12 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
 
   describe('Loading state', () => {
     beforeEach(() => {
-      mockProposeAddVerifier.mockResolvedValue('message-id-123');
-      mockGetStateWaitMsg.mockResolvedValue(mockStateWaitResponse);
+      mocks.mockProposeAddVerifier.mockResolvedValue('message-id-123');
+      mocks.mockCheckTransactionState.mockResolvedValue(mockStateWaitResponse);
     });
 
     it('should show loading step during ledger transaction', async () => {
-      mockProposeAddVerifier.mockImplementation(() => new Promise(() => {}));
+      mocks.mockProposeAddVerifier.mockImplementation(() => new Promise(() => {}));
       const user = userEvent.setup();
 
       render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });
@@ -185,7 +194,7 @@ describe('RefreshAllocatorDialog Integration Tests', () => {
     });
 
     it('should show loading stat during getStateWaitMsg', async () => {
-      mockGetStateWaitMsg.mockImplementation(() => new Promise(() => {}));
+      mocks.mockCheckTransactionState.mockImplementation(() => new Promise(() => {}));
       const user = userEvent.setup();
 
       render(<RefreshAllocatorDialog {...mockProps} />, { wrapper });

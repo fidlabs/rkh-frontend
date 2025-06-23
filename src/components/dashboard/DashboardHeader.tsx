@@ -1,6 +1,6 @@
-import { Search, ListFilter } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { ListFilter, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -8,50 +8,42 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/dropdown-menu';
+import { Option } from '@/components/ui/multiple-selector';
+import { Badge } from '@/components/ui/badge';
 
 const OPTIONS: Option[] = [
-  { label: "SUBMISSION", value: "SUBMISSION" },
-  { label: "KYC", value: "KYC" },
-  { label: "GOVERNANCE_REVIEW", value: "GOVERNANCE_REVIEW" },
-  { label: "RKH_APPROVAL", value: "RKH_APPROVAL" },
+  { label: 'SUBMISSION', value: 'SUBMISSION' },
+  { label: 'KYC', value: 'KYC' },
+  { label: 'GOVERNANCE_REVIEW', value: 'GOVERNANCE_REVIEW' },
+  { label: 'RKH_APPROVAL', value: 'RKH_APPROVAL' },
 ];
 
 const FILTER_LABELS: Record<string, string> = {
-  KYC_PHASE: "KYC",
-  GOVERNANCE_REVIEW_PHASE: "Governance Review",
-  RKH_APPROVAL_PHASE: "RKH Approval",
-  META_APPROVAL_PHASE: "Meta Approval",
-  APPROVED: "Approved",
-  REJECTED: "Rejected",
-  DC_ALLOCATED: "DC Allocated",
+  KYC_PHASE: 'KYC',
+  GOVERNANCE_REVIEW_PHASE: 'Governance Review',
+  RKH_APPROVAL_PHASE: 'RKH Approval',
+  META_APPROVAL_PHASE: 'Meta Approval',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
+  DC_ALLOCATED: 'DC Allocated',
 };
 
 interface DashboardHeaderProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   activeFilters: string[];
-  setActiveFilters: (filters: string[]) => void;
+  availableFilters: string[];
+  onFilterChange: (filter: string, checked: boolean) => void;
 }
 
 export function DashboardHeader({
   searchTerm,
   setSearchTerm,
+  availableFilters,
   activeFilters,
-  setActiveFilters,
+  onFilterChange,
 }: DashboardHeaderProps) {
-  const filters: string[] = [
-    "KYC_PHASE",
-    "GOVERNANCE_REVIEW_PHASE",
-    "RKH_APPROVAL_PHASE",
-    "META_APPROVAL_PHASE",
-    "APPROVED",
-    "DC_ALLOCATED",
-    "REJECTED",
-  ];
-
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <div className="relative flex-1">
@@ -60,8 +52,9 @@ export function DashboardHeader({
           type="search"
           placeholder="Search by name..."
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+          data-testid="search-input"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
       </div>
 
@@ -72,26 +65,24 @@ export function DashboardHeader({
               <ListFilter className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only">Filters</span>
               {activeFilters.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                <Badge
+                  data-testid="count-badge"
+                  variant="secondary"
+                  className="ml-1 h-4 px-1 text-xs"
+                >
                   {activeFilters.length}
                 </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[250px]">
-            <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
+            <DropdownMenuLabel data-testid="dropdown-label">Filter by status</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {filters.map((filter) => (
+            {availableFilters.map(filter => (
               <DropdownMenuCheckboxItem
                 key={filter}
                 checked={activeFilters.includes(filter)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setActiveFilters([...activeFilters, filter]);
-                  } else {
-                    setActiveFilters(activeFilters.filter((f) => f !== filter));
-                  }
-                }}
+                onCheckedChange={checked => onFilterChange(filter, checked)}
               >
                 {FILTER_LABELS[filter]}
               </DropdownMenuCheckboxItem>
