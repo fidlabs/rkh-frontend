@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useAccount } from '@/hooks/useAccount';
+import { useAccount } from '@/hooks';
 import { Application } from '@/types/application';
 
 interface UseRKHTransactionProps {

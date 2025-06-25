@@ -1,29 +1,29 @@
-import { Application } from "@/types/application";
-import { Button } from "../../../ui/button";
-import Link from "next/link";
-import { useAccount } from "@/hooks/useAccount";
-import { AccountRole } from "@/types/account";
-import SignRkhTransactionButton from "@/components/sign/SignRkhTransactionButton";
-import SignMetaAllocatorTransactionButton from "@/components/sign/SignMetaAllocatorTransactionButton";
-import ApproveGovernanceReviewButton from "@/components/sign/ApproveGovernanceReviewButton";
-import { useState } from "react";
-import { ConnectWalletDialog } from "@/components/connect/ConnectWalletDialog";
-import OverrideKYCButton from "@/components/sign/OverrideKYCButton";
+import { Application } from '@/types/application';
+import { Button } from '../../../ui/button';
+import Link from 'next/link';
+import { useAccount } from '@/hooks';
+import { AccountRole } from '@/types/account';
+import SignRkhTransactionButton from '@/components/sign/SignRkhTransactionButton';
+import SignMetaAllocatorTransactionButton from '@/components/sign/SignMetaAllocatorTransactionButton';
+import ApproveGovernanceReviewButton from '@/components/sign/ApproveGovernanceReviewButton';
+import { useState } from 'react';
+import { ConnectWalletDialog } from '@/components/connect/ConnectWalletDialog';
+import OverrideKYCButton from '@/components/sign/OverrideKYCButton';
 
 interface ActionConfig {
   label: string;
   href?: string;
   disabled?: boolean;
   component?: React.ComponentType<any>;
-  connectWallet?: boolean; 
+  connectWallet?: boolean;
 }
 
 function getActionConfig(application: Application, account?: { role: AccountRole }): ActionConfig {
   const { status, id, githubPrNumber } = application;
-  let label = ""
+  let label = '';
 
   switch (status) {
-    case "KYC_PHASE":
+    case 'KYC_PHASE':
       // If gov team is logged in they can override KYC.
       // If not, the viewer can submit KYC
       if (account?.role === AccountRole.GOVERNANCE_TEAM || account?.role === AccountRole.ADMIN) {
@@ -33,12 +33,12 @@ function getActionConfig(application: Application, account?: { role: AccountRole
         };
       } else {
         return {
-          label: "Submit KYC",
+          label: 'Submit KYC',
           href: `https://verify.zyphe.com/flow/fil-kyc/kyc/kyc?applicationId=${application.id}`,
         };
       }
 
-    case "GOVERNANCE_REVIEW_PHASE":
+    case 'GOVERNANCE_REVIEW_PHASE':
       if (account?.role === AccountRole.GOVERNANCE_TEAM || account?.role === AccountRole.ADMIN) {
         return {
           label,
@@ -46,12 +46,12 @@ function getActionConfig(application: Application, account?: { role: AccountRole
         };
       } else {
         return {
-          label: "Connect Wallet",
+          label: 'Connect Wallet',
           connectWallet: true,
         } as ActionConfig & { connectWallet: true };
       }
 
-    case "RKH_APPROVAL_PHASE":
+    case 'RKH_APPROVAL_PHASE':
       label = `(${application.rkhApprovals?.length ?? 0}/${application.rkhApprovalsThreshold ?? 2}) Approve`;
       if (account?.role === AccountRole.ROOT_KEY_HOLDER || account?.role === AccountRole.ADMIN) {
         return {
@@ -60,38 +60,43 @@ function getActionConfig(application: Application, account?: { role: AccountRole
         };
       } else {
         return {
-          label: "Connect Wallet",
+          label: 'Connect Wallet',
           connectWallet: true,
         } as ActionConfig & { connectWallet: true };
       }
 
-    case "META_APPROVAL_PHASE":
-        if (account?.role === AccountRole.METADATA_ALLOCATOR || account?.role === AccountRole.ADMIN) {
-          return {
-            label: "Approve",
-            component: SignMetaAllocatorTransactionButton,
-          };
-        } else {
-          return {
-            label: "Connect Wallet",
-            connectWallet: true,
-          } as ActionConfig & { connectWallet: true };
-        }
-       
+    case 'META_APPROVAL_PHASE':
+      if (account?.role === AccountRole.METADATA_ALLOCATOR || account?.role === AccountRole.ADMIN) {
+        return {
+          label: 'Approve',
+          component: SignMetaAllocatorTransactionButton,
+        };
+      } else {
+        return {
+          label: 'Connect Wallet',
+          connectWallet: true,
+        } as ActionConfig & { connectWallet: true };
+      }
+
     default:
       return {
-        label: "Connect Wallet",
+        label: 'Connect Wallet',
         connectWallet: true,
       } as ActionConfig & { connectWallet: true };
   }
 }
 
-export function ApplicationActionButton({ application }: { application: Application }) {  
+export function ApplicationActionButton({ application }: { application: Application }) {
   const { account } = useAccount();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const handleClose = () => setDialogOpen(false);
-  const { label, href, disabled, component: Component, connectWallet } = getActionConfig(application, { role: account?.role ?? AccountRole.GUEST });
-
+  const {
+    label,
+    href,
+    disabled,
+    component: Component,
+    connectWallet,
+  } = getActionConfig(application, { role: account?.role ?? AccountRole.GUEST });
 
   return (
     <>

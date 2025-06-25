@@ -1,27 +1,22 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Application, ApplicationStatus } from '@/types/application';
-import { CheckCircle2, AlertCircle, Clock, XCircle, HelpCircle } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+import { AlertCircle, HelpCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
 
 interface ApplicationStatusBarProps {
   application: Application;
 }
 
 const phases: ApplicationStatus[] = [
-  "KYC_PHASE",
-  "GOVERNANCE_REVIEW_PHASE",
-  "RKH_APPROVAL_PHASE",
-  "META_APPROVAL_PHASE",
-  "APPROVED",
-  "DC_ALLOCATED",
-  "REJECTED",
+  'KYC_PHASE',
+  'GOVERNANCE_REVIEW_PHASE',
+  'RKH_APPROVAL_PHASE',
+  'META_APPROVAL_PHASE',
+  'APPROVED',
+  'DC_ALLOCATED',
+  'REJECTED',
 ];
 
 const phaseColors: Record<ApplicationStatus, string> = {
@@ -32,6 +27,7 @@ const phaseColors: Record<ApplicationStatus, string> = {
   DC_ALLOCATED: 'bg-green-600',
   APPROVED: 'bg-green-600',
   REJECTED: 'bg-red-600',
+  IN_REFRESSH: 'bg-gray-600',
 };
 
 const phaseDescriptions: Record<ApplicationStatus, string> = {
@@ -42,6 +38,7 @@ const phaseDescriptions: Record<ApplicationStatus, string> = {
   DC_ALLOCATED: 'Received DC',
   APPROVED: 'Application approved',
   REJECTED: 'Application rejected',
+  IN_REFRESSH: 'In refresh',
 };
 
 const phaseNames: Record<ApplicationStatus, string> = {
@@ -51,6 +48,7 @@ const phaseNames: Record<ApplicationStatus, string> = {
   META_APPROVAL_PHASE: 'Meta approval',
   DC_ALLOCATED: 'DC Allocated',
   APPROVED: 'Approved',
+  IN_REFRESSH: 'In Refresh',
   REJECTED: 'Rejected',
 };
 
@@ -70,15 +68,15 @@ export function ApplicationStatusBar({ application }: ApplicationStatusBarProps)
           <React.Fragment key={p}>
             <div
               className={cn(
-                "absolute h-2 rounded-full",
-                index <= currentPhaseIndex ? phaseColors[p] : 'bg-gray-300'
+                'absolute h-2 rounded-full',
+                index <= currentPhaseIndex ? phaseColors[p] : 'bg-gray-300',
               )}
               style={{
                 left: `${(index / (phases.length - 1)) * 100}%`,
                 width: `${100 / (phases.length - 1)}%`,
                 transform: `scaleX(${getPhaseProgress(index)})`,
                 transformOrigin: 'left',
-                transition: 'transform 0.3s ease-in-out'
+                transition: 'transform 0.3s ease-in-out',
               }}
             ></div>
             {index === currentPhaseIndex && (
@@ -86,12 +84,7 @@ export function ApplicationStatusBar({ application }: ApplicationStatusBarProps)
                 className="absolute -top-7 -translate-x-1/2"
                 style={{ left: `${(index / (phases.length - 1)) * 100}%` }}
               >
-                <Badge 
-                  className={cn(
-                    "text-xs font-semibold",
-                    phaseColors[p],
-                  )}
-                >
+                <Badge className={cn('text-xs font-semibold', phaseColors[p])}>
                   {phaseNames[p]}
                   <TooltipProvider>
                     <Tooltip>
@@ -108,8 +101,8 @@ export function ApplicationStatusBar({ application }: ApplicationStatusBarProps)
             )}
             <div
               className={cn(
-                "absolute top-1/2 w-3 h-3 rounded-full -translate-y-1/2 border-2 border-white",
-                index <= currentPhaseIndex ? phaseColors[p] : 'bg-gray-300'
+                'absolute top-1/2 w-3 h-3 rounded-full -translate-y-1/2 border-2 border-white',
+                index <= currentPhaseIndex ? phaseColors[p] : 'bg-gray-300',
               )}
               style={{ left: `calc(${(index / (phases.length - 1)) * 100}% - 6px)` }}
             ></div>
@@ -117,24 +110,24 @@ export function ApplicationStatusBar({ application }: ApplicationStatusBarProps)
         ))}
       </div>
       <div className="sm:hidden flex justify-center">
-        <Badge 
+        <Badge
           className={cn(
-            "text-xs font-semibold",
+            'text-xs font-semibold',
             phaseColors[application.status],
-            'ring-2 ring-offset-2 ring-offset-white ring-gray-300'
+            'ring-2 ring-offset-2 ring-offset-white ring-gray-300',
           )}
         >
           {phaseNames[application.status]}
           <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild className="ml-2">
-                        <HelpCircle className="w-4 h-4 text-white" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{phaseDescriptions[application.status]}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild className="ml-2">
+                <HelpCircle className="w-4 h-4 text-white" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{phaseDescriptions[application.status]}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </Badge>
       </div>
     </div>

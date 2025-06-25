@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import ScaleLoader from "react-spinners/ScaleLoader";
-import { ExternalLink } from "lucide-react";
+import React, { useState } from 'react';
+import ScaleLoader from 'react-spinners/ScaleLoader';
+import { ExternalLink } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
+} from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
 import {
   Table,
   TableBody,
@@ -20,9 +20,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { useAccount } from "@/hooks/useAccount";
-import { Application } from "@/types/application";
+} from '@/components/ui/table';
+import { useAccount } from '@/hooks';
+import { Application } from '@/types/application';
 
 interface SignRkhTransactionButtonProps {
   application: Application;
@@ -43,15 +43,15 @@ export default function SignRkhTransactionButton({
     try {
       const messageId = await proposeAddVerifier(application.address, application.datacap);
       toast({
-        title: "RKH Transaction Proposed",
+        title: 'RKH Transaction Proposed',
         description: `Transaction proposed with message id: ${messageId}`,
       });
     } catch (error) {
       console.error('Error proposing verifier:', error);
       toast({
-        title: "Error",
-        description: "Failed to propose verifier",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to propose verifier',
+        variant: 'destructive',
       });
     }
     setIsPending(false);
@@ -64,19 +64,19 @@ export default function SignRkhTransactionButton({
       const messageId = await acceptVerifierProposal(
         application.address,
         application.datacap,
-        application.rkhApprovals ? application.rkhApprovals[0] : "",
-        application.rkhMessageId ?? 0
+        application.rkhApprovals ? application.rkhApprovals[0] : '',
+        application.rkhMessageId ?? 0,
       );
       toast({
-        title: "RKH Transaction Approved",
+        title: 'RKH Transaction Approved',
         description: `Transaction approved with message id: ${messageId}`,
       });
     } catch (error) {
       console.error('Error accepting verifier proposal:', error);
       toast({
-        title: "Error",
-        description: "Failed to accept verifier proposal",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to accept verifier proposal',
+        variant: 'destructive',
       });
     }
     setIsPending(false);
@@ -111,7 +111,7 @@ export default function SignRkhTransactionButton({
               </TableHeader>
               <TableBody>
                 <TableRow key="verifier">
-                  <TableCell>{"Verifier"}</TableCell>
+                  <TableCell>{'Verifier'}</TableCell>
                   <TableCell>
                     {application.actorId}
                     <a
@@ -125,7 +125,7 @@ export default function SignRkhTransactionButton({
                   </TableCell>
                 </TableRow>
                 <TableRow key="datacap">
-                  <TableCell>{"DataCap"}</TableCell>
+                  <TableCell>{'DataCap'}</TableCell>
                   <TableCell>{application.datacap} PiB</TableCell>
                 </TableRow>
               </TableBody>
@@ -133,15 +133,19 @@ export default function SignRkhTransactionButton({
           )}
         </div>
         <div className="flex justify-center">
-        <Button className="w-[150px]" disabled={isPending} onClick={() => {
-          if (application.rkhApprovals && application.rkhApprovals.length > 0) {
-            approveTransaction();
-          } else {
-            proposeTransaction();
-          }
-        }}>
-          {isPending ? "Submitting..." : "Submit"}
-        </Button>
+          <Button
+            className="w-[150px]"
+            disabled={isPending}
+            onClick={() => {
+              if (application.rkhApprovals && application.rkhApprovals.length > 0) {
+                approveTransaction();
+              } else {
+                proposeTransaction();
+              }
+            }}
+          >
+            {isPending ? 'Submitting...' : 'Submit'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

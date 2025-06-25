@@ -1,10 +1,10 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { useRKHTransaction } from '@/hooks/useRKHTransaction';
-import { useAccount } from '@/hooks/useAccount';
+import { useRKHTransaction } from './useRKHTransaction';
+import { useAccount } from '@/hooks';
 import { createWrapper } from '@/test-utils';
 
-vi.mock('@/hooks/useAccount');
+vi.mock('@/hooks');
 
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 const mockUseAccount = useAccount as Mock;

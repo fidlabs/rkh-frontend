@@ -1,4 +1,13 @@
-export type ApplicationStatus = "KYC_PHASE" | "GOVERNANCE_REVIEW_PHASE" | "RKH_APPROVAL_PHASE" | "APPROVED" | "META_APPROVAL_PHASE" | "DC_ALLOCATED" | "REJECTED";
+//FIXME there is a backend typo associated with IN_REFRESH status, it should be investigated before changing (database model and migrations)
+export type ApplicationStatus =
+  | 'KYC_PHASE'
+  | 'GOVERNANCE_REVIEW_PHASE'
+  | 'RKH_APPROVAL_PHASE'
+  | 'APPROVED'
+  | 'META_APPROVAL_PHASE'
+  | 'DC_ALLOCATED'
+  | 'REJECTED'
+  | 'IN_REFRESSH'; // backend typo
 
 export interface Application {
   id: string;
@@ -26,15 +35,15 @@ export interface Application {
 
   // GOVERNANCE REVIEW PHASE
   applicationInstructions?: {
-    method: string[],
-    timestamp: number,
-    datacap_amount: number,
-  }
+    method: string[];
+    timestamp: number;
+    datacap_amount: number;
+  };
 
   // KHK APPROVAL PHASE
   rkhApprovals?: string[];
   rkhApprovalsThreshold?: number;
-  rkhMessageId?: number
+  rkhMessageId?: number;
 }
 
 export interface ApplicationsResponse {

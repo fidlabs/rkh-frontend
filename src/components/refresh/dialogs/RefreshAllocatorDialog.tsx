@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
-import { useRKHTransaction } from '@/hooks/useRKHTransaction';
 import {
   RefreshAllocatorErrorStep,
   RefreshAllocatorFormStep,
@@ -17,7 +16,7 @@ import {
   RefreshAllocatorSuccessStep,
 } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
-import { useStateWaitMsg } from '@/hooks';
+import { useRKHTransaction, useStateWaitMsg } from '@/hooks';
 
 interface RefreshAllocatorButtonProps {
   open: boolean;
