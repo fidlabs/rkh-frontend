@@ -1,6 +1,6 @@
-import { env, testApplications } from "@/config/environment";
-import { AccountRole } from "@/types/account";
-import { ApplicationsResponse } from "@/types/application";
+import { env, testApplications } from '@/config/environment';
+import { AccountRole } from '@/types/account';
+import { ApplicationsResponse } from '@/types/application';
 
 /**
  * API base URL for fetching applications.
@@ -21,7 +21,7 @@ export async function fetchApplications(
   searchTerm: string,
   filters: string[],
   page: number,
-  pageLimit: number
+  pageLimit: number,
 ): Promise<ApplicationsResponse> {
   if (env.useTestData) {
     return {
@@ -35,10 +35,10 @@ export async function fetchApplications(
     limit: pageLimit.toString(),
   });
 
-  filters.forEach((filter) => params.append("status[]", filter));
+  filters.forEach(filter => params.append('status[]', filter));
 
   if (searchTerm) {
-    params.append("search", searchTerm);
+    params.append('search', searchTerm);
   }
 
   const url = `${API_BASE_URL}/applications?${params.toString()}`;
@@ -55,11 +55,15 @@ export async function fetchApplications(
       applications: result.data.results
         .map((allocator: any) => {
           try {
-            const datacap = allocator?.applicationInstructions?.amount ? allocator?.applicationInstructions?.amount : allocator?.datacap;
-            const githubWebLink = allocator.applicationDetails?.pullRequestUrl ? 
-              allocator.applicationDetails?.pullRequestUrl.replace('api.github.com/repos', 'github.com').replace('/pulls/', '/pull/') :
-              '#'
-              
+            const datacap = allocator?.applicationInstructions?.amount
+              ? allocator?.applicationInstructions?.amount
+              : allocator?.datacap;
+            const githubWebLink = allocator.applicationDetails?.pullRequestUrl
+              ? allocator.applicationDetails?.pullRequestUrl
+                  .replace('api.github.com/repos', 'github.com')
+                  .replace('/pulls/', '/pull/')
+              : '#';
+
             return {
               id: allocator.id,
               number: allocator.number,
@@ -67,11 +71,11 @@ export async function fetchApplications(
               organization: allocator.organization,
               address: allocator.address,
               github: allocator.github,
-              country: allocator.location?.[0] || "Unknown",
-              region: allocator.location?.[1] || "Unknown",
+              country: allocator.location?.[0] || 'Unknown',
+              region: allocator.location?.[1] || 'Unknown',
               type: allocator.type,
               datacap: datacap,
-              createdAt: allocator.createdAt || "2021-09-01T00:00:00.000Z",
+              createdAt: allocator.createdAt || '2021-09-01T00:00:00.000Z',
               status: allocator.status,
               actorId: allocator.actorId,
               githubPrLink: githubWebLink,
@@ -82,16 +86,19 @@ export async function fetchApplications(
               applicationInstructions: allocator.applicationInstructions,
             };
           } catch (error) {
-            console.error("Error processing application:", error);
+            console.error('Error processing application:', error);
             return null;
           }
         })
-        .filter((application: any): application is NonNullable<typeof application> => application !== null),
+        .filter(
+          (application: any): application is NonNullable<typeof application> =>
+            application !== null,
+        ),
       totalCount: result.data.pagination.totalItems,
     };
   } catch (error) {
-    console.error("Failed to fetch applications:", error);
-    throw new Error("Failed to fetch applications");
+    console.error('Failed to fetch applications:', error);
+    throw new Error('Failed to fetch applications');
   }
 }
 
@@ -112,8 +119,8 @@ export async function fetchRole(address: string): Promise<AccountRole> {
 
     return result.data.role;
   } catch (error) {
-    console.error("Failed to fetch role:", error);
-    throw new Error("Failed to fetch role");
+    console.error('Failed to fetch role:', error);
+    throw new Error('Failed to fetch role');
   }
 }
 
@@ -128,35 +135,57 @@ export async function overrideKYC(id: string, payload: any) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
   } catch (error) {
-    console.error("Failed to approve KYC:", error);
-    throw new Error("Failed to approve KYC");
+    console.error('Failed to approve KYC:', error);
+    throw new Error('Failed to approve KYC');
   }
 }
 
 export async function governanceReview(id: string, payload: any) {
   const url = `${API_BASE_URL}/applications/${id}/approveGovernanceReview`;
-  console.log(payload)
+  console.log(payload);
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
   } catch (error) {
-    console.error("Failed to submit Governance Review:", error);
-    throw new Error("Failed to submit Governance Review");
+    console.error('Failed to submit Governance Review:', error);
+    throw new Error('Failed to submit Governance Review');
+  }
+}
+
+export async function getRefreshes(searchTerm: string, page: number, pageLimit: number) {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: pageLimit.toString(),
+  });
+
+  if (searchTerm) {
+    params.append('search', searchTerm);
+  }
+
+  const url = `${API_BASE_URL}/refreshes?${params.toString()}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Failed to fetch applications:', error);
+    throw new Error('Failed to fetch applications');
   }
 }

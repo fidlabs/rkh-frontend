@@ -14,6 +14,8 @@ import { AccountRole } from '@/types/account';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { availableFilters, DashboardTabs } from '@/components/dashboard/constants';
 import { useAccountRole, useGetApplications } from '@/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import { RefreshesPanel } from '@/components/dashboard/panels/refreshes/RefreshesPanel';
 
 /**
  * DashboardPage component
@@ -25,6 +27,7 @@ export function DashboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [tab, setTab] = useState<DashboardTabs>(DashboardTabs.NEW_APPLICATIONS);
   const role = useAccountRole();
+  const queryClient = useQueryClient();
 
   const { data, error } = useGetApplications({
     searchTerm,
@@ -52,6 +55,15 @@ export function DashboardPage() {
   useEffect(() => {
     setActiveFilters([]);
     setCurrentPage(1);
+    if ([DashboardTabs.COMPLETED_APPLICATIONS, DashboardTabs.NEW_APPLICATIONS].includes(tab)) {
+      queryClient.invalidateQueries({
+        queryKey: ['applications'],
+      });
+    }
+
+    return () => {
+      queryClient.cancelQueries();
+    };
   }, [tab]);
 
   return (
@@ -130,6 +142,16 @@ export function DashboardPage() {
               <ApplicationsPanel
                 title="Completed Applications"
                 description="Consult and manage Fil+ program applications."
+                applications={applications}
+                totalCount={totalCount}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+              />
+            </TabsContent>
+            <TabsContent value={DashboardTabs.REFRESHES}>
+              <RefreshesPanel
+                title="Refreshes"
+                description="Consult and manage Fil+ datacap Refreshes."
                 applications={applications}
                 totalCount={totalCount}
                 currentPage={currentPage}

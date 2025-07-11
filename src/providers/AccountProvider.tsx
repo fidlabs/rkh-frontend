@@ -51,7 +51,7 @@ export const AccountProvider: React.FC<{
           const provider = await wagmiConnector?.getProvider();
           const safeKit = await getSafeKit(provider);
           const maOwners = await safeKit.getOwners();
-
+          
           setAccount({
             address: wagmiAddress,
             index: 0,

@@ -12,11 +12,18 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 interface RefreshAllocatorFormStepProps {
+  toAddress?: string;
+  fromAddress?: string;
   onSubmit: (props: FormFields) => void;
   onCancel: () => void;
 }
 
-export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocatorFormStepProps) {
+export function SignTransactionFormStep({
+  toAddress,
+  fromAddress,
+  onSubmit,
+  onCancel,
+}: RefreshAllocatorFormStepProps) {
   const {
     register,
     handleSubmit,
@@ -26,16 +33,21 @@ export function RefreshAllocatorFormStep({ onSubmit, onCancel }: RefreshAllocato
   return (
     <>
       <form className="pt-4 pb-6">
-        <fieldset className="pb-">
-          <FormItem
-            required
-            name="allocator_address"
-            label="Allocator address"
-            error={errors?.allocatorAddress}
-          >
-            <Input {...register('allocatorAddress')} />
-          </FormItem>
+        {fromAddress ? (
+          <div className="flex flex-col gap-2 pb-6" data-testid="from-address">
+            <span>From:</span>
+            <span className="text-muted-foreground break-all">{fromAddress}</span>
+          </div>
+        ) : null}
 
+        {toAddress ? (
+          <div className="flex flex-col gap-2 pb-6" data-testid="to-address">
+            <span>To:</span>
+            <span className="text-muted-foreground break-all">{toAddress}</span>
+          </div>
+        ) : null}
+
+        <fieldset className="pb-2">
           <FormItem required name="data_cap" label="DataCap in PiB" error={errors?.dataCap}>
             <Input {...register('dataCap', validationRules.dataCap())} />
           </FormItem>

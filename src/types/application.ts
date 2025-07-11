@@ -9,6 +9,8 @@ export type ApplicationStatus =
   | 'REJECTED'
   | 'IN_REFRESSH'; // backend typo
 
+export type RefreshStatus = 'PENDING' | 'DC_ALLOCATED';
+
 export interface Application {
   id: string;
   number: number;
@@ -44,6 +46,36 @@ export interface Application {
   rkhApprovals?: string[];
   rkhApprovalsThreshold?: number;
   rkhMessageId?: number;
+}
+
+export interface Refresh {
+  githubIssueId: number;
+  title: string;
+  creator: {
+    userId: number;
+    name: string;
+  };
+  assignees:
+    | {
+        userId: number;
+        name: string;
+      }[]
+    | null;
+  labels: string[] | null;
+  state: string;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  closedAt: Date | null;
+  jsonNumber: string;
+  allocatorDetails?: Application;
+  metapathwayType?: 'MDMA' | 'RKH';
+  dataCap: number;
+  msigAddress: string;
+  maAddress: `0x${string}`;
+  rkhPhase: {
+    approvals: string[];
+    messageId: number;
+  };
 }
 
 export interface ApplicationsResponse {

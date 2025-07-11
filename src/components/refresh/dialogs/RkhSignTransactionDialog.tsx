@@ -11,19 +11,24 @@ import { useEffect, useState } from 'react';
 import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
 import {
   RefreshAllocatorErrorStep,
-  RefreshAllocatorFormStep,
   RefreshAllocatorLoadingStep,
   RefreshAllocatorSuccessStep,
+  SignTransactionFormStep,
 } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useProposeRKHTransaction, useStateWaitMsg } from '@/hooks';
 
-interface RefreshAllocatorButtonProps {
+interface RkhSignTransactionDialogProps {
   open: boolean;
+  address: string;
   onOpenChange: (open: boolean) => void;
 }
 
-export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorButtonProps) {
+export function RkhSignTransactionDialog({
+  onOpenChange,
+  open,
+  address,
+}: RkhSignTransactionDialogProps) {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -62,7 +67,11 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
-      <RefreshAllocatorFormStep onSubmit={onSubmit} onCancel={() => onOpenChange(false)} />
+      <SignTransactionFormStep
+        fromAddress={address}
+        onSubmit={onSubmit}
+        onCancel={() => onOpenChange(false)}
+      />
     ),
     [RefreshAllocatorSteps.LOADING]: (
       <RefreshAllocatorLoadingStep loadingMessage={loadingMessage} />
@@ -95,10 +104,9 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
     <Dialog data-testid="refresh-allocator-dialog" open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-fit">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">Refresh Allocator</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">Sign as RKH</DialogTitle>
           <DialogDescription className="max-w-[500px]">
-            Signing a RKH transaction to assign DataCap to an allocator without the full application
-            process. This will not update the Allocator JSON automatically!
+            Signing a RKH transaction to assign DataCap to an refresh application
           </DialogDescription>
         </DialogHeader>
         {stepsConfig[step]}

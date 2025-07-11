@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useAccount } from '@/hooks';
 import { Application } from '@/types/application';
 
-interface UseRKHTransactionProps {
+interface UseProposeRKHTransactionProps {
   onProposeTransaction?: () => void;
   onProposeTransactionFailed?: (error: unknown) => void;
   onProposeTransactionSuccess?: (messageId: string) => void;
@@ -13,11 +13,11 @@ interface ProposeTransactionParams {
   datacap: number;
 }
 
-export function useRKHTransaction({
+export function useProposeRKHTransaction({
   onProposeTransaction,
   onProposeTransactionFailed,
   onProposeTransactionSuccess,
-}: UseRKHTransactionProps = {}) {
+}: UseProposeRKHTransactionProps = {}) {
   const { proposeAddVerifier } = useAccount();
 
   const mutation = useMutation({
