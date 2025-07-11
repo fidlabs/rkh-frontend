@@ -1,15 +1,15 @@
 import Safe, { Eip1193Provider } from '@safe-global/protocol-kit';
 
-export const safeAddress = '0xa21b82aad96e4e3b491ffd61aeaac6ababaf23e8';
+export const safeAddress = '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e';
 
 export const getSafeKit = async (provider: any): Promise<Safe> => {
   const safeKit = await Safe.init({
     provider: provider as Eip1193Provider,
-    safeAddress: safeAddress
-  })
+    safeAddress: safeAddress,
+  });
 
-  return safeKit
-}
+  return safeKit;
+};
 /* configuration for test net
 export const getSafeKit = async (provider: any): Promise<Safe> => {
   const safeKit = await Safe.init({

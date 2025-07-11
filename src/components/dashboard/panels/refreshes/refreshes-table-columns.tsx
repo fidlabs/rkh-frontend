@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Refresh, RefreshStatus } from '@/types/application';
+import { Refresh, RefreshStatus } from '@/types/refresh';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 import Link from 'next/link';
@@ -9,11 +9,11 @@ import { MetaAllocatorSignTransactionButton } from '@/components/refresh/MetaAll
 import { RkhApproveTransactionButton } from '@/components/refresh/RkhApproveTransactionButton';
 import { RefreshStatusBadge } from '@/components/dashboard/panels/refreshes/components/RefreshStatusBadge';
 
+type GetRefreshColumn = (props: RefreshesTableColumnsProps) => ColumnDef<Refresh>[];
+
 interface RefreshesTableColumnsProps {
   role?: AccountRole;
 }
-
-type GetRefreshColumn = (props: RefreshesTableColumnsProps) => ColumnDef<Refresh>[];
 
 const renderOptionally = <T,>(condition: boolean, children: ColumnDef<T>) =>
   condition ? [children] : [];
@@ -102,7 +102,7 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
     cell: ({ row }) => {
       const refreshStatus = row.getValue('refreshStatus') as RefreshStatus;
 
-      return <RefreshStatusBadge refreshStatus={refreshStatus} />;
+      return refreshStatus ? <RefreshStatusBadge refreshStatus={refreshStatus} /> : null;
     },
   },
   {
@@ -119,20 +119,19 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
     header: ' ',
     accessorKey: 'msigAddress',
     cell: ({ row }) => {
-      const refresh = row.original;
-      const hasSigners = !!refresh?.rkhPhase?.approvals?.length;
-      const address = row.getValue('msigAddress') as string;
+      const { dataCap, refreshStatus, rkhPhase, msigAddress, metapathwayType } = row.original;
+      const hasSigners = !!rkhPhase?.approvals?.length;
+      const signer = rkhPhase.approvals.at(0) as string;
+      const transactionId = rkhPhase.messageId;
 
-      if (refresh.metapathwayType !== 'RKH') return null;
-      if (!hasSigners) return <RkhSignTransactionButton address={address} />;
+      if (metapathwayType !== 'RKH') return null;
+      if (['DC_ALLOCATED', 'REJECTED'].includes(refreshStatus)) return null;
 
-      const signer = refresh.rkhPhase.approvals.at(0) as string;
-      const transactionId = refresh.rkhPhase.messageId;
-      const dataCap = refresh.dataCap;
+      if (!hasSigners) return <RkhSignTransactionButton address={msigAddress} />;
 
       return (
         <RkhApproveTransactionButton
-          address={address}
+          address={msigAddress}
           fromAccount={signer}
           transactionId={transactionId}
           datacap={dataCap}
@@ -145,11 +144,10 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
     header: ' ',
     accessorKey: 'maAddress',
     cell: ({ row }) => {
-      const refresh = row.original;
-      const msigAddress = refresh.msigAddress;
-      const maAddress = row.getValue('maAddress') as `0x${string}`;
+      const { msigAddress, maAddress, metapathwayType, refreshStatus } = row.original;
 
-      if (refresh.metapathwayType !== 'MDMA' || !maAddress) return null;
+      if (metapathwayType !== 'MDMA' || !maAddress) return null;
+      if (['DC_ALLOCATED', 'REJECTED'].includes(refreshStatus)) return null;
 
       return <MetaAllocatorSignTransactionButton address={msigAddress} maAddress={maAddress} />;
     },

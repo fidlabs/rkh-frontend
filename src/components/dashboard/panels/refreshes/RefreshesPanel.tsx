@@ -13,7 +13,7 @@ import { useGetRefreshes } from '@/hooks/useGetRefreshes';
 import { refreshesTableColumns } from '@/components/dashboard/panels/refreshes/refreshes-table-columns';
 import { useAccountRole } from '@/hooks';
 
-interface ApplicationsPanelProps {
+interface RefreshPanelProps {
   title: string;
   description: string;
   applications: Application[];
@@ -28,7 +28,7 @@ export function RefreshesPanel({
   onPageChange,
   title,
   description,
-}: ApplicationsPanelProps) {
+}: RefreshPanelProps) {
   const { data, isLoading } = useGetRefreshes({
     searchTerm: '',
     currentPage,

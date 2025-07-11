@@ -13,10 +13,9 @@ const environments: { [key: string]: Environment } = {
   development: {
     apiBaseUrl: 'http://localhost:3001/api/v1',
     useTestData: false,
-    useTestnet: true,
-    rpcUrl: 'http://localhost:1234/rpc/v1',
-    rpcToken:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.N5sTkBLkh10nFYT3gGzG4FyY94HPf89G8AwgtL5p25w',
+    useTestnet: false,
+    rpcUrl: 'https://api.node.glif.io/rpc/v1',
+    rpcToken: process.env.RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
   },
   staging: {
