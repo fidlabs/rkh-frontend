@@ -25,9 +25,7 @@ const filecoinLocalTestnet = defineChain({
       address: process.env.NEXT_PUBLIC_SAFE_PROXY_FACTORY_ADDRESS as `0x${string}`,
     },
     multiSend: {
-      address:
-        (process.env.NEXT_PUBLIC_SAFE_MULTISEND_ADDRESS as `0x${string}`) ||
-        '0x8c240982AF0dcE4F0faC5BB4a2d1f032e00005bD',
+      address: process.env.NEXT_PUBLIC_SAFE_MULTISEND_ADDRESS as `0x${string}`,
     },
     multiSendCallOnly: {
       address: process.env.NEXT_PUBLIC_SAFE_MULTISEND_CALL_ONLY_ADDRESS as `0x${string}`,
