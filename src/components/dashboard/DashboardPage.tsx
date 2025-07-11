@@ -60,11 +60,16 @@ export function DashboardPage() {
         queryKey: ['applications'],
       });
     }
+  }, [queryClient, tab]);
 
-    return () => {
-      queryClient.cancelQueries();
-    };
-  }, [tab]);
+  useEffect(
+    () => () => {
+      queryClient.cancelQueries({
+        queryKey: ['applications'],
+      });
+    },
+    [queryClient],
+  );
 
   return (
     <>

@@ -9,9 +9,8 @@ import {
 } from '@/components/ui/card';
 import { PAGE_SIZE } from '@/components/dashboard/constants';
 import { TableGenerator } from '@/components/ui/table-generator';
-import { useGetRefreshes } from '@/hooks/useGetRefreshes';
 import { refreshesTableColumns } from '@/components/dashboard/panels/refreshes/refreshes-table-columns';
-import { useAccountRole } from '@/hooks';
+import { useAccountRole, useGetRefreshes } from '@/hooks';
 
 interface RefreshPanelProps {
   title: string;

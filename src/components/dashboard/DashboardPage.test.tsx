@@ -12,14 +12,23 @@ const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
   mockUseStateWaitMsg: vi.fn(),
   mockUseProposeRKHTransaction: vi.fn(),
+  mockUseQueryClient: vi.fn(),
+  mockCancelQueries: vi.fn(),
+  mockInvalidateQueries: vi.fn(),
+  mockUseGetRefreshes: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({
   useAccount: mocks.mockUseAccount,
   useGetApplications: mocks.mockUseGetApplications,
+  useGetRefreshes: mocks.mockUseGetRefreshes,
   useAccountRole: mocks.mockUseAccountRole,
   useStateWaitMsg: mocks.mockUseStateWaitMsg,
   useProposeRKHTransaction: mocks.mockUseProposeRKHTransaction,
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: mocks.mockUseQueryClient,
 }));
 
 vi.mock('@/config/environment', () => ({
@@ -37,6 +46,13 @@ const mockApplicationsData = {
   totalCount: 2,
 };
 
+const mockRefreshesData = {
+  refreshes: [
+    { id: '1', name: 'Test Refresh 1', status: 'NEW' },
+    { id: '2', name: 'Test Refresh 2', status: 'KYC_PHASE' },
+  ],
+};
+
 const mockAccount = {
   address: '0x123...',
   isConnected: true,
@@ -46,11 +62,13 @@ const mockAccount = {
 
 describe('DashboardPage', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-
     mocks.mockUseAccount.mockReturnValue({ account: mockAccount });
     mocks.mockUseAccountRole.mockReturnValue(AccountRole.METADATA_ALLOCATOR);
     mocks.mockUseGetApplications.mockReturnValue({
+      data: mockApplicationsData,
+      error: null,
+    });
+    mocks.mockUseGetRefreshes.mockReturnValue({
       data: mockApplicationsData,
       error: null,
     });
@@ -62,6 +80,14 @@ describe('DashboardPage', () => {
       proposeTransaction: vi.fn(),
       messageId: 'mock-messageId',
     });
+    mocks.mockUseQueryClient.mockReturnValue({
+      invalidateQueries: mocks.mockInvalidateQueries,
+      cancelQueries: mocks.mockCancelQueries,
+    });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it('should render dashboard with basic elements for logged in user', () => {
@@ -154,5 +180,27 @@ describe('DashboardPage', () => {
         searchTerm: 'test',
       }),
     );
+  });
+
+  it('should refetch queries when changing tabs', async () => {
+    const user = userEvent.setup();
+    render(<DashboardPage />, { wrapper: TooltipProvider });
+
+    const refreshTab = screen.getByRole('tab', { name: 'Completed Applications' });
+    await user.click(refreshTab);
+
+    expect(mocks.mockInvalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['applications'],
+    });
+  });
+
+  it('should cancel queries when component unmounts', () => {
+    const { unmount } = render(<DashboardPage />, { wrapper: TooltipProvider });
+
+    unmount();
+
+    expect(mocks.mockCancelQueries).toHaveBeenCalledWith({
+      queryKey: ['applications'],
+    });
   });
 });

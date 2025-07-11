@@ -7,6 +7,7 @@ interface Environment {
   rpcUrl: string;
   rpcToken: string;
   metaAllocatorContractAddress: string;
+  githubOwner: string;
 }
 
 const environments: { [key: string]: Environment } = {
@@ -17,6 +18,7 @@ const environments: { [key: string]: Environment } = {
     rpcUrl: 'https://api.node.glif.io/rpc/v1',
     rpcToken: process.env.RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
+    githubOwner: process.env.GITHUB_OWNER || '',
   },
   staging: {
     apiBaseUrl: 'https://allocator-rkh-backend-utcn6.ondigitalocean.app/api/v1',
@@ -25,6 +27,7 @@ const environments: { [key: string]: Environment } = {
     rpcUrl: 'https://api.node.glif.io/rpc/v1',
     rpcToken: process.env.RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
+    githubOwner: process.env.GITHUB_OWNER || '',
   },
   production: {
     apiBaseUrl: 'https://allocator-rkh-backend-utcn6.ondigitalocean.app/backend/api/v1',
@@ -33,6 +36,7 @@ const environments: { [key: string]: Environment } = {
     rpcUrl: 'https://api.node.glif.io/rpc/v1',
     rpcToken: process.env.RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
+    githubOwner: process.env.GITHUB_OWNER || 'filecoin-project',
   },
 };
 

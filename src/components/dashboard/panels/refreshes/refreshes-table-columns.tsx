@@ -8,6 +8,7 @@ import { RkhSignTransactionButton } from '@/components/refresh/RkhSignTransactio
 import { MetaAllocatorSignTransactionButton } from '@/components/refresh/MetaAllocatorSignTransactionButton';
 import { RkhApproveTransactionButton } from '@/components/refresh/RkhApproveTransactionButton';
 import { RefreshStatusBadge } from '@/components/dashboard/panels/refreshes/components/RefreshStatusBadge';
+import { createAllocatorRegistryUrl } from '@/lib/factories/create-allocator-registry-url';
 
 type GetRefreshColumn = (props: RefreshesTableColumnsProps) => ColumnDef<Refresh>[];
 
@@ -63,7 +64,7 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
 
       return (
         <Link
-          href={`https://github.com/RafalMagrys/Allocator-Registry/blob/main/Allocators/${jsonNumber}.json`}
+          href={createAllocatorRegistryUrl(jsonNumber)}
           className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
         >
           {jsonNumber}

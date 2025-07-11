@@ -6,3 +6,4 @@ export * from './useAccountRole';
 export * from './useProposeRKHTransaction';
 export * from './useMetaAllocatorTransaction';
 export * from './useApproveRKHTransaction';
+export * from './useGetRefreshes';
