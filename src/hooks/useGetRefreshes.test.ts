@@ -1,15 +1,14 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { useGetApplications } from '@/hooks/useGetApplications';
-import { fetchApplications } from '@/lib/api';
+import { useGetRefreshes } from '@/hooks/useGetRefreshes';
+import { getRefreshes } from '@/lib/api';
 import { createWrapper } from '@/test-utils';
-import { DashboardTabs } from '@/components/dashboard/constants';
 
 vi.mock('@/lib/api');
 
-const mockFetchApplications = fetchApplications as Mock;
+const mockGetRefreshes = getRefreshes as Mock;
 
-describe('useGetApplications', () => {
+describe('useGetRefreshes', () => {
   const wrapper = createWrapper();
 
   beforeEach(() => {
@@ -17,15 +16,26 @@ describe('useGetApplications', () => {
   });
 
   it('should return initial state correctly', () => {
-    mockFetchApplications.mockResolvedValue({ applications: [], total: 0 });
+    const mockData = {
+      data: {
+        pagination: {
+          currentPage: 1,
+          itemsPerPage: 10,
+          totalItems: 0,
+          totalPages: 0,
+        },
+        results: [],
+      },
+      message: 'Success',
+      status: 'ok',
+    };
+    mockGetRefreshes.mockResolvedValue(mockData);
 
     const { result } = renderHook(
       () =>
-        useGetApplications({
+        useGetRefreshes({
           searchTerm: '',
-          activeFilters: [],
           currentPage: 1,
-          currentTab: DashboardTabs.NEW_APPLICATIONS,
         }),
       { wrapper },
     );
@@ -35,17 +45,33 @@ describe('useGetApplications', () => {
     expect(result.current.isError).toBe(false);
   });
 
-  it('should fetch applications with correct parameters', async () => {
-    const mockData = { applications: [], total: 0 };
-    mockFetchApplications.mockResolvedValue(mockData);
+  it('should fetch refreshes with correct parameters', async () => {
+    const mockData = {
+      data: {
+        pagination: {
+          currentPage: 1,
+          itemsPerPage: 10,
+          totalItems: 5,
+          totalPages: 1,
+        },
+        results: [
+          {
+            _id: 'test-id',
+            title: 'Test Refresh',
+            creator: { name: 'test-user' },
+          },
+        ],
+      },
+      message: 'Success',
+      status: 'ok',
+    };
+    mockGetRefreshes.mockResolvedValue(mockData);
 
     const { result } = renderHook(
       () =>
-        useGetApplications({
+        useGetRefreshes({
           searchTerm: 'test',
-          activeFilters: ['filter1'],
-          currentPage: 1,
-          currentTab: DashboardTabs.NEW_APPLICATIONS,
+          currentPage: 2,
         }),
       { wrapper },
     );
@@ -54,21 +80,19 @@ describe('useGetApplications', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockFetchApplications).toHaveBeenCalledWith('test', ['filter1'], 1, 10);
+    expect(mockGetRefreshes).toHaveBeenCalledWith('test', 2, 10);
     expect(result.current.data).toEqual(mockData);
   });
 
   it('should handle API errors', async () => {
     const error = new Error('API Error');
-    mockFetchApplications.mockRejectedValue(error);
+    mockGetRefreshes.mockRejectedValue(error);
 
     const { result } = renderHook(
       () =>
-        useGetApplications({
+        useGetRefreshes({
           searchTerm: 'test',
-          activeFilters: ['filter1'],
           currentPage: 1,
-          currentTab: DashboardTabs.NEW_APPLICATIONS,
         }),
       { wrapper },
     );

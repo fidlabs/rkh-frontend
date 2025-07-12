@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import React from "react";
+import Link from 'next/link';
+import React from 'react';
 
 import {
   Breadcrumb,
@@ -9,7 +9,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/ui/breadcrumb';
 
 interface BreadcrumbItem {
   label: string;
@@ -25,15 +25,13 @@ export function DashboardBreadcrumb({ items }: DashboardBreadcrumbProps) {
     <Breadcrumb className="hidden md:flex">
       <BreadcrumbList>
         {items.map((item, index) => (
-          <React.Fragment key={item.href}>
+          <React.Fragment key={`${item.href}-${index}`}>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link href={item.href}>{item.label}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            {index < items.length - 1 && (
-              <BreadcrumbSeparator />
-            )}
+            {index < items.length - 1 && <BreadcrumbSeparator />}
           </React.Fragment>
         ))}
       </BreadcrumbList>

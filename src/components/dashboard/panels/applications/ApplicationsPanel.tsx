@@ -54,7 +54,7 @@ export function ApplicationsPanel({
 
   return (
     <>
-      <Card>
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>

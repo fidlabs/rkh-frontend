@@ -62,7 +62,7 @@ export const useStateWaitMsg = ({
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
-  const checkTransactionState = async (transactionCid?: string) => {
+  const checkTransactionState = async (transactionCid: string) => {
     if (!transactionCid) {
       throw new Error('Transaction CID is required');
     }

@@ -5,11 +5,13 @@ import { RefreshAllocatorSection } from './RefreshAllocatorSection';
 import { createWrapper } from '@/test-utils';
 
 const mocks = vi.hoisted(() => ({
-  mockUseRKHTransaction: vi.fn(),
+  mockProposeUseRKHTransaction: vi.fn(),
 }));
 
-vi.mock('@/hooks/useRKHTransaction', () => ({
-  useRKHTransaction: mocks.mockUseRKHTransaction.mockReturnValue({ proposeTransaction: vi.fn() }),
+vi.mock('@/hooks/useProposeRKHTransaction', () => ({
+  useProposeRKHTransaction: mocks.mockProposeUseRKHTransaction.mockReturnValue({
+    proposeTransaction: vi.fn(),
+  }),
 }));
 
 describe('RefreshAllocatorSection', () => {
