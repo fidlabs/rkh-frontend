@@ -185,7 +185,7 @@ export async function getRefreshes(searchTerm: string, page: number, pageLimit: 
     }
     return response.json();
   } catch (error) {
-    console.error('Failed to fetch applications:', error);
-    throw new Error('Failed to fetch applications');
+    console.error('Failed to fetch refresh applications:', error);
+    throw new Error('Failed to fetch refresh applications');
   }
 }

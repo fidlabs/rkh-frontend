@@ -69,16 +69,13 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
     render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
     const dialog = screen.getByRole('dialog', { name: /Sign as RKH/i });
-    expect(dialog).toHaveTextContent(
-      'Signing a RKH transaction to assign DataCap to an refresh application',
-    );
+    expect(dialog).toHaveTextContent('Signing a RKH transaction to refresh DataCap');
   });
 
-  it('should display from address in form step', () => {
+  it('should display toAddress in form step', () => {
     render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-    expect(screen.getByTestId('from-address')).toBeInTheDocument();
-    expect(screen.getByTestId('from-address')).toHaveTextContent('From:f1234567890abcdef');
+    expect(screen.getByTestId('to-address')).toHaveTextContent('To:f1234567890abcdef');
   });
 
   describe('Success flow', () => {
@@ -96,7 +93,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
-      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(undefined, '1000');
+      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(mockProps.address, '1000');
 
       const successHeader = await screen.findByTestId('success-header');
       expect(successHeader).toHaveTextContent('Success!');
@@ -155,7 +152,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       await user.click(screen.getByRole('button', { name: /go back/i }));
 
       expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
-      expect(screen.getByTestId('from-address')).toHaveTextContent('From:f1234567890abcdef');
+      expect(screen.getByTestId('to-address')).toHaveTextContent('To:f1234567890abcdef');
     });
   });
 

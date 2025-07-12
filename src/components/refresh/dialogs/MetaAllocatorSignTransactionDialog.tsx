@@ -107,7 +107,7 @@ export function MetaAllocatorSignTransactionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">Approve as MetaAllocator</DialogTitle>
           <DialogDescription className="max-w-[500px]">
-            Approve a Meta Allocator transaction to assign DataCap to an refresh application
+            Approve a Meta Allocator transaction to refresh DataCap
           </DialogDescription>
         </DialogHeader>
         {stepsConfig[step]}

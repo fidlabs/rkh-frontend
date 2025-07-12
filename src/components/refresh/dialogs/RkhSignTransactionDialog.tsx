@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
 import {
   RefreshAllocatorErrorStep,
@@ -58,8 +58,10 @@ export function RkhSignTransactionDialog({
     onProposeTransactionSuccess: (messageId: string) => checkTransactionState(messageId),
   });
 
-  const onSubmit = async ({ allocatorAddress, dataCap }: FormFields) =>
-    proposeTransaction({ address: allocatorAddress, datacap: dataCap });
+  const onSubmit = useCallback(
+    async ({ dataCap }: FormFields) => proposeTransaction({ address, datacap: dataCap }),
+    [address, proposeTransaction],
+  );
 
   const getBlockNumber = () => {
     return typeof stateWaitMsg === 'object' ? stateWaitMsg?.Height : undefined;
@@ -68,7 +70,7 @@ export function RkhSignTransactionDialog({
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
       <SignTransactionFormStep
-        fromAddress={address}
+        toAddress={address}
         onSubmit={onSubmit}
         onCancel={() => onOpenChange(false)}
       />
@@ -106,7 +108,7 @@ export function RkhSignTransactionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">Sign as RKH</DialogTitle>
           <DialogDescription className="max-w-[500px]">
-            Signing a RKH transaction to assign DataCap to an refresh application
+            Signing a RKH transaction to refresh DataCap
           </DialogDescription>
         </DialogHeader>
         {stepsConfig[step]}

@@ -46,9 +46,7 @@ describe('RkhApproveTransactionDialog Integration Tests', () => {
     render(<RkhApproveTransactionDialog {...mockProps} />, { wrapper });
 
     const dialog = screen.getByRole('dialog', { name: /Approve as RKH/i });
-    expect(dialog).toHaveTextContent(
-      'Approving a RKH transaction to assign DataCap to an refresh application',
-    );
+    expect(dialog).toHaveTextContent('Approving a RKH transaction to refresh DataCap');
   });
 
   it('should display transaction details in form step', () => {

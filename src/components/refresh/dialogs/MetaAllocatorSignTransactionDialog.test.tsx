@@ -87,9 +87,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
     render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
     const dialog = screen.getByRole('dialog', { name: /Approve as MetaAllocator/i });
-    expect(dialog).toHaveTextContent(
-      'Approve a Meta Allocator transaction to assign DataCap to an refresh application',
-    );
+    expect(dialog).toHaveTextContent('Approve a Meta Allocator transaction to refresh DataCap');
   });
 
   describe('Success flow', () => {

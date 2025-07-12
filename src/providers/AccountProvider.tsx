@@ -51,7 +51,7 @@ export const AccountProvider: React.FC<{
           const provider = await wagmiConnector?.getProvider();
           const safeKit = await getSafeKit(provider);
           const maOwners = await safeKit.getOwners();
-          
+
           setAccount({
             address: wagmiAddress,
             index: 0,
@@ -186,7 +186,9 @@ export const AccountProvider: React.FC<{
       }
 
       const api = new VerifyAPI(
-        VerifyAPI.browserProvider(env.rpcUrl, {}),
+        VerifyAPI.browserProvider(env.rpcUrl, {
+          token: async () => env.rpcToken,
+        }),
         account.wallet,
         env.useTestnet,
       );

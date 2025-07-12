@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ApproveTransactionDetailsStep,
   RefreshAllocatorErrorStep,
@@ -51,14 +51,17 @@ export function RkhApproveTransactionDialog({
       setStep(RefreshAllocatorSteps.SUCCESS);
     },
   });
-
-  const onSubmit = async () =>
-    approveTransaction({
-      address,
-      transactionId,
-      datacap,
-      fromAccount,
-    });
+  
+  const onSubmit = useCallback(
+    async () =>
+      approveTransaction({
+        address,
+        transactionId,
+        datacap,
+        fromAccount,
+      }),
+    [address, approveTransaction, datacap, fromAccount, transactionId],
+  );
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
@@ -99,7 +102,7 @@ export function RkhApproveTransactionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">Approve as RKH</DialogTitle>
           <DialogDescription className="max-w-[500px]">
-            Approving a RKH transaction to assign DataCap to an refresh application
+            Approving a RKH transaction to refresh DataCap
           </DialogDescription>
         </DialogHeader>
         {stepsConfig[step]}

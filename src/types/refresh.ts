@@ -1,6 +1,4 @@
-import { Application } from '@/types/application';
-
-export type RefreshStatus = 'PENDING' | 'DC_ALLOCATED' | 'REJECTED';
+export type RefreshStatus = 'PENDING' | 'DC_ALLOCATED' | 'REJECTED' | 'SIGNED_BY_RKH';
 
 export interface Refresh {
   githubIssueId: number;
@@ -21,13 +19,12 @@ export interface Refresh {
   updatedAt: Date | null;
   closedAt: Date | null;
   jsonNumber: string;
-  allocatorDetails?: Application;
   metapathwayType?: 'MDMA' | 'RKH';
   refreshStatus: RefreshStatus;
   dataCap: number;
   msigAddress: string;
   maAddress: `0x${string}`;
-  rkhPhase: {
+  rkhPhase?: {
     approvals: string[];
     messageId: number;
   };

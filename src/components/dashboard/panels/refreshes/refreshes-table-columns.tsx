@@ -8,7 +8,7 @@ import { RkhSignTransactionButton } from '@/components/refresh/RkhSignTransactio
 import { MetaAllocatorSignTransactionButton } from '@/components/refresh/MetaAllocatorSignTransactionButton';
 import { RkhApproveTransactionButton } from '@/components/refresh/RkhApproveTransactionButton';
 import { RefreshStatusBadge } from '@/components/dashboard/panels/refreshes/components/RefreshStatusBadge';
-import { createAllocatorRegistryUrl } from '@/lib/factories/create-allocator-registry-url';
+import { createAllocatorGovernanceIssueUrl, createAllocatorRegistryJsonUrl } from '@/lib/factories';
 
 type GetRefreshColumn = (props: RefreshesTableColumnsProps) => ColumnDef<Refresh>[];
 
@@ -34,11 +34,11 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
       );
     },
     cell: ({ row }) => {
-      const issueNumber = row.getValue('githubIssueNumber') as string;
+      const issueNumber = row.getValue('githubIssueNumber') as number;
 
       return (
         <Link
-          href={`https://github.com/RafalMagrys/Allocator-Governance/issues/${issueNumber}`}
+          href={createAllocatorGovernanceIssueUrl(issueNumber)}
           className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
         >
           #{issueNumber}
@@ -64,7 +64,7 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
 
       return (
         <Link
-          href={createAllocatorRegistryUrl(jsonNumber)}
+          href={createAllocatorRegistryJsonUrl(jsonNumber)}
           className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
         >
           {jsonNumber}
@@ -115,20 +115,21 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
       return <div className="flex justify-center">{dataCap ? `${dataCap} PiB` : '...'}</div>;
     },
   },
-  ...renderOptionally<Refresh>(role === AccountRole.METADATA_ALLOCATOR, {
+  ...renderOptionally<Refresh>(role === AccountRole.ROOT_KEY_HOLDER, {
     enableHiding: false,
     header: ' ',
     accessorKey: 'msigAddress',
     cell: ({ row }) => {
       const { dataCap, refreshStatus, rkhPhase, msigAddress, metapathwayType } = row.original;
       const hasSigners = !!rkhPhase?.approvals?.length;
-      const signer = rkhPhase.approvals.at(0) as string;
-      const transactionId = rkhPhase.messageId;
 
       if (metapathwayType !== 'RKH') return null;
       if (['DC_ALLOCATED', 'REJECTED'].includes(refreshStatus)) return null;
 
-      if (!hasSigners) return <RkhSignTransactionButton address={msigAddress} />;
+      if (!rkhPhase && !hasSigners) return <RkhSignTransactionButton address={msigAddress} />;
+
+      const transactionId = rkhPhase.messageId;
+      const signer = rkhPhase.approvals?.at(0) as string;
 
       return (
         <RkhApproveTransactionButton
@@ -140,7 +141,7 @@ export const refreshesTableColumns: GetRefreshColumn = ({ role }) => [
       );
     },
   }),
-  ...renderOptionally<Refresh>(role === AccountRole.ROOT_KEY_HOLDER, {
+  ...renderOptionally<Refresh>(role === AccountRole.METADATA_ALLOCATOR, {
     enableHiding: false,
     header: ' ',
     accessorKey: 'maAddress',

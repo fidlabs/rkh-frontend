@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAccount } from '@/hooks';
+import { useCallback } from 'react';
 
 interface UseApproveRKHTransactionProps {
   onApproveTransaction?: () => void;
@@ -30,8 +31,7 @@ export function useApproveRKHTransaction({
       transactionId,
     }: ApproveTransactionParams) => {
       onApproveTransaction?.();
-      const messageId = await acceptVerifierProposal(address, datacap, fromAccount, transactionId);
-      return messageId;
+      return acceptVerifierProposal(address, datacap, fromAccount, transactionId);
     },
     onSuccess: (messageId: string) => {
       onApproveTransactionSuccess?.(messageId);
@@ -49,14 +49,16 @@ export function useApproveRKHTransaction({
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const approveTransaction = async (params: ApproveTransactionParams) => {
-    return mutation.mutateAsync({
-      address: params.address,
-      datacap: params.datacap,
-      fromAccount: params.fromAccount,
-      transactionId: params.transactionId,
-    });
-  };
+  const approveTransaction = useCallback(
+    async (params: ApproveTransactionParams) =>
+      mutation.mutateAsync({
+        address: params.address,
+        datacap: params.datacap,
+        fromAccount: params.fromAccount,
+        transactionId: params.transactionId,
+      }),
+    [mutation],
+  );
 
   return {
     approveTransaction,
