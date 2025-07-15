@@ -186,7 +186,9 @@ export const AccountProvider: React.FC<{
       }
 
       const api = new VerifyAPI(
-        VerifyAPI.browserProvider(env.rpcUrl, {}),
+        VerifyAPI.browserProvider(env.rpcUrl, {
+          token: async () => env.rpcToken,
+        }),
         account.wallet,
         env.useTestnet,
       );

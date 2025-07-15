@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { useRKHTransaction } from './useRKHTransaction';
+import { useProposeRKHTransaction } from './useProposeRKHTransaction';
 import { useAccount } from '@/hooks';
 import { createWrapper } from '@/test-utils';
 
@@ -9,7 +9,7 @@ vi.mock('@/hooks');
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 const mockUseAccount = useAccount as Mock;
 
-describe('useRKHTransaction', () => {
+describe('useProposeRKHTransaction', () => {
   const mockProposeAddVerifier = vi.fn();
   const mockOnProposeTransaction = vi.fn();
   const mockOnProposeTransactionFailed = vi.fn();
@@ -31,7 +31,7 @@ describe('useRKHTransaction', () => {
   it('should return initial state correctly', () => {
     const { result } = renderHook(
       () =>
-        useRKHTransaction({
+        useProposeRKHTransaction({
           onProposeTransaction: mockOnProposeTransaction,
           onProposeTransactionFailed: mockOnProposeTransactionFailed,
           onProposeTransactionSuccess: mockOnProposeTransactionSuccess,
@@ -47,7 +47,7 @@ describe('useRKHTransaction', () => {
   it('should work without callback props', () => {
     const wrapper = createWrapper();
 
-    const { result } = renderHook(() => useRKHTransaction({}), { wrapper });
+    const { result } = renderHook(() => useProposeRKHTransaction({}), { wrapper });
 
     expect(result.current.isPending).toBe(false);
     expect(result.current.messageId).toBe(null);
@@ -59,7 +59,7 @@ describe('useRKHTransaction', () => {
 
     const { result } = renderHook(
       () =>
-        useRKHTransaction({
+        useProposeRKHTransaction({
           onProposeTransaction: mockOnProposeTransaction,
           onProposeTransactionSuccess: mockOnProposeTransactionSuccess,
         }),
@@ -99,7 +99,7 @@ describe('useRKHTransaction', () => {
 
     const { result } = renderHook(
       () =>
-        useRKHTransaction({
+        useProposeRKHTransaction({
           onProposeTransactionFailed: mockOnProposeTransactionFailed,
         }),
       { wrapper },
