@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getRefreshes } from '@/lib/api';
 import { PAGE_SIZE } from '@/components/dashboard/constants';
-import { Refresh } from '@/types/application';
+import { Refresh } from '@/types/refresh';
 
 interface UseGetRefreshesResponse {
   data: {
