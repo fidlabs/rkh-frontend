@@ -3,7 +3,7 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   images: {
-    domains: ["www.gravatar.com"],
+    domains: ['www.gravatar.com'],
   },
   webpack: (config, { isServer }) => {
     config.experiments = {

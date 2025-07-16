@@ -1,12 +1,12 @@
-import { Application } from "@/types/application";
-import { useState, useEffect, useCallback } from "react";
+import { Application } from '@/types/application';
+import { useState, useEffect, useCallback } from 'react';
 
 export function useAutoRefreshData(
   fetchFunction: () => Promise<{
     applications: Application[];
     totalCount: number;
   }>,
-  refreshInterval: number
+  refreshInterval: number,
 ) {
   const [data, setData] = useState<{
     applications: Application[];
@@ -22,7 +22,7 @@ export function useAutoRefreshData(
       setData(result);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("An error occurred"));
+      setError(err instanceof Error ? err : new Error('An error occurred'));
     } finally {
       setIsLoading(false);
     }

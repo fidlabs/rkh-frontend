@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { KeyRound, Users, Loader2, ArrowLeft } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { KeyRound, Users, Loader2, ArrowLeft } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import { useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
-import { useAccount } from "@/hooks";
+import { useAccount } from '@/hooks';
 
 interface ConnectDialogProps {
   onClose: () => void;
 }
 
-type Step = "select-role" | "select-provider";
-type Role = "root" | "meta-allocator";
-type Provider = "metamask" | "filsnap" | "ledger";
+type Step = 'select-role' | 'select-provider';
+type Role = 'root' | 'meta-allocator';
+type Provider = 'metamask' | 'filsnap' | 'ledger';
 
 interface StepConfig {
   title: string;
@@ -22,7 +22,7 @@ interface StepConfig {
 }
 
 export default function ConnectDialog({ onClose }: ConnectDialogProps) {
-  const [currentStep, setCurrentStep] = useState<Step>("select-role");
+  const [currentStep, setCurrentStep] = useState<Step>('select-role');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const { connect: connectFilsnap } = useAccount();
@@ -31,42 +31,43 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
   const hasConnectedRef = useRef(false);
 
   const stepConfigs: Record<Step, StepConfig> = {
-    "select-role": {
-      title: "Select Your Role",
-      description: "Choose your role to continue",
+    'select-role': {
+      title: 'Select Your Role',
+      description: 'Choose your role to continue',
       canGoBack: false,
     },
-    "select-provider": {
-      title: "Connect Wallet",
-      description: selectedRole === "root" 
-        ? "Connect using MetaMask Snap or Ledger"
-        : "Connect using MetaMask",
+    'select-provider': {
+      title: 'Connect Wallet',
+      description:
+        selectedRole === 'root'
+          ? 'Connect using MetaMask Snap or Ledger'
+          : 'Connect using MetaMask',
       canGoBack: true,
     },
   };
 
   const handleRoleSelect = (role: Role) => {
     setSelectedRole(role);
-    setCurrentStep("select-provider");
+    setCurrentStep('select-provider');
   };
 
   const handleProviderSelect = async (provider: Provider) => {
     setIsConnecting(true);
 
     try {
-      if (provider === "filsnap") {
-        await connectFilsnap("filsnap");
+      if (provider === 'filsnap') {
+        await connectFilsnap('filsnap');
         onClose();
-      } else if (provider === "metamask" && !hasConnectedRef.current) {
+      } else if (provider === 'metamask' && !hasConnectedRef.current) {
         hasConnectedRef.current = true;
         await connectMetamask({ connector: injected() });
       }
     } catch (error) {
-      console.error("Connection error:", error);
+      console.error('Connection error:', error);
       toast({
-        title: "Connection Failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive",
+        title: 'Connection Failed',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+        variant: 'destructive',
       });
       onClose();
     } finally {
@@ -77,16 +78,16 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
   useEffect(() => {
     if (status === 'success') {
       toast({
-        title: "Connection Successful",
-        description: "Successfully connected to wallet",
-        variant: "default",
+        title: 'Connection Successful',
+        description: 'Successfully connected to wallet',
+        variant: 'default',
       });
       onClose();
     } else if (status === 'error' && error) {
       toast({
-        title: "Connection Failed",
-        description: error.message || "Failed to connect",
-        variant: "destructive",
+        title: 'Connection Failed',
+        description: error.message || 'Failed to connect',
+        variant: 'destructive',
       });
       onClose();
     }
@@ -105,7 +106,7 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setCurrentStep("select-role")}
+            onClick={() => setCurrentStep('select-role')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -119,7 +120,7 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
           <Loader2 className="h-8 w-8 animate-spin" />
           <p>Connecting to wallet...</p>
         </div>
-      ) : currentStep === "select-role" ? (
+      ) : currentStep === 'select-role' ? (
         <div className="flex gap-4">
           <Card className="flex-1">
             <CardHeader>
@@ -134,10 +135,7 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
               </p>
             </CardContent>
             <CardFooter>
-              <Button 
-                className="w-full" 
-                onClick={() => handleRoleSelect("root")}
-              >
+              <Button className="w-full" onClick={() => handleRoleSelect('root')}>
                 Connect as Root
               </Button>
             </CardFooter>
@@ -156,10 +154,7 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
               </p>
             </CardContent>
             <CardFooter>
-              <Button 
-                className="w-full"
-                onClick={() => handleRoleSelect("meta-allocator")}
-              >
+              <Button className="w-full" onClick={() => handleRoleSelect('meta-allocator')}>
                 Connect as Allocator
               </Button>
             </CardFooter>
@@ -167,28 +162,28 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
         </div>
       ) : (
         <div className="grid gap-4">
-          {selectedRole === "root" ? (
+          {selectedRole === 'root' ? (
             <>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
-                onClick={() => handleProviderSelect("filsnap")}
+                onClick={() => handleProviderSelect('filsnap')}
               >
                 Connect with MetaMask Snap
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
-                onClick={() => handleProviderSelect("ledger")}
+                onClick={() => handleProviderSelect('ledger')}
               >
                 Connect with Ledger
               </Button>
             </>
           ) : (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full"
-              onClick={() => handleProviderSelect("metamask")}
+              onClick={() => handleProviderSelect('metamask')}
             >
               Connect with MetaMask
             </Button>
@@ -197,4 +192,4 @@ export default function ConnectDialog({ onClose }: ConnectDialogProps) {
       )}
     </div>
   );
-} 
+}

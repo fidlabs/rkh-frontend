@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { DialogStep, Role } from "./types";
-import { RoleSelectionScreen } from "./screens/RoleSelectionScreen";
-import { ProviderSelectionScreen } from "./screens/ProviderSelectionScreen";
-import { WalletConnectionScreen } from "./screens/WalletConnectionScreen";
+} from '@/components/ui/dialog';
+import { DialogStep, Role } from './types';
+import { RoleSelectionScreen } from './screens/RoleSelectionScreen';
+import { ProviderSelectionScreen } from './screens/ProviderSelectionScreen';
+import { WalletConnectionScreen } from './screens/WalletConnectionScreen';
 
 interface StepConfig {
   title: string;
@@ -23,21 +23,21 @@ interface StepConfig {
 }
 
 const STEP_CONFIGS: Record<DialogStep, (role?: Role) => StepConfig> = {
-    "select-role": () => ({
-        title: "Select Role",
-        description: "Please select a role to continue.",
-        canGoBack: false
-    }),
-    "select-provider": () => ({
-        title: "Select Provider",
-        description: "Please select a provider to continue.",
-        canGoBack: true
-    }),
-    "connect-wallet": () => ({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to continue.",
-        canGoBack: true
-    }),
+  'select-role': () => ({
+    title: 'Select Role',
+    description: 'Please select a role to continue.',
+    canGoBack: false,
+  }),
+  'select-provider': () => ({
+    title: 'Select Provider',
+    description: 'Please select a provider to continue.',
+    canGoBack: true,
+  }),
+  'connect-wallet': () => ({
+    title: 'Connect Wallet',
+    description: 'Please connect your wallet to continue.',
+    canGoBack: true,
+  }),
 };
 
 interface ConnectWalletDialogProps {
@@ -47,78 +47,74 @@ interface ConnectWalletDialogProps {
 }
 
 export function ConnectWalletDialog({ isOpen, setIsOpen, handleClose }: ConnectWalletDialogProps) {
-  const [currentStep, setCurrentStep] = useState<DialogStep>("select-role");
+  const [currentStep, setCurrentStep] = useState<DialogStep>('select-role');
   const [selectedRole, setSelectedRole] = useState<Role | undefined>();
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>();
 
   const handleRoleSelect = (role: Role) => {
     setSelectedRole(role);
-    setCurrentStep("select-provider");
+    setCurrentStep('select-provider');
   };
 
   const handleProviderSelect = (provider: string) => {
     setSelectedProvider(provider);
-    setCurrentStep("connect-wallet");
+    setCurrentStep('connect-wallet');
   };
 
   const handleConnect = () => {
-    console.log("connect");
-    
-    setCurrentStep("select-role");
+    console.log('connect');
+
+    setCurrentStep('select-role');
     setSelectedRole(undefined);
     setSelectedProvider(undefined);
-    
+
     handleClose();
   };
 
   const handleError = () => {
     handleClose();
 
-    setCurrentStep("select-role");
+    setCurrentStep('select-role');
     setSelectedRole(undefined);
     setSelectedProvider(undefined);
-  }
+  };
 
   const currentConfig = STEP_CONFIGS[currentStep](selectedRole);
 
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(open) => {
+      onOpenChange={open => {
         setIsOpen(open);
         if (!open) {
           handleClose();
         }
       }}
     >
-        <DialogContent className="max-w-fit">
+      <DialogContent className="max-w-fit">
         <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-                {currentConfig.canGoBack && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setCurrentStep("select-role")}
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                )}
-                {currentConfig.title}
-            </DialogTitle>
-            <DialogDescription>
-                {currentConfig.description}
-            </DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            {currentConfig.canGoBack && (
+              <Button variant="ghost" size="sm" onClick={() => setCurrentStep('select-role')}>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            {currentConfig.title}
+          </DialogTitle>
+          <DialogDescription>{currentConfig.description}</DialogDescription>
         </DialogHeader>
-        {
-            currentStep === "select-role" ? (
-                <RoleSelectionScreen onRoleSelect={handleRoleSelect} />
-            ) : currentStep === "select-provider" && selectedRole ? (
-                <ProviderSelectionScreen role={selectedRole} onProviderSelect={handleProviderSelect}/>
-            ) : selectedProvider ? (
-                <WalletConnectionScreen provider={selectedProvider} onConnect={handleConnect} onError={handleError}/>
-            ) : null
-        }
+        {currentStep === 'select-role' ? (
+          <RoleSelectionScreen onRoleSelect={handleRoleSelect} />
+        ) : currentStep === 'select-provider' && selectedRole ? (
+          <ProviderSelectionScreen role={selectedRole} onProviderSelect={handleProviderSelect} />
+        ) : selectedProvider ? (
+          <WalletConnectionScreen
+            provider={selectedProvider}
+            onConnect={handleConnect}
+            onError={handleError}
+          />
+        ) : null}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,72 +1,68 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { KeyRound, Users } from "lucide-react";
-import LedgerDialog from "./LedgerDialog";
-import FilsnapDialog from "./FilsnapDialog";
-import MetamaskDialog from "./MetamaskDialog";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { KeyRound, Users } from 'lucide-react';
+import LedgerDialog from './LedgerDialog';
+import FilsnapDialog from './FilsnapDialog';
+import MetamaskDialog from './MetamaskDialog';
 
 interface SelectRoleDialogProps {
   onClose: () => void;
 }
 
-type DialogState = "select-role" | "connect-wallet";
-type Role = "root" | "meta-allocator";
+type DialogState = 'select-role' | 'connect-wallet';
+type Role = 'root' | 'meta-allocator';
 
 export default function SelectRoleDialog({ onClose }: SelectRoleDialogProps) {
-  const [dialogState, setDialogState] = useState<DialogState>("select-role");
+  const [dialogState, setDialogState] = useState<DialogState>('select-role');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
 
   const handleRoleSelect = (role: Role) => {
     setSelectedRole(role);
-    setDialogState("connect-wallet");
+    setDialogState('connect-wallet');
   };
 
-  if (dialogState === "connect-wallet") {
+  if (dialogState === 'connect-wallet') {
     if (selectedProvider) {
       switch (selectedProvider) {
-        case "ledger":
+        case 'ledger':
           return <LedgerDialog onClose={onClose} />;
-        case "filsnap":
+        case 'filsnap':
           return <FilsnapDialog onClose={onClose} />;
-        case "metamask":
+        case 'metamask':
           return <MetamaskDialog onClose={onClose} />;
       }
     }
 
     return (
       <div className="space-y-4">
-        <Button 
-          variant="ghost" 
-          className="mb-4"
-          onClick={() => setDialogState("select-role")}
-        >
+        <Button variant="ghost" className="mb-4" onClick={() => setDialogState('select-role')}>
           ← Back to role selection
         </Button>
         <div className="grid gap-4">
-          {selectedRole === "root" ? (
+          {selectedRole === 'root' ? (
             <>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
-                onClick={() => setSelectedProvider("filsnap")}
+                onClick={() => setSelectedProvider('filsnap')}
               >
                 Connect with MetaMask Snap
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
-                onClick={() => setSelectedProvider("ledger")}
+                onClick={() => setSelectedProvider('ledger')}
               >
                 Connect with Ledger
               </Button>
             </>
           ) : (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full"
-              onClick={() => setSelectedProvider("metamask")}
+              onClick={() => setSelectedProvider('metamask')}
             >
               Connect with MetaMask
             </Button>
@@ -91,10 +87,7 @@ export default function SelectRoleDialog({ onClose }: SelectRoleDialogProps) {
           </p>
         </CardContent>
         <CardFooter>
-          <Button 
-            className="w-full" 
-            onClick={() => handleRoleSelect("root")}
-          >
+          <Button className="w-full" onClick={() => handleRoleSelect('root')}>
             Connect as RKH
           </Button>
         </CardFooter>
@@ -113,10 +106,7 @@ export default function SelectRoleDialog({ onClose }: SelectRoleDialogProps) {
           </p>
         </CardContent>
         <CardFooter>
-          <Button 
-            className="w-full"
-            onClick={() => handleRoleSelect("meta-allocator")}
-          >
+          <Button className="w-full" onClick={() => handleRoleSelect('meta-allocator')}>
             Connect as Meta Allocator
           </Button>
         </CardFooter>
