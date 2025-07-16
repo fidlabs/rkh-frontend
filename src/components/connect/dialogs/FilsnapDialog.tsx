@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
-import { useAccount } from "@/hooks";
+import React, { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
+import { useAccount } from '@/hooks';
 
 interface FilsnapDialogProps {
   onClose: () => void;
@@ -16,17 +16,15 @@ export default function FilsnapDialog({ onClose }: FilsnapDialogProps) {
     setIsConnecting(true);
 
     try {
-      await connect("filsnap");
+      await connect('filsnap');
       onClose();
     } catch (error) {
-      console.error("Filsnap connection error:", error);
+      console.error('Filsnap connection error:', error);
       toast({
-        title: "Connection Failed",
+        title: 'Connection Failed',
         description:
-          error instanceof Error
-            ? error.message
-            : "An unknown error occurred. Please try again.",
-        variant: "destructive",
+          error instanceof Error ? error.message : 'An unknown error occurred. Please try again.',
+        variant: 'destructive',
       });
       onClose(); // Close the dialog on error
     } finally {

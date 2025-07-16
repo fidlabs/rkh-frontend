@@ -51,7 +51,7 @@ export function RkhApproveTransactionDialog({
       setStep(RefreshAllocatorSteps.SUCCESS);
     },
   });
-  
+
   const onSubmit = useCallback(
     async () =>
       approveTransaction({

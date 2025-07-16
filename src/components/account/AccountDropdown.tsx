@@ -1,6 +1,6 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +8,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Account } from "@/types/account";
+} from '@/components/ui/dropdown-menu';
+import { Account } from '@/types/account';
 
 interface AccountDropdownProps {
   account: Account;
@@ -20,11 +20,7 @@ export default function AccountDropdown({ account, onLogout }: AccountDropdownPr
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="overflow-hidden rounded-full"
-        >
+        <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
           <Image
             src={`https://www.gravatar.com/avatar/${account.address}?d=identicon`}
             width={36}

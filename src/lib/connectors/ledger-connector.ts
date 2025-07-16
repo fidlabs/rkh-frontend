@@ -1,14 +1,14 @@
-import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 // @ts-ignore
-import FilecoinApp from "@zondax/ledger-filecoin";
+import FilecoinApp from '@zondax/ledger-filecoin';
 
-import { fetchRole } from "@/lib/api";
-import { Connector } from "@/types/connector";
-import { Account } from "@/types/account";
-import { LedgerWallet } from "../wallets/ledger-wallet";
+import { fetchRole } from '@/lib/api';
+import { Connector } from '@/types/connector';
+import { Account } from '@/types/account';
+import { LedgerWallet } from '../wallets/ledger-wallet';
 
 export class LedgerConnector implements Connector {
-  name = "ledger";
+  name = 'ledger';
   private transport: any;
   private filecoinApp: any;
   private connected = false;
@@ -28,17 +28,18 @@ export class LedgerConnector implements Connector {
 
       const version = await this.filecoinApp.getVersion();
       if (version.device_locked) {
-        throw new Error("Ledger is locked. Please unlock your Ledger device.");
+        throw new Error('Ledger is locked. Please unlock your Ledger device.');
       }
       if (version.test_mode) {
-        throw new Error("Filecoin app is in test mode.");
+        throw new Error('Filecoin app is in test mode.');
       }
       if (version.major < 2) {
-        throw new Error("Please update the Filecoin app on your Ledger device.");
+        throw new Error('Please update the Filecoin app on your Ledger device.');
       }
 
       const path = `m/44'/461'/0'/0/${this.accountIndex}`;
-      const { addrString: address, compressed_pk: pubkey } = await this.filecoinApp.getAddressAndPubKey(path);
+      const { addrString: address, compressed_pk: pubkey } =
+        await this.filecoinApp.getAddressAndPubKey(path);
 
       const role = await fetchRole(address);
       this.account = {
