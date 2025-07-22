@@ -2,8 +2,9 @@ import type { FilecoinAddress } from '@/types/filecoin';
 import type { Address, Client, EIP1193RequestFn, Hex } from 'viem';
 import { filecoin, filecoinCalibration } from 'viem/chains';
 import { useChainId, useClient } from 'wagmi';
+import { env } from '@/config/environment';
 
-const filecoinChainsIds = [filecoin.id, filecoinCalibration.id] as const;
+const filecoinChainsIds = [filecoin.id, filecoinCalibration.id, env.testNetChainId] as const;
 type FilecoinChainId = (typeof filecoinChainsIds)[number];
 
 type FilecoinRPCSchema = [
