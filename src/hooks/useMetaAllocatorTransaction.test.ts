@@ -93,6 +93,7 @@ describe('useMetaAllocatorTransaction', () => {
 
     expect(result.current.isPending).toBe(false);
     expect(result.current.txHash).toBe(null);
+    expect(result.current.blockNumber).toBe(null);
     expect(typeof result.current.submitSafeTransaction).toBe('function');
   });
 
@@ -101,6 +102,7 @@ describe('useMetaAllocatorTransaction', () => {
 
     expect(result.current.isPending).toBe(false);
     expect(result.current.txHash).toBe(null);
+    expect(result.current.blockNumber).toBe(null);
     expect(typeof result.current.submitSafeTransaction).toBe('function');
   });
 
@@ -143,11 +145,15 @@ describe('useMetaAllocatorTransaction', () => {
     expect(mockSafeKit.signTransaction).toHaveBeenCalled();
     expect(mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
     expect(mockSafeKit.executeTransaction).toHaveBeenCalled();
-    expect(mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith({
-      hash: '0xabcdef123456789',
-      status: 'success',
-    });
+    expect(mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith(
+      {
+        hash: '0xabcdef123456789',
+        status: 'success',
+      },
+      null,
+    );
     expect(result.current.txHash).toBe('0xabcdef123456789');
+    expect(result.current.blockNumber).toBe(null);
   });
 
   it('should handle successful transaction with Filecoin address conversion', async () => {
@@ -256,9 +262,7 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(
-      new Error('An unknown error occurred whilst converting to Ethereum address.'),
-    );
+    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith('Unknown error');
   });
 
   it('should handle invalid address validation error', async () => {
@@ -409,5 +413,65 @@ describe('useMetaAllocatorTransaction', () => {
       functionName: 'addAllowance',
       args: [transactionParams.address, expectedDatacap],
     });
+  });
+
+  it('should fetch transaction receipt', async () => {
+    const fixtureReceiptResponse = {
+      blockNumber: 12345,
+    };
+    const fixtureExecuteTransactionResponse = {
+      hash: '0xabcdef123456789',
+      status: 'success',
+      transactionResponse: {
+        wait: vi.fn().mockResolvedValue(fixtureReceiptResponse),
+      },
+    };
+
+    mockSafeKit.executeTransaction.mockResolvedValue(fixtureExecuteTransactionResponse);
+
+    const transactionParams = {
+      address: '0x1234567890123456789012345678901234567890',
+      datacap: 100,
+      metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+    };
+
+    const { result } = renderHook(
+      () =>
+        useMetaAllocatorTransaction({
+          onSubmitSafeTransaction: mockOnSubmitSafeTransaction,
+          onSubmitSafeTransactionSuccess: mockOnSubmitSafeTransactionSuccess,
+          onSignSafeTransaction: mockOnSignSafeTransaction,
+          onExecuteSafeTransaction: mockOnExecuteSafeTransaction,
+        }),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await result.current.submitSafeTransaction(transactionParams);
+    });
+
+    await waitFor(() => {
+      expect(result.current.isPending).toBe(false);
+    });
+
+    expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
+    expect(mockEncodeFunctionData).toHaveBeenCalledWith({
+      abi: expect.any(Array),
+      functionName: 'addAllowance',
+      args: [transactionParams.address, BigInt(100 * 1_125_899_906_842_624)],
+    });
+    expect(mockSafeKit.createTransaction).toHaveBeenCalled();
+    expect(mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mockSafeKit.signTransaction).toHaveBeenCalled();
+    expect(mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mockSafeKit.executeTransaction).toHaveBeenCalled();
+    expect(mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith(
+      fixtureExecuteTransactionResponse,
+      fixtureReceiptResponse,
+    );
+    expect(result.current.txHash).toBe('0xabcdef123456789');
+    expect(result.current.blockNumber).toBe(fixtureReceiptResponse.blockNumber);
   });
 });

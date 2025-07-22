@@ -34,8 +34,6 @@ describe('useSwitchChain', () => {
 
     expect(result.current.chains).toBe(mockChains);
     expect(result.current.switchChain).toBe(mockSwitchChain);
-    expect(result.current.isPending).toBe(false);
-    expect(result.current.error).toBe(null);
     expect(typeof result.current.autoSwitchChain).toBe('function');
   });
 

@@ -95,6 +95,11 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       mocks.mockSafeKit.executeTransaction.mockResolvedValue({
         hash: '0xabcdef123456789',
         status: 'success',
+        transactionResponse: {
+          wait: vi.fn().mockResolvedValue({
+            blockNumber: 123,
+          }),
+        },
       });
     });
 
