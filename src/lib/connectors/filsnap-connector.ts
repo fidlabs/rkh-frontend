@@ -1,11 +1,11 @@
-import { Connector } from "@/types/connector";
-import { Account, AccountRole } from "@/types/account";
-import { fetchRole } from "@/lib/api";
+import { Connector } from '@/types/connector';
+import { Account, AccountRole } from '@/types/account';
+import { fetchRole } from '@/lib/api';
 import { FilsnapAdapter } from 'filsnap-adapter';
-import { FilsnapWallet } from "../wallets/filsnap-wallet";
+import { FilsnapWallet } from '../wallets/filsnap-wallet';
 
 export class FilsnapConnector implements Connector {
-  name = "filsnap";
+  name = 'filsnap';
   private connected = false;
   private account: Account | null = null;
   private adapter: FilsnapAdapter | null = null;
@@ -15,7 +15,7 @@ export class FilsnapConnector implements Connector {
       // Check if Metamask with Snaps support is installed
       const hasSnaps = await FilsnapAdapter.hasSnaps();
       if (!hasSnaps) {
-        throw new Error("Metamask with Snaps support is not installed");
+        throw new Error('Metamask with Snaps support is not installed');
       }
 
       // Connect to the Filsnap adapter

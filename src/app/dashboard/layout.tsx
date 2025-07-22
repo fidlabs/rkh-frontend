@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { DashboardSidebar } from "@/components/dashboard";
+import { DashboardSidebar } from '@/components/dashboard';
 
 export default function DashboardLayout({
   children,

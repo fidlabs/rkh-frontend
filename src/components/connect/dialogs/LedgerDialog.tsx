@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, ChevronLeft, ChevronRight, Copy } from "lucide-react";
-import { LedgerConnector } from "@/lib/connectors/ledger-connector";
-import { useAccount } from "@/hooks";
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { Loader2, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
+import { LedgerConnector } from '@/lib/connectors/ledger-connector';
+import { useAccount } from '@/hooks';
 
 interface LedgerDialogProps {
   onClose: () => void;
@@ -37,19 +37,17 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
     setIsConnecting(true);
 
     try {
-      const ledgerConnector = connectors["ledger"] as LedgerConnector;
+      const ledgerConnector = connectors['ledger'] as LedgerConnector;
       const accounts = await ledgerConnector.fetchAccounts();
-      console.log("accounts", accounts);
+      console.log('accounts', accounts);
       setLedgerAccounts(accounts);
     } catch (error) {
-      console.error("Connection error:", error);
+      console.error('Connection error:', error);
       toast({
-        title: "Connection Failed",
+        title: 'Connection Failed',
         description:
-          error instanceof Error
-            ? error.message
-            : "An unknown error occurred. Please try again.",
-        variant: "destructive",
+          error instanceof Error ? error.message : 'An unknown error occurred. Please try again.',
+        variant: 'destructive',
       });
       onClose(); // Close the dialog on error
     } finally {
@@ -59,14 +57,14 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
 
   const handleLedgerAccountSelect = async (selectedAccount: LedgerAccount) => {
     try {
-      await connect("ledger", selectedAccount.index);
+      await connect('ledger', selectedAccount.index);
       onClose();
     } catch (error) {
-      console.error("Ledger connection error:", error);
+      console.error('Ledger connection error:', error);
       toast({
-        title: "Connection Failed",
-        description: "There was an error connecting your Ledger account. Please try again.",
-        variant: "destructive",
+        title: 'Connection Failed',
+        description: 'There was an error connecting your Ledger account. Please try again.',
+        variant: 'destructive',
       });
       onClose(); // Close the dialog on error
     }
@@ -74,7 +72,7 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
 
   const paginatedAccounts = ledgerAccounts.slice(
     currentPage * accountsPerPage,
-    (currentPage + 1) * accountsPerPage
+    (currentPage + 1) * accountsPerPage,
   );
 
   if (isConnecting) {
@@ -90,10 +88,7 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
     <div className="flex flex-col space-y-4">
       <h3 className="text-lg font-semibold">Select Ledger Account</h3>
       {paginatedAccounts.map((account, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between p-2 border rounded"
-        >
+        <div key={index} className="flex items-center justify-between p-2 border rounded">
           <div>
             <p className="font-mono text-sm">{account.address}</p>
             <p className="text-xs text-gray-500">Index: {account.index}</p>
@@ -103,10 +98,10 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
               size="sm"
               variant="outline"
               onClick={() => {
-                navigator.clipboard.writeText(account.address)
+                navigator.clipboard.writeText(account.address);
                 toast({
-                  title: "Copied to clipboard",
-                  description: "The address has been copied to your clipboard.",
+                  title: 'Copied to clipboard',
+                  description: 'The address has been copied to your clipboard.',
                 });
               }}
             >
@@ -120,7 +115,7 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
       ))}
       <div className="flex justify-between mt-4">
         <Button
-          onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+          onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
           disabled={currentPage === 0}
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
@@ -128,11 +123,8 @@ export default function LedgerDialog({ onClose }: LedgerDialogProps) {
         </Button>
         <Button
           onClick={() =>
-            setCurrentPage((prev) =>
-              Math.min(
-                Math.ceil(ledgerAccounts.length / accountsPerPage) - 1,
-                prev + 1
-              )
+            setCurrentPage(prev =>
+              Math.min(Math.ceil(ledgerAccounts.length / accountsPerPage) - 1, prev + 1),
             )
           }
           disabled={(currentPage + 1) * accountsPerPage >= ledgerAccounts.length}
