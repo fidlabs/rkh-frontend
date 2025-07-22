@@ -1,10 +1,47 @@
 import { isFilecoinAddress } from '@/types/filecoin';
 import { encodeFunctionData } from 'viem/utils';
 import { MetaTransactionData, OperationType, TransactionResult } from '@safe-global/types-kit';
-import { useAccount as useAccountWagmi, useSwitchChain } from 'wagmi';
-import { useFilecoinPublicClient } from '@/hooks/use-filecoin-public-client';
+import { useAccount as useAccountWagmi } from 'wagmi';
+import { useFilecoinPublicClient } from '@/hooks';
 import { useState } from 'react';
 import { getSafeKit } from '@/lib/safe';
+import { useSwitchChain } from '@/hooks/useSwitchChain';
+
+interface TransactionLog {
+  address: string;
+  data: string;
+  topics: string[];
+  removed: boolean;
+  logIndex: number;
+  blockHash: string;
+  blockNumber: bigint;
+  transactionHash: string;
+  transactionIndex: number;
+}
+
+interface TransactionReceipt {
+  transactionHash: string;
+  transactionIndex: number;
+  blockHash: string;
+  blockNumber: bigint;
+  from: string;
+  to: string;
+  contractAddress: string | null;
+  cumulativeGasUsed: bigint;
+  effectiveGasPrice: bigint;
+  gasUsed: bigint;
+  logs: TransactionLog[];
+  logsBloom: string;
+  root: string;
+  status: 'success' | 'reverted';
+  type: string;
+}
+
+interface SafeTransactionResponse {
+  hash: string;
+
+  wait(): Promise<TransactionReceipt>;
+}
 
 const addAllowanceContractAbi = [
   {
@@ -29,10 +66,14 @@ const addAllowanceContractAbi = [
 
 interface MetaAllocatorTransaction {
   onSubmitSafeTransaction?: () => void;
-  onSubmitSafeTransactionSuccess?: (result: TransactionResult) => void;
+  onSubmitSafeTransactionSuccess?: (
+    txResult: TransactionResult,
+    txReceipt?: TransactionReceipt,
+  ) => void;
   onSignSafeTransaction?: () => void;
   onExecuteSafeTransaction?: () => void;
   onConvertingAddress?: () => void;
+  onFetchTransactionReceipt?: () => void;
   onSubmitSafeTransactionError?: (error: unknown) => void;
 }
 
@@ -48,13 +89,15 @@ export const useMetaAllocatorTransaction = ({
   onSubmitSafeTransactionError,
   onConvertingAddress,
   onSignSafeTransaction,
+  onFetchTransactionReceipt,
   onExecuteSafeTransaction,
 }: MetaAllocatorTransaction) => {
   const { connector } = useAccountWagmi();
-  const { chains, switchChain } = useSwitchChain();
+  const { autoSwitchChain } = useSwitchChain();
   const client = useFilecoinPublicClient();
   const [isPending, setIsPending] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [blockNumber, setBlockNumber] = useState<number | null>(null);
 
   const submitSafeTransaction = async ({
     address,
@@ -64,9 +107,7 @@ export const useMetaAllocatorTransaction = ({
     setIsPending(true);
     onSubmitSafeTransaction?.();
 
-    switchChain({
-      chainId: chains[0].id,
-    });
+    autoSwitchChain();
 
     const provider = await connector?.getProvider();
     const safeKit = await getSafeKit(provider);
@@ -148,8 +189,25 @@ export const useMetaAllocatorTransaction = ({
 
       onExecuteSafeTransaction?.();
       const executeTxResponse = await safeKit.executeTransaction(signedSafeTransaction);
+      console.log('executeTxResponse', executeTxResponse);
       setTxHash(executeTxResponse.hash);
-      onSubmitSafeTransactionSuccess?.(executeTxResponse);
+
+      const { wait } = executeTxResponse?.transactionResponse as SafeTransactionResponse;
+
+      if (!wait) {
+        onSubmitSafeTransactionSuccess?.(executeTxResponse, undefined);
+        return;
+      }
+
+      onFetchTransactionReceipt?.();
+      await wait?.()
+        .then(response => {
+          setBlockNumber(Number(response.blockNumber));
+          onSubmitSafeTransactionSuccess?.(executeTxResponse, response);
+        })
+        .catch(() => {
+          onSubmitSafeTransactionSuccess?.(executeTxResponse, undefined);
+        });
     } catch (error) {
       onSubmitSafeTransactionError?.(error);
     }
@@ -157,5 +215,5 @@ export const useMetaAllocatorTransaction = ({
     setIsPending(false);
   };
 
-  return { submitSafeTransaction, isPending, txHash };
+  return { submitSafeTransaction, isPending, txHash, blockNumber };
 };
