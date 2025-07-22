@@ -34,7 +34,7 @@ export function MetaAllocatorSignTransactionDialog({
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { submitSafeTransaction, txHash } = useMetaAllocatorTransaction({
+  const { submitSafeTransaction, txHash, blockNumber } = useMetaAllocatorTransaction({
     onSubmitSafeTransaction: () => {
       setStep(RefreshAllocatorSteps.LOADING);
       setLoadingMessage('Signing transaction. Please wait...');
@@ -50,6 +50,10 @@ export function MetaAllocatorSignTransactionDialog({
     onExecuteSafeTransaction: () => {
       setStep(RefreshAllocatorSteps.LOADING);
       setLoadingMessage('Executing transaction. Please confrim on your MetaMask.');
+    },
+    onFetchTransactionReceipt: () => {
+      setStep(RefreshAllocatorSteps.LOADING);
+      setLoadingMessage('Fetching transaction receipt. Please wait...');
     },
     onSubmitSafeTransactionError: error => {
       setStep(RefreshAllocatorSteps.ERROR);
@@ -79,8 +83,8 @@ export function MetaAllocatorSignTransactionDialog({
     ),
     [RefreshAllocatorSteps.SUCCESS]: (
       <RefreshAllocatorSuccessStep
+        blockNumber={blockNumber}
         messageId={txHash}
-        blockNumber={123}
         onClose={() => onOpenChange(false)}
       />
     ),

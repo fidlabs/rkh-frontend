@@ -5,7 +5,6 @@ import ScaleLoader from 'react-spinners/ScaleLoader';
 import { ExternalLink } from 'lucide-react';
 import {
   useAccount as useAccountWagmi,
-  useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from 'wagmi';
@@ -29,7 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/components/ui/use-toast';
-import { useAccount } from '@/hooks';
+import { useAccount, useSwitchChain } from '@/hooks';
 import { Application } from '@/types/application';
 import { isFilecoinAddress } from '@/types/filecoin';
 import { env } from '@/config/environment';
@@ -69,7 +68,7 @@ export default function SignMetaAllocatorTransactionButton({
   const { toast } = useToast();
   const { connector } = useAccountWagmi();
   const client = useFilecoinPublicClient();
-  const { chains, switchChain } = useSwitchChain();
+  const { autoSwitchChain } = useSwitchChain();
 
   const { writeContract, isPending, error: isError, data: hash, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
@@ -117,9 +116,7 @@ export default function SignMetaAllocatorTransactionButton({
   };
 
   const submitSafeTransaction = async () => {
-    switchChain({
-      chainId: chains[0].id,
-    });
+    autoSwitchChain();
     const provider = await connector?.getProvider();
     const safeKit = await getSafeKit(provider);
 

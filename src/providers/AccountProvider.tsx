@@ -5,7 +5,6 @@ import {
   useAccount as useWagmiAccount,
   useConnect as useWagmiConnect,
   useDisconnect as useWagmiDisconnect,
-  useSwitchChain,
 } from 'wagmi';
 
 import { AccountContext } from '@/contexts/AccountContext';
@@ -19,6 +18,7 @@ import { VerifyAPI } from 'filecoin-verifier-tools';
 import { env } from '@/config/environment';
 import { injected } from 'wagmi/connectors';
 import { getSafeKit } from '@/lib/safe';
+import { useSwitchChain } from '@/hooks';
 
 const queryClient = new QueryClient();
 
@@ -36,15 +36,13 @@ export const AccountProvider: React.FC<{
     status: wagmiStatus,
     connector: wagmiConnector,
   } = useWagmiAccount();
-  const { chains, switchChain: wagmiSwitchChain } = useSwitchChain();
+  const { autoSwitchChain } = useSwitchChain();
   const { connect: wagmiConnect } = useWagmiConnect();
   const { disconnect: wagmiDisconnect } = useWagmiDisconnect();
 
   useEffect(() => {
     if (wagmiStatus === 'connected') {
-      wagmiSwitchChain({
-        chainId: chains[0].id,
-      });
+      autoSwitchChain();
 
       const setupSafe = async () => {
         try {

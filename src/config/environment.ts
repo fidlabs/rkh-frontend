@@ -1,24 +1,54 @@
 import { Application } from '@/types/application';
+import { Address } from 'viem';
+
+interface SafeContractAddresses {
+  safeSingletonAddress: Address;
+  safeProxyFactoryAddress: Address;
+  multiSendAddress: Address;
+  fallbackHandlerAddress: Address;
+  multiSendCallOnlyAddress: Address;
+  createCallAddress: Address;
+  signMessageLibAddress: Address;
+  simulateTxAccessorAddress: Address;
+}
 
 interface Environment {
   apiBaseUrl: string;
   useTestData: boolean;
   useTestnet: boolean;
+  testNetChainId: number;
   rpcUrl: string;
   rpcToken: string;
   metaAllocatorContractAddress: string;
   githubOwner: string;
+  safeAddress: string;
 }
+
+export const testNetSafeContracts: SafeContractAddresses = {
+  safeSingletonAddress: process.env.NEXT_PUBLIC_SAFE_SINGLETON_ADDRESS as Address,
+  safeProxyFactoryAddress: process.env.NEXT_PUBLIC_SAFE_PROXY_FACTORY_ADDRESS as Address,
+  multiSendAddress: process.env.NEXT_PUBLIC_SAFE_MULTISEND_ADDRESS as Address,
+  fallbackHandlerAddress: process.env.NEXT_PUBLIC_SAFE_FALLBACK_HANDLER_ADDRESS as Address,
+  multiSendCallOnlyAddress: process.env.NEXT_PUBLIC_SAFE_MULTISEND_CALL_ONLY_ADDRESS as Address,
+  createCallAddress: process.env.NEXT_PUBLIC_SAFE_CREATE_CALL_ADDRESS as Address,
+  signMessageLibAddress: process.env.NEXT_PUBLIC_SAFE_SIGN_MESSAGE_LIB_ADDRESS as Address,
+  simulateTxAccessorAddress: process.env.NEXT_PUBLIC_SAFE_SIMULATE_TX_ACCESSOR_ADDRESS as Address,
+};
 
 const environments: { [key: string]: Environment } = {
   development: {
     apiBaseUrl: 'http://localhost:3001/api/v1',
     useTestData: false,
-    useTestnet: Boolean(process.env.USE_TEST_NET) || false,
-    rpcUrl: process.env.RPC_URL || 'https://api.node.glif.io/rpc/v1',
-    rpcToken: process.env.RPC_TOKEN || '',
-    metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
-    githubOwner: process.env.GITHUB_OWNER || '',
+    testNetChainId: Number(process.env.NEXT_PUBLIC_LOCAL_TEST_NET_CHAIN_ID) || 31415926,
+    useTestnet: Boolean(process.env.NEXT_PUBLIC_USE_TEST_NET) || false,
+    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'https://api.node.glif.io/rpc/v1',
+    rpcToken: process.env.NEXT_PUBLIC_RPC_TOKEN || '',
+    metaAllocatorContractAddress:
+      process.env.NEXT_PUBLIC_META_ALLOCATOR_CONTRACT_ADDRESS ||
+      '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
+    githubOwner: process.env.NEXT_PUBLIC_GITHUB_OWNER || 'filecoin-project',
+    safeAddress:
+      process.env.NEXT_PUBLIC_SAFE_ADDRESS || '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e',
   },
   staging: {
     apiBaseUrl: 'https://allocator-rkh-backend-utcn6.ondigitalocean.app/api/v1',
@@ -27,7 +57,9 @@ const environments: { [key: string]: Environment } = {
     rpcUrl: 'https://api.node.glif.io/rpc/v1',
     rpcToken: process.env.RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
-    githubOwner: process.env.GITHUB_OWNER || '',
+    githubOwner: process.env.GITHUB_OWNER || 'filecoin-project',
+    safeAddress: '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e',
+    testNetChainId: 31415926,
   },
   production: {
     apiBaseUrl: 'https://allocator-rkh-backend-utcn6.ondigitalocean.app/backend/api/v1',
@@ -37,6 +69,8 @@ const environments: { [key: string]: Environment } = {
     rpcToken: process.env.RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
     githubOwner: process.env.GITHUB_OWNER || 'filecoin-project',
+    safeAddress: '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e',
+    testNetChainId: 31415926,
   },
 };
 
