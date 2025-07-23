@@ -6,6 +6,8 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  OnChangeFn,
+  PaginationState,
   SortingState,
   Table as TableSchema,
   useReactTable,
@@ -21,13 +23,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+interface Pagination<TData> {
+  totalPages: number;
+  paginationState: PaginationState;
+  setPaginationState?: OnChangeFn<PaginationState>;
+}
 
 interface TableGeneratorProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];
+  pagination?: Pagination<TData>;
 }
 
-export function TableGenerator<TData>({ data, columns }: TableGeneratorProps<TData>) {
+export function TableGenerator<TData>({ data, columns, pagination }: TableGeneratorProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -37,6 +47,9 @@ export function TableGenerator<TData>({ data, columns }: TableGeneratorProps<TDa
     data,
     columns,
     onSortingChange: setSorting,
+    manualPagination: !!pagination,
+    pageCount: pagination?.totalPages,
+    onPaginationChange: pagination?.setPaginationState,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -49,6 +62,7 @@ export function TableGenerator<TData>({ data, columns }: TableGeneratorProps<TDa
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: pagination?.paginationState,
     },
   });
 
@@ -94,32 +108,38 @@ export function TableGenerator<TData>({ data, columns }: TableGeneratorProps<TDa
         </Table>
       </div>
 
-      <DashboardTableFooter table={table} />
+      <DashboardTableFooter pagination={pagination} table={table} />
     </div>
   );
 }
 
-function DashboardTableFooter<TData>({ table }: { table: TableSchema<TData> }) {
+function DashboardTableFooter<TData>({
+  table,
+  pagination,
+}: { table: TableSchema<TData> } & { pagination?: Pagination<TData> }) {
   return (
-    <div className="flex items-center justify-end space-x-2 py-4">
-      <div className="space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+    <div className="flex items-center justify-between mt-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => table.previousPage()}
+        disabled={!table.getCanPreviousPage()}
+      >
+        <ChevronLeft className="h-4 w-4 mr-2" />
+        Previous
+      </Button>
+      <span className="text-sm text-muted-foreground">
+        Page {(pagination?.paginationState?.pageIndex || 0) + 1} of {pagination?.totalPages || 1}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => table.nextPage()}
+        disabled={!table.getCanNextPage()}
+      >
+        Next
+        <ChevronRight className="h-4 w-4 ml-2" />
+      </Button>
     </div>
   );
 }

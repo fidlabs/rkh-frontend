@@ -157,10 +157,6 @@ export function DashboardPage() {
               <RefreshesPanel
                 title="Refreshes"
                 description="Consult and manage Fil+ datacap Refreshes."
-                applications={applications}
-                totalCount={totalCount}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
               />
             </TabsContent>
           </Suspense>
