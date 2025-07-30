@@ -54,7 +54,7 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
   });
 
   const onSubmit = async ({ allocatorAddress, dataCap }: FormFields) =>
-    proposeTransaction({ address: allocatorAddress, datacap: dataCap });
+    proposeTransaction({ address: allocatorAddress, datacap: dataCap }).catch(() => {});
 
   const getBlockNumber = () => {
     return typeof stateWaitMsg === 'object' ? stateWaitMsg?.Height : undefined;

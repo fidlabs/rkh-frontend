@@ -59,7 +59,9 @@ export function RkhSignTransactionDialog({
   });
 
   const onSubmit = useCallback(
-    async ({ dataCap }: FormFields) => proposeTransaction({ address, datacap: dataCap }),
+    async ({ dataCap }: FormFields) =>
+      proposeTransaction({ address, datacap: dataCap }).catch(() => {}),
+
     [address, proposeTransaction],
   );
 
