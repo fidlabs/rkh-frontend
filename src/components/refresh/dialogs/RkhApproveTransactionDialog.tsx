@@ -54,7 +54,9 @@ export function RkhApproveTransactionDialog({
 
   const onSubmit = useCallback(
     async () =>
-      approveTransaction({ address, datacap, fromAccount, transactionId }).catch(() => {}),
+      approveTransaction({ address, datacap, fromAccount, transactionId }).catch(error => {
+        console.error('Error approving transaction:', error);
+      }),
     [address, approveTransaction, datacap, fromAccount, transactionId],
   );
 

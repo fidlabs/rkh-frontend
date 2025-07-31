@@ -60,8 +60,9 @@ export function RkhSignTransactionDialog({
 
   const onSubmit = useCallback(
     async ({ dataCap }: FormFields) =>
-      proposeTransaction({ address, datacap: dataCap }).catch(() => {}),
-
+      proposeTransaction({ address, datacap: dataCap }).catch(error => {
+        console.error('Error proposing verifier:', error);
+      }),
     [address, proposeTransaction],
   );
 

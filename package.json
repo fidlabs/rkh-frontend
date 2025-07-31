@@ -10,8 +10,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:unit": "vitest run",
-    "fmt:check": "prettier --check .",
-    "fmt:fix": "prettier --write --ignore-unknown ."
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write --ignore-unknown ."
   },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.29.2",
