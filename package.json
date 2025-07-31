@@ -9,7 +9,7 @@
     "lint": "next lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run",
+    "test:unit": "vitest run",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write --ignore-unknown ."
   },

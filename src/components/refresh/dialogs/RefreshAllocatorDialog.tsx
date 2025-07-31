@@ -54,7 +54,9 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
   });
 
   const onSubmit = async ({ allocatorAddress, dataCap }: FormFields) =>
-    proposeTransaction({ address: allocatorAddress, datacap: dataCap });
+    proposeTransaction({ address: allocatorAddress, datacap: dataCap }).catch(error => {
+      console.error('Error proposing verifier:', error);
+    });
 
   const getBlockNumber = () => {
     return typeof stateWaitMsg === 'object' ? stateWaitMsg?.Height : undefined;
