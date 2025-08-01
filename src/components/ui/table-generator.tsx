@@ -8,12 +8,13 @@ import {
   getSortedRowModel,
   OnChangeFn,
   PaginationState,
+  Row,
   SortingState,
   Table as TableSchema,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -23,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader, Loader2 } from 'lucide-react';
 
 interface Pagination<TData> {
   totalPages: number;
@@ -35,9 +36,17 @@ interface TableGeneratorProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];
   pagination?: Pagination<TData>;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
-export function TableGenerator<TData>({ data, columns, pagination }: TableGeneratorProps<TData>) {
+export function TableGenerator<TData>({
+  data,
+  columns,
+  pagination,
+  isError,
+  isLoading,
+}: TableGeneratorProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -56,23 +65,24 @@ export function TableGenerator<TData>({ data, columns, pagination }: TableGenera
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    enableHiding: true,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination: pagination?.paginationState,
+      ...(pagination ? { pagination: pagination.paginationState } : {}),
     },
   });
 
   return (
     <div className="w-full">
       <div className="rounded-md">
-        <Table>
-          <TableHeader>
+        <Table role="table">
+          <TableHeader role="rowgroup">
             {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} role="row">
                 {headerGroup.headers.map(header => {
                   return (
                     <TableHead key={header.id}>
@@ -86,29 +96,18 @@ export function TableGenerator<TData>({ data, columns, pagination }: TableGenera
             ))}
           </TableHeader>
 
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
+          <TableBody role="rowgroup">
+            <TableBodyContent
+              table={table}
+              columns={columns}
+              isError={isError}
+              isLoading={isLoading}
+            />
           </TableBody>
         </Table>
       </div>
 
-      <DashboardTableFooter pagination={pagination} table={table} />
+      {pagination ? <DashboardTableFooter pagination={pagination} table={table} /> : null}
     </div>
   );
 }
@@ -118,7 +117,11 @@ function DashboardTableFooter<TData>({
   pagination,
 }: { table: TableSchema<TData> } & { pagination?: Pagination<TData> }) {
   return (
-    <div className="flex items-center justify-between mt-4">
+    <nav
+      role="navigation"
+      aria-label="Pagination"
+      className="flex items-center justify-between mt-4"
+    >
       <Button
         variant="outline"
         size="sm"
@@ -140,6 +143,62 @@ function DashboardTableFooter<TData>({
         Next
         <ChevronRight className="h-4 w-4 ml-2" />
       </Button>
-    </div>
+    </nav>
   );
+}
+
+function TableBodyContent<TData>({
+  table,
+  columns,
+  isError,
+  isLoading,
+}: { table: TableSchema<TData> } & {
+  columns: ColumnDef<TData>[];
+  isError?: boolean;
+  isLoading?: boolean;
+}) {
+  if (isError) {
+    return (
+      <TableRow role="row">
+        <TableCell colSpan={columns.length} className="h-24 text-center">
+          <p data-testid="error-message" className="text-red-500">
+            Cannot load data
+          </p>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <TableRow role="row">
+        <TableCell colSpan={columns.length} className="h-24 text-center">
+          <Loader size={24} data-testid="table-spinner" className="animate-spin mx-auto" />
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  const tableRows = table.getRowModel().rows;
+
+  if (!tableRows.length)
+    return (
+      <TableRow role="row">
+        <TableCell colSpan={columns.length} className="h-24 text-center">
+          <p data-testid="no-results-message" className="text-muted-foreground">
+            No results.
+          </p>
+        </TableCell>
+      </TableRow>
+    );
+
+  return tableRows.map(row => (
+    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+      {row.getVisibleCells().map(cell => (
+        <TableCell key={cell.id} role="cell">
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
+      ))}
+    </TableRow>
+  ));
 }
