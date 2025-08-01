@@ -1,5 +1,5 @@
 import { Application } from '@/types/application';
-import { Button } from '../../../ui/button';
+import { Button } from '../../ui/button';
 import Link from 'next/link';
 import { useAccount } from '@/hooks';
 import { AccountRole } from '@/types/account';

@@ -160,12 +160,12 @@ describe('DashboardPage', () => {
   it('should display error when API fails', () => {
     mocks.mockUseGetApplications.mockReturnValue({
       data: null,
-      error: new Error('Network error'),
+      isError: true,
     });
 
     render(<DashboardPage />, { wrapper: TooltipProvider });
 
-    expect(screen.getByText('Error: Network error')).toBeInTheDocument();
+    expect(screen.getByTestId('error-message')).toBeInTheDocument();
   });
 
   it('should handle search term changes', async () => {
@@ -180,27 +180,5 @@ describe('DashboardPage', () => {
         searchTerm: 'test',
       }),
     );
-  });
-
-  it('should refetch queries when changing tabs', async () => {
-    const user = userEvent.setup();
-    render(<DashboardPage />, { wrapper: TooltipProvider });
-
-    const refreshTab = screen.getByRole('tab', { name: 'Completed Applications' });
-    await user.click(refreshTab);
-
-    expect(mocks.mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['applications'],
-    });
-  });
-
-  it('should cancel queries when component unmounts', () => {
-    const { unmount } = render(<DashboardPage />, { wrapper: TooltipProvider });
-
-    unmount();
-
-    expect(mocks.mockCancelQueries).toHaveBeenCalledWith({
-      queryKey: ['applications'],
-    });
   });
 });

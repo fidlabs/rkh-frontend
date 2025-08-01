@@ -12,7 +12,7 @@ export const availableFilters: Record<DashboardTabs, string[]> = {
     'APPROVED',
     'META_APPROVAL_PHASE',
   ],
-  [DashboardTabs.COMPLETED_APPLICATIONS]: ['DC_ALLOCATED', 'IN_REFRESSH', 'REJECTED'], // FIXME backend typo
+  [DashboardTabs.COMPLETED_APPLICATIONS]: ['DC_ALLOCATED', 'REJECTED'], // FIXME backend typo
   [DashboardTabs.REFRESHES]: [],
 };
 

@@ -8,26 +8,24 @@ import {
 } from '@/components/ui/card';
 import { PAGE_SIZE } from '@/components/dashboard/constants';
 import { TableGenerator } from '@/components/ui/table-generator';
-import { refreshesTableColumns } from '@/components/dashboard/panels/refreshes/refreshes-table-columns';
-import { useAccountRole, useGetRefreshes } from '@/hooks';
+import { useGetRefreshes } from '@/hooks';
 import { useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
+import { refreshesTableColumns } from './refreshes-table-columns';
 
-interface RefreshPanelProps {
-  title: string;
-  description: string;
+interface RefreshesPanelProps {
+  searchTerm: string;
 }
 
-export function RefreshesPanel({ title, description }: RefreshPanelProps) {
+export function RefreshesPanel({ searchTerm }: RefreshesPanelProps) {
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const { data, isLoading } = useGetRefreshes({
-    searchTerm: '',
+  const { data, isLoading, isError } = useGetRefreshes({
+    searchTerm,
     currentPage: paginationState.pageIndex + 1,
   });
-  const role = useAccountRole();
 
   const totalCount = data?.data?.pagination?.totalItems || 0;
   const startIndex = paginationState.pageIndex * PAGE_SIZE + 1;
@@ -38,21 +36,23 @@ export function RefreshesPanel({ title, description }: RefreshPanelProps) {
     <>
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardTitle>Refreshes</CardTitle>
+          <CardDescription data-testid="refresh-table-description">
+            Consult and manage Fil+ datacap Refreshes.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading || !data?.data?.results ? null : (
-            <TableGenerator
-              data={data?.data?.results}
-              pagination={{
-                totalPages,
-                paginationState,
-                setPaginationState,
-              }}
-              columns={refreshesTableColumns({ role })}
-            />
-          )}
+          <TableGenerator
+            data={data?.data?.results || []}
+            isLoading={isLoading}
+            isError={isError}
+            pagination={{
+              totalPages,
+              paginationState,
+              setPaginationState,
+            }}
+            columns={refreshesTableColumns}
+          />
         </CardContent>
         <CardFooter>
           <div className="flex gap-1 text-xs text-muted-foreground">

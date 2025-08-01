@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 
-import { ApplicationsPanel, DashboardHeader } from '@/components/dashboard';
+import { DashboardHeader } from '@/components/dashboard';
 import Account from '@/components/account/Account';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { DashboardBreadcrumb } from '@/components/dashboard/DashboardBreadcrumb';
@@ -13,9 +13,10 @@ import { RefreshAllocatorSection } from '@/components/refresh/RefreshAllocatorSe
 import { AccountRole } from '@/types/account';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { availableFilters, DashboardTabs } from '@/components/dashboard/constants';
-import { useAccountRole, useGetApplications } from '@/hooks';
-import { useQueryClient } from '@tanstack/react-query';
-import { RefreshesPanel } from '@/components/dashboard/panels/refreshes/RefreshesPanel';
+import { useAccountRole } from '@/hooks';
+import { CompletedApplicationsPanel } from './completed-applications/CompletedApplicationsPanel';
+import { NewApplicationsPanel } from './new-applications/NewApplicationsPanel';
+import { RefreshesPanel } from './refreshes/RefreshesPanel';
 
 /**
  * DashboardPage component
@@ -24,25 +25,13 @@ import { RefreshesPanel } from '@/components/dashboard/panels/refreshes/Refreshe
 export function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [tab, setTab] = useState<DashboardTabs>(DashboardTabs.NEW_APPLICATIONS);
   const role = useAccountRole();
-  const queryClient = useQueryClient();
-
-  const { data, error } = useGetApplications({
-    searchTerm,
-    activeFilters,
-    currentTab: tab,
-    currentPage,
-  });
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Applications', href: '/dashboard' },
   ];
-
-  const applications = data?.applications || [];
-  const totalCount = data?.totalCount || 0;
 
   const handleFilterChange = (filter: string, checked: boolean) => {
     if (checked) {
@@ -53,23 +42,9 @@ export function DashboardPage() {
   };
 
   useEffect(() => {
+    setSearchTerm('');
     setActiveFilters([]);
-    setCurrentPage(1);
-    if ([DashboardTabs.COMPLETED_APPLICATIONS, DashboardTabs.NEW_APPLICATIONS].includes(tab)) {
-      queryClient.invalidateQueries({
-        queryKey: ['applications'],
-      });
-    }
-  }, [queryClient, tab]);
-
-  useEffect(
-    () => () => {
-      queryClient.cancelQueries({
-        queryKey: ['applications'],
-      });
-    },
-    [queryClient],
-  );
+  }, [tab]);
 
   return (
     <>
@@ -107,12 +82,6 @@ export function DashboardPage() {
       />
 
       <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-        {error && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-red-500 text-center">Error: {error.message}</div>
-          </div>
-        )}
-
         <Tabs value={tab} onValueChange={value => setTab(value as DashboardTabs)}>
           <TabsList className="w-full mt-4">
             <TabsTrigger className="flex-1" value={DashboardTabs.NEW_APPLICATIONS}>
@@ -134,30 +103,13 @@ export function DashboardPage() {
             }
           >
             <TabsContent value={DashboardTabs.NEW_APPLICATIONS}>
-              <ApplicationsPanel
-                title="New Applications"
-                description="Consult and manage Fil+ program applications."
-                applications={applications}
-                totalCount={totalCount}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-              />
+              <NewApplicationsPanel searchTerm={searchTerm} activeFilters={activeFilters} />
             </TabsContent>
             <TabsContent value={DashboardTabs.COMPLETED_APPLICATIONS}>
-              <ApplicationsPanel
-                title="Completed Applications"
-                description="Consult and manage Fil+ program applications."
-                applications={applications}
-                totalCount={totalCount}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-              />
+              <CompletedApplicationsPanel searchTerm={searchTerm} activeFilters={activeFilters} />
             </TabsContent>
             <TabsContent value={DashboardTabs.REFRESHES}>
-              <RefreshesPanel
-                title="Refreshes"
-                description="Consult and manage Fil+ datacap Refreshes."
-              />
+              <RefreshesPanel searchTerm={searchTerm} />
             </TabsContent>
           </Suspense>
         </Tabs>
