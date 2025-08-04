@@ -38,7 +38,6 @@ export function NewApplicationsPanel({ searchTerm, activeFilters }: NewApplicati
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-    <>
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>New Applications</CardTitle>
@@ -67,6 +66,5 @@ export function NewApplicationsPanel({ searchTerm, activeFilters }: NewApplicati
           </div>
         </CardFooter>
       </Card>
-    </>
   );
 }

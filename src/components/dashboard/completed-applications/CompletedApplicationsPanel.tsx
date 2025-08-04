@@ -41,7 +41,6 @@ export function CompletedApplicationsPanel({
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-    <>
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Completed Applications</CardTitle>
@@ -70,6 +69,5 @@ export function CompletedApplicationsPanel({
           </div>
         </CardFooter>
       </Card>
-    </>
   );
 }
