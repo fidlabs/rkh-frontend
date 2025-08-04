@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
+import { Button } from './button';
+import { Column } from '@tanstack/react-table';
 
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
@@ -88,4 +90,31 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = 'TableCaption';
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+const TableSortableHeader = React.forwardRef<
+  HTMLButtonElement,
+  React.ThHTMLAttributes<HTMLButtonElement> & { column: Column<any> }
+>(({ className, column, children, ...props }, ref) => (
+  <Button
+    {...props}
+    ref={ref}
+    className={cn(className)}
+    variant="ghost"
+    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+  >
+    {children}
+    {column.getIsSorted() === 'asc' ? ' ▲' : ' ▼'}
+  </Button>
+));
+TableSortableHeader.displayName = 'TableSortableHeader';
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+  TableSortableHeader,
+};

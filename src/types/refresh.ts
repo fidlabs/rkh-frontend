@@ -1,4 +1,14 @@
-export type RefreshStatus = 'PENDING' | 'DC_ALLOCATED' | 'REJECTED' | 'SIGNED_BY_RKH';
+export enum RefreshStatus {
+  PENDING = 'PENDING',
+  DC_ALLOCATED = 'DC_ALLOCATED',
+  REJECTED = 'REJECTED',
+  SIGNED_BY_RKH = 'SIGNED_BY_RKH',
+}
+
+export enum MetapathwayType {
+  MDMA = 'MDMA',
+  RKH = 'RKH',
+}
 
 export interface Refresh {
   githubIssueId: number;
@@ -19,7 +29,8 @@ export interface Refresh {
   updatedAt: Date | null;
   closedAt: Date | null;
   jsonNumber: string;
-  metapathwayType?: 'MDMA' | 'RKH';
+  metapathwayType?: MetapathwayType;
+  transactionCid?: string;
   refreshStatus: RefreshStatus;
   dataCap: number;
   msigAddress: string;
