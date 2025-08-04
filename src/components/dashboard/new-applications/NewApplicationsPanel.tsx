@@ -38,33 +38,33 @@ export function NewApplicationsPanel({ searchTerm, activeFilters }: NewApplicati
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>New Applications</CardTitle>
-          <CardDescription>Consult and manage Fil+ program applications.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <TableGenerator
-            isLoading={isLoading}
-            isError={isError}
-            data={data?.applications || []}
-            pagination={{
-              totalPages,
-              paginationState,
-              setPaginationState,
-            }}
-            columns={newApplicationsTableColumns}
-          />
-        </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Showing{' '}
-            <strong>
-              {startIndex}-{endIndex}
-            </strong>{' '}
-            of <strong>{totalCount}</strong> applications
-          </div>
-        </CardFooter>
-      </Card>
+    <Card className="mb-4">
+      <CardHeader>
+        <CardTitle>New Applications</CardTitle>
+        <CardDescription>Consult and manage Fil+ program applications.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <TableGenerator
+          isLoading={isLoading}
+          isError={isError}
+          data={data?.applications || []}
+          pagination={{
+            totalPages,
+            paginationState,
+            setPaginationState,
+          }}
+          columns={newApplicationsTableColumns}
+        />
+      </CardContent>
+      <CardFooter>
+        <div className="text-xs text-muted-foreground">
+          Showing{' '}
+          <strong>
+            {startIndex}-{endIndex}
+          </strong>{' '}
+          of <strong>{totalCount}</strong> applications
+        </div>
+      </CardFooter>
+    </Card>
   );
 }
