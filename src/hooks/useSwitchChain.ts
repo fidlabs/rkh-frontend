@@ -1,5 +1,6 @@
 import { useSwitchChain as useWagmiSwitchChain } from 'wagmi';
 import { env } from '@/config/environment';
+import { useCallback } from 'react';
 
 enum ChainId {
   Mainnet = 0,
@@ -9,13 +10,13 @@ enum ChainId {
 export const useSwitchChain = () => {
   const { chains, switchChain, ...rest } = useWagmiSwitchChain();
 
-  const autoSwitchChain = () => {
+  const autoSwitchChain = useCallback(() => {
     const chainIndex = env.useTestnet ? ChainId.Testnet : ChainId.Mainnet;
 
     return switchChain({
       chainId: chains[chainIndex].id,
     });
-  };
+  }, [switchChain, chains]);
 
   return {
     ...rest,
