@@ -13,3 +13,4 @@ export * from './useAllocatorProposals';
 export * from './useMyProposals';
 export * from './useSignerManagement';
 export * from './useProposalActions';
+export * from './useMaAddresses';

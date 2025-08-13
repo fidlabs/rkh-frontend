@@ -102,6 +102,7 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
           <div className="flex space-x-2">
             <Button
               size="sm"
+              aria-label="Copy address"
               variant="outline"
               onClick={() => {
                 navigator.clipboard.writeText(account.address);
@@ -113,7 +114,11 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
             >
               <Copy className="h-4 w-4" />
             </Button>
-            <Button size="sm" onClick={() => handleLedgerAccountSelect(account)}>
+            <Button
+              size="sm"
+              aria-label={`Connect to ${account.address}`}
+              onClick={() => handleLedgerAccountSelect(account)}
+            >
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>

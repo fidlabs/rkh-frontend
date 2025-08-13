@@ -6,7 +6,7 @@ import { Refresh } from '@/types/refresh';
 import { Row } from '@tanstack/react-table';
 import { Link } from '@/components/ui/link';
 import { AccountRole } from '@/types/account';
-import { useAccountRole } from '@/hooks';
+import { useAccount } from '@/hooks';
 import {
   isAllocated,
   isWaitingForMAApprove,
@@ -15,7 +15,7 @@ import {
 } from './table.utils';
 
 export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
-  const role = useAccountRole();
+  const { account, selectedMetaAllocator } = useAccount();
 
   switch (true) {
     case isAllocated(row):
@@ -28,10 +28,12 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
           View on Filfox
         </Link>
       );
-    case (role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
+    case (account?.role === AccountRole.ROOT_KEY_HOLDER ||
+      account?.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
       isWaitingForRkhSign(row):
       return <RkhSignTransactionButton address={row.original.msigAddress} />;
-    case (role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
+    case (account?.role === AccountRole.ROOT_KEY_HOLDER ||
+      account?.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
       isWaitingForRkhApprove(row):
       return (
         <RkhApproveTransactionButton
@@ -41,7 +43,9 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
           fromAccount={row.original.rkhPhase?.approvals?.at(0) as string}
         />
       );
-    case role === AccountRole.METADATA_ALLOCATOR && isWaitingForMAApprove(row):
+    case account?.role === AccountRole.METADATA_ALLOCATOR &&
+      isWaitingForMAApprove(row) &&
+      selectedMetaAllocator?.ethAddress === row.original.maAddress:
       return (
         <MetaAllocatorSignTransactionButton
           address={row.original.msigAddress}

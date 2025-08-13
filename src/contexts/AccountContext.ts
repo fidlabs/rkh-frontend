@@ -2,11 +2,13 @@ import { createContext } from 'react';
 
 import { Account } from '@/types/account';
 import { Connector } from '@/types/connector';
+import { MetaAllocator } from '@/types/ma';
 
 export interface AccountContextType {
   account: Account | null;
+  selectedMetaAllocator?: MetaAllocator | null;
   connectors: { [key: string]: Connector };
-  connect: (connectorName: string, accountIndex?: number) => Promise<void>;
+  connect: (connectorName: string, accountIndex?: number, ma?: MetaAllocator) => Promise<void>;
   disconnect: () => Promise<void>;
   loadPersistedAccount: () => Promise<void>;
 

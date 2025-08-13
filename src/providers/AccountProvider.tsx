@@ -23,6 +23,7 @@ import { env } from '@/config/environment';
 import { injected } from 'wagmi/connectors';
 import { getSafeKit } from '@/lib/safe';
 import { useSwitchChain } from '@/hooks';
+import { MetaAllocator } from '@/types/ma';
 
 const queryClient = new QueryClient();
 
@@ -59,8 +60,9 @@ export const AccountProvider: React.FC<{
     connector: wagmiConnector,
   } = useWagmiAccount();
   const { autoSwitchChain } = useSwitchChain();
-  const { connect: wagmiConnect } = useWagmiConnect();
+  const { connectAsync: wagmiConnect } = useWagmiConnect();
   const { disconnect: wagmiDisconnect } = useWagmiDisconnect();
+  const [selectedMetaAllocator, setSelectedMetaAllocator] = useState<MetaAllocator | null>(null);
 
   useEffect(() => {
     if (wagmiStatus === 'connected') {
@@ -69,7 +71,7 @@ export const AccountProvider: React.FC<{
       const setupSafe = async () => {
         try {
           const provider = await wagmiConnector?.getProvider();
-          const safeKit = await getSafeKit(provider);
+          const safeKit = await getSafeKit(provider, selectedMetaAllocator?.ethSafeAddress);
           const maOwners = await safeKit.getOwners();
 
           setAccount({
@@ -100,7 +102,7 @@ export const AccountProvider: React.FC<{
 
       setupSafe();
     }
-  }, [wagmiStatus, wagmiAddress, wagmiConnector]);
+  }, [wagmiStatus, wagmiAddress, wagmiConnector, selectedMetaAllocator, autoSwitchChain]);
 
   // Registry of available connectors
   const connectors: { [key: string]: Connector } = {
@@ -114,14 +116,17 @@ export const AccountProvider: React.FC<{
    * Connects using the specified connector.
    * @param connectorName The name of the connector ('ledger' or 'metamask').
    * @param accountIndex The index of the account to connect to on the ledger.
+   * @param ma The MetaAllocator with safe address for safe kit.
    */
   const connect = useCallback(
-    async (connectorName: string, accountIndex?: number) => {
+    async (connectorName: string, accountIndex?: number, ma?: MetaAllocator) => {
       try {
         switch (connectorName) {
           case 'metamask':
             await wagmiConnect({
               connector: injected(),
+            }).then(() => {
+              setSelectedMetaAllocator(ma || null);
             });
             break;
           case 'ledger':
@@ -377,6 +382,7 @@ export const AccountProvider: React.FC<{
           proposeAddVerifier,
           acceptVerifierProposal,
           loadPersistedAccount,
+          selectedMetaAllocator,
         }}
       >
         {children}
