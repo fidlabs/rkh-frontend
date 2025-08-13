@@ -6,17 +6,20 @@ import { MetaAllocator } from '@/types/ma';
 
 interface MetamaskConnectionScreenProps {
   onConnect: () => void;
-  ma?: MetaAllocator;
+  metaAllocator?: MetaAllocator;
 }
 
-export const MetamaskConnectionScreen = ({ onConnect, ma }: MetamaskConnectionScreenProps) => {
+export const MetamaskConnectionScreen = ({
+  onConnect,
+  metaAllocator,
+}: MetamaskConnectionScreenProps) => {
   const { account, connect } = useAccount();
 
   useEffect(() => {
     if (account) {
       onConnect();
     } else {
-      connect('metamask', 0, ma);
+      connect('metamask', 0, metaAllocator);
     }
   }, [account]);
 

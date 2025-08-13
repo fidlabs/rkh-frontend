@@ -35,10 +35,10 @@ export function ConnectWalletDialog({ isOpen, setIsOpen, handleClose }: ConnectW
   const [currentStep, setCurrentStep] = useState<DialogStep>(DialogStep.SELECT_ROLE);
   const [selectedRole, setSelectedRole] = useState<Role | undefined>();
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>();
-  const [selectedMa, setSelectedMa] = useState<MetaAllocator | undefined>();
+  const [selectedMetaAllocator, setSelectedMetaAllocator] = useState<MetaAllocator | undefined>();
 
-  const handleMaSelect = (ma: MetaAllocator) => {
-    setSelectedMa(ma);
+  const handleMaSelect = (metaAllocator: MetaAllocator) => {
+    setSelectedMetaAllocator(metaAllocator);
     setCurrentStep(DialogStep.SELECT_PROVIDER);
   };
 
@@ -104,7 +104,7 @@ export function ConnectWalletDialog({ isOpen, setIsOpen, handleClose }: ConnectW
       body: (
         <WalletConnectionScreen
           provider={selectedProvider || ''}
-          ma={selectedMa}
+          metaAllocator={selectedMetaAllocator}
           onConnect={handleConnect}
           onError={handleError}
         />

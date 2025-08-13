@@ -47,7 +47,12 @@ describe('MetamaskConnectionScreen', () => {
   });
 
   it('should call connect with meta allocator when provided', () => {
-    render(<MetamaskConnectionScreen onConnect={mocks.mockOnConnect} ma={fixtureMetaAllocator} />);
+    render(
+      <MetamaskConnectionScreen
+        onConnect={mocks.mockOnConnect}
+        metaAllocator={fixtureMetaAllocator}
+      />,
+    );
 
     expect(mocks.mockConnect).toHaveBeenCalledWith('metamask', 0, fixtureMetaAllocator);
     expect(mocks.mockConnect).toHaveBeenCalledTimes(1);
