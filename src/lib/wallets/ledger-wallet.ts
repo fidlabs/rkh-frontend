@@ -22,7 +22,7 @@ interface LedgerAccount {
 export class LedgerWallet implements Wallet {
   type = 'ledger';
 
-  private filecoinApp: FilecoinApp;
+  public filecoinApp: FilecoinApp;
   private address: string;
   private pubkey: Buffer;
 

@@ -35,13 +35,14 @@ export default function SignRkhTransactionButton({
 }: SignRkhTransactionButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
-  const { account, proposeAddVerifier, acceptVerifierProposal } = useAccount();
+  const { account, proposeAddVerifier, proposeAddVerifierAsMsig, acceptVerifierProposal } = useAccount();
   const { toast } = useToast();
 
   const proposeTransaction = async () => {
     setIsPending(true);
     try {
-      const messageId = await proposeAddVerifier(application.address, application.datacap);
+      //const messageId = await proposeAddVerifier(application.address, application.datacap);
+      const messageId = await proposeAddVerifierAsMsig('t2q4zeevbw6twcqd2gm7b25bg3wydq7qq72qhmy5y', application.address, application.datacap);
       toast({
         title: 'RKH Transaction Proposed',
         description: `Transaction proposed with message id: ${messageId}`,
