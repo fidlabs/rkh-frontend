@@ -15,6 +15,7 @@ interface AccountContextType {
 
   // Root Key Holder
   proposeAddVerifier: (verifierAddress: string, datacap: number) => Promise<string>;
+  proposeAddVerifierAsMsig: (msigAddress: string, verifierAddress: string, datacap: number) => Promise<string>;
   acceptVerifierProposal: (
     verifierAddress: string,
     datacap: number,
