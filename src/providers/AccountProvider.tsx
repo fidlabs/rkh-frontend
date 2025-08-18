@@ -176,6 +176,8 @@ export const AccountProvider: React.FC<{
         verifierAccountId = await api.actorKey(verifierAccountId);
       }
 
+      // Is this a direct RKH or a multisig member?
+      if (account.role === AccountRole.ROOT_KEY_HOLDER) {
       const messageId = await api.proposeVerifier(
         verifierAddress,
         fullDataCap,
@@ -183,33 +185,12 @@ export const AccountProvider: React.FC<{
         account.wallet,
       );
       return messageId;
-    },
-    [currentConnector],
-  );
-  
-  const proposeAddVerifierAsMsig = useCallback(
-    async (msigAddress: string, verifierAddress: string, datacap: number) => {
-      if (!account?.wallet) {
-        throw new Error('Wallet not connected');
-      }
-console.log('1...')
-      const api = new VerifyAPI(
-        VerifyAPI.browserProvider(env.rpcUrl, {
-          token: async () => env.rpcToken,
-        }),
-        account.wallet,
-        env.useTestnet,
-      );
-console.log('2...')
-      // 1PiB is 2^50
-      const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
-      let verifierAccountId = verifierAddress;
-      if (verifierAccountId.length < 12) {
-        verifierAccountId = await api.actorKey(verifierAccountId);
-      }
-console.log('3...')
+    } else {
+      // Go the multisig way - requires some torture to get the message in the right shape
+      //FIXME need to get this from some ind of setting
+      const msigAddress ='t2q4zeevbw6twcqd2gm7b25bg3wydq7qq72qhmy5y'
 
-      console.log('RPC config ...', env.rpcUrl, env.rpcToken);
+      // Prepare RPC access}
       const req = new ethers.FetchRequest(env.rpcUrl);
       req.setHeader("Authorization", `Bearer ${env.rpcToken}`);
       req.setHeader("Content-Type", "application/json");
@@ -321,17 +302,6 @@ console.log('filecoinApp ...', account.wallet.filecoinApp);
       },
     };
 
-
-
-
-
-
-
-
-
-
-
-
 console.log('tbs ...', tbs);
     tbs.Message.Params = msg.Params; //JAGMEM - try to hack this in...but it wasn't signed, was it?
 console.log('tbs mod...', tbs);
@@ -339,6 +309,7 @@ console.log('tbs mod...', tbs);
     const cid = await rpcProvider.send("Filecoin.MpoolPush", [tbs]);
 console.log('Returned CID ...', cid);
     return cid["/"]  || 'ERROR';
+    }
     },
     [currentConnector],
   );
@@ -406,7 +377,6 @@ console.log('Returned CID ...', cid);
           connectors,
           signStateMessage,
           proposeAddVerifier,
-          proposeAddVerifierAsMsig,
           acceptVerifierProposal,
           loadPersistedAccount,
         }}

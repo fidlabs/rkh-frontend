@@ -19,14 +19,13 @@ export function useProposeRKHTransaction({
   onProposeTransactionFailed,
   onProposeTransactionSuccess,
 }: UseProposeRKHTransactionProps = {}) {
-  const { proposeAddVerifier, proposeAddVerifierAsMsig } = useAccount();
+  const { proposeAddVerifier } = useAccount();
 
   const mutation = useMutation({
     mutationKey: ['proposeTransaction'],
     mutationFn: async ({ address, datacap }: ProposeTransactionParams) => {
       onProposeTransaction?.();
-      //return proposeAddVerifier(address, datacap);
-      return proposeAddVerifierAsMsig('t2q4zeevbw6twcqd2gm7b25bg3wydq7qq72qhmy5y', address, datacap);
+      return proposeAddVerifier(address, datacap);
     },
     onSuccess: (messageId: string) => {
       onProposeTransactionSuccess?.(messageId);

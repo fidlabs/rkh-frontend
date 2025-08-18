@@ -41,7 +41,7 @@ const environments: { [key: string]: Environment } = {
     useTestData: false,
     testNetChainId: Number(process.env.NEXT_PUBLIC_LOCAL_TEST_NET_CHAIN_ID) || 31415926,
     useTestnet: Boolean(process.env.NEXT_PUBLIC_USE_TEST_NET) || false,
-    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'http://84.68.108.231:1234/rpc/v0',
+    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'http://84.70.152.51:1234/rpc/v0',
     rpcToken: process.env.NEXT_PUBLIC_RPC_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.jJ0HBf8JhcbIJJ9ZNuRK5z3BbLcMncDr-sgfVx2wwbI',
     metaAllocatorContractAddress:
       process.env.NEXT_PUBLIC_META_ALLOCATOR_CONTRACT_ADDRESS ||
