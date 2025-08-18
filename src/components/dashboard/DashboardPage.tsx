@@ -61,16 +61,6 @@ export function DashboardPage() {
 
         {role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER ? <RefreshAllocatorSection /> : null}
 
-        {(role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) && (
-          <Button variant="outline">
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              <Link href="/multisig-rkh-portal">
-                Multisig RKH Portal
-              </Link>
-            </span>
-          </Button>
-        )}
-
         <Button variant="outline">
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             <Link

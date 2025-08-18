@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { createFilecoinRpcClient } from '@/lib/filecoin-rpc';
 import { filecoinConfig } from '@/config/filecoin';
+import { 
+  approveAddVerifierIndirect,
+  rejectAddVerifierIndirect,
+  approveAddSignerIndirect,
+  rejectAddSignerIndirect,
+  proposeAddSigner,
+  rejectAddSigner,
+} from '@/lib/multisig-actions';
+import { useAccount } from './useAccount';
 
 export interface ProposalActionResult {
   success: boolean;
@@ -8,33 +17,44 @@ export interface ProposalActionResult {
   error?: string;
 }
 
+export interface ProposalActionParams {
+  proposalId: number;
+  method: number;
+}
+
 export function useProposalActions(msigAddress: string = filecoinConfig.defaultMsigAddress) {
   const [isLoading, setIsLoading] = useState(false);
+  const accountContext = useAccount();
 
-  const approveProposal = async (proposalId: number): Promise<void> => {
+  const approveProposal = async (proposalId: number, method: number): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
     setIsLoading(true);
     try {
-      const client = createFilecoinRpcClient(msigAddress);
-      
-      // Method 3 is "Approve" for multisig
-      const approveParams = {
-        ID: proposalId,
-      };
+      let result;
 
-      // This would typically involve signing and sending a transaction
-      // For now, we'll simulate the approval process
-      console.log('Approving proposal:', proposalId, 'with params:', approveParams);
-      
-      // TODO: Implement actual Lotus command execution
-      // Example Lotus commands that would be sent:
-      // 1. Create approval message
-      // 2. Sign with wallet
-      // 3. Submit to network
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      throw new Error('Lotus command execution not yet implemented');
+      if (method === 2) {
+        // Method 2: AddVerifierIndirect
+        result = await approveAddVerifierIndirect({
+          proposalId,
+          msigAddress,
+          accountContext,
+        });
+      } else if (method === 5) {
+        // Method 5: AddSignerIndirect
+        result = await approveAddSignerIndirect({
+          proposalId,
+          msigAddress,
+          accountContext,
+        });
+      } else {
+        throw new Error(`Unsupported method ${method} for approval`);
+      }
+
+      if (!result.success) {
+        throw new Error(result.error || 'Approval failed');
+      }
+
+      console.log('Proposal approved successfully:', result.message);
+      return result;
       
     } catch (error) {
       console.error('Failed to approve proposal:', error);
@@ -44,30 +64,35 @@ export function useProposalActions(msigAddress: string = filecoinConfig.defaultM
     }
   };
 
-  const rejectProposal = async (proposalId: number): Promise<void> => {
+  const rejectProposal = async (proposalId: number, method: number): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
     setIsLoading(true);
     try {
-      const client = createFilecoinRpcClient(msigAddress);
-      
-      // Method 4 is "Cancel" for multisig (rejecting)
-      const rejectParams = {
-        ID: proposalId,
-      };
+      let result;
 
-      // This would typically involve signing and sending a transaction
-      // For now, we'll simulate the rejection process
-      console.log('Rejecting proposal:', proposalId, 'with params:', rejectParams);
-      
-      // TODO: Implement actual Lotus command execution
-      // Example Lotus commands that would be sent:
-      // 1. Create cancellation message
-      // 2. Sign with wallet
-      // 3. Submit to network
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      throw new Error('Lotus command execution not yet implemented');
+      if (method === 2) {
+        // Method 2: AddVerifierIndirect
+        result = await rejectAddVerifierIndirect({
+          proposalId,
+          msigAddress,
+          accountContext,
+        });
+      } else if (method === 5) {
+        // Method 5: AddSignerIndirect
+        result = await rejectAddSignerIndirect({
+          proposalId,
+          msigAddress,
+          accountContext,
+        });
+      } else {
+        throw new Error(`Unsupported method ${method} for rejection`);
+      }
+
+      if (!result.success) {
+        throw new Error(result.error || 'Rejection failed');
+      }
+
+      console.log('Proposal rejected successfully:', result.message);
+      return result;
       
     } catch (error) {
       console.error('Failed to reject proposal:', error);

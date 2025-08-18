@@ -29,7 +29,7 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { proposals, totalCount, isLoading, isError } = useMyProposals();
-  const { approveProposal, rejectProposal } = useProposalActions();
+  const { approveProposal, rejectProposal } = useProposalActions('t01025'); //JAGTAG this needs to coe from logged in context
 
   const handleApprove = (proposal: AllocatorProposal) => {
     setSelectedProposal(proposal);
@@ -50,10 +50,23 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
   };
 
   const handleConfirmAction = async (proposalId: number) => {
-    if (dialogAction === 'approve') {
-      await approveProposal(proposalId);
-    } else if (dialogAction === 'reject') {
-      await rejectProposal(proposalId);
+    if (!selectedProposal) return { success: false, message: 'No proposal selected', error: 'No proposal selected' };
+    
+    try {
+      if (dialogAction === 'approve') {
+        const result = await approveProposal(proposalId, selectedProposal.method);
+        return result;
+      } else if (dialogAction === 'reject') {
+        const result = await rejectProposal(proposalId, selectedProposal.method);
+        return result;
+      }
+      return { success: false, message: 'Unknown action', error: 'Unknown action' };
+    } catch (error) {
+      return { 
+        success: false, 
+        message: 'Action failed', 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   };
 
