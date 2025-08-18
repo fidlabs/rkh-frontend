@@ -12,3 +12,4 @@ export * from './use-filecoin-public-client';
 export * from './useAllocatorProposals';
 export * from './useMyProposals';
 export * from './useSignerManagement';
+export * from './useProposalActions';

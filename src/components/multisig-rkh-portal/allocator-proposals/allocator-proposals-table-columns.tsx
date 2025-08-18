@@ -22,7 +22,11 @@ function getMethodName(method: number): string {
   return methodNames[method] || `Method ${method}`;
 }
 
-export const allocatorProposalsTableColumns: ColumnDef<AllocatorProposal>[] = [
+// This function will be passed from the parent component
+export const createAllocatorProposalsTableColumns = (
+  onApprove: (proposal: AllocatorProposal) => void,
+  onReject: (proposal: AllocatorProposal) => void
+): ColumnDef<AllocatorProposal>[] => [
   {
     accessorKey: 'id',
     header: 'ID',
@@ -102,7 +106,7 @@ export const allocatorProposalsTableColumns: ColumnDef<AllocatorProposal>[] = [
             size="sm"
             variant="outline"
             className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-            onClick={() => handleApprove(proposal.id)}
+            onClick={() => onApprove(proposal)}
             title="Approve"
           >
             <CheckIcon className="h-4 w-4" />
@@ -111,7 +115,7 @@ export const allocatorProposalsTableColumns: ColumnDef<AllocatorProposal>[] = [
             size="sm"
             variant="outline"
             className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-            onClick={() => handleReject(proposal.id)}
+            onClick={() => onReject(proposal)}
             title="Reject"
           >
             <XIcon className="h-4 w-4" />
@@ -122,13 +126,4 @@ export const allocatorProposalsTableColumns: ColumnDef<AllocatorProposal>[] = [
   },
 ];
 
-// TODO: Implement these handlers
-function handleApprove(proposalId: number) {
-  console.log('Approve proposal:', proposalId);
-  // TODO: Implement approval logic
-}
 
-function handleReject(proposalId: number) {
-  console.log('Reject proposal:', proposalId);
-  // TODO: Implement rejection logic
-}
