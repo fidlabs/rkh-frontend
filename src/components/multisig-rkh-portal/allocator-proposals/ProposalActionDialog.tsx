@@ -17,7 +17,7 @@ interface ProposalActionDialogProps {
   onClose: () => void;
   proposal: AllocatorProposal | null;
   action: 'approve' | 'reject';
-  onConfirm: (proposalId: number) => Promise<void>;
+  onConfirm: (proposalId: number) => Promise<{ success: boolean; message: string; txHash?: string; error?: string }>;
 }
 
 export function ProposalActionDialog({
@@ -29,6 +29,7 @@ export function ProposalActionDialog({
 }: ProposalActionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<{ message: string; txHash: string } | null>(null);
 
   if (!proposal) return null;
 
@@ -36,8 +37,18 @@ export function ProposalActionDialog({
     try {
       setIsLoading(true);
       setError(null);
-      await onConfirm(proposal.id);
-      onClose();
+      setSuccess(null);
+      
+      const result = await onConfirm(proposal.id);
+      
+      if (result && result.success) {
+        setSuccess({
+          message: result.message,
+          txHash: result.txHash || 'No transaction hash available'
+        });
+      } else {
+        setError(result?.error || 'Action failed');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Action failed');
     } finally {
@@ -117,20 +128,42 @@ export function ProposalActionDialog({
               <div className="text-sm text-red-600">{error}</div>
             </div>
           )}
+
+          {success && (
+            <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+              <div className="text-sm text-green-600 font-medium mb-2">
+                ✅ {success.message}
+              </div>
+              <div className="text-xs text-green-700">
+                <strong>Transaction Hash:</strong>
+                <div className="font-mono bg-green-100 p-2 rounded mt-1 break-all">
+                  {success.txHash}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button
-            className={actionColor}
-            onClick={handleConfirm}
-            disabled={isLoading}
-          >
-            {isLoading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-            {actionText} Proposal
-          </Button>
+          {success ? (
+            <Button onClick={onClose} className="bg-green-600 hover:bg-green-700">
+              Close
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" onClick={onClose} disabled={isLoading}>
+                Cancel
+              </Button>
+              <Button
+                className={actionColor}
+                onClick={handleConfirm}
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                {actionText} Proposal
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

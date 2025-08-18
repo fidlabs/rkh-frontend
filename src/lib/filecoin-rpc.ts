@@ -59,9 +59,23 @@ export class FilecoinRpcClient {
     return await this.provider.send("Filecoin.StateDecodeParams", [this.msigAddress, method, params, null]);
   }
 
+  async encodeParams(actor: string, method: number, params: any): Promise<string> {
+    return await this.provider.send("Filecoin.StateEncodeParams", [actor, method, params]);
+  }
+
+  async getActorCode(actorAddress: string): Promise<string> {
+    const actor = await this.provider.send("Filecoin.StateGetActor", [actorAddress, null]);
+    return actor.Code;
+  }
+
   async getTotalBalance(): Promise<string> {
     const actor = await this.getActorInfo();
     return actor.Balance;
+  }
+
+  // Public method to access provider for custom RPC calls
+  async sendRpc(method: string, params: any[]): Promise<any> {
+    return await this.provider.send(method, params);
   }
 }
 
