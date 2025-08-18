@@ -4,6 +4,4 @@ export interface Wallet {
   signArbitrary: (message: string, indexAccount: number) => Promise<string>;
   getAccounts: () => Promise<string[]>;
   getPubKey: () => Buffer;
-  filecoinApp?: any; // Optional, used for Ledger wallets
-  filsnapAdapter?: any; // Optional, used for Filsnap wallets
 }
