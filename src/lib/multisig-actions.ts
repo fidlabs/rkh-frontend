@@ -171,11 +171,6 @@ export async function approveAddVerifierIndirect({
     const approveParams = {
       ID: proposalId,
     };
-
-    // TODO: Implement actual approval logic
-    // 1. Create approval message using the proposal ID
-    // 2. Sign with Ledger wallet
-    // 3. Submit to network via RPC provider
     
     console.log('Approving AddVerifierIndirect proposal:', proposalId, 'with params:', approveParams);
 
@@ -280,21 +275,33 @@ export async function approveAddSignerIndirect({
     const approveParams = {
       ID: proposalId,
     };
-
-    // TODO: Implement actual approval logic
-    // 1. Create approval message using the proposal ID
-    // 2. Sign with Ledger wallet
-    // 3. Submit to network via RPC provider
     
     console.log('Approving AddSignerIndirect proposal:', proposalId, 'with params:', approveParams);
     
-    // Placeholder for actual implementation
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const f080Code = await client.getActorCode('f080');
+    const msigCode = await client.getActorCode(msigAddress);
+    const InnerParamsB64 = await client.encodeParams(f080Code, 3, {ID: proposalId});
+    const OuterParamsB64 = await client.encodeParams(msigCode, 2, {
+      To: 'f080',
+      Method: 3,
+      Value: "0",
+      Params: InnerParamsB64,
+    });
+
+    const msg: FilecoinMessage = {
+      To: msigAddress,
+      From: accountContext.account?.address || '',
+      Value: "0",
+      Method: 2, // we are PROPOSING to our msig, the APPROVE is in the inner params
+      Params: OuterParamsB64,
+    };
+
+    const txHash = await sendMsigMsg(msg, accountContext, msigAddress)
     
     return {
       success: true,
       message: `Successfully approved AddSignerIndirect proposal #${proposalId}`,
-      txHash: 'placeholder-tx-hash',
+      txHash: txHash,
     };
     
   } catch (error) {
