@@ -3,7 +3,7 @@ import { createFilecoinRpcClient } from './filecoin-rpc';
 import { filecoinConfig } from '@/config/filecoin';
 
 export interface MultisigActionParams {
-  proposalId: number;
+  proposalId: number | string;
   msigAddress: string;
   accountContext: AccountContextType;
 }
@@ -374,27 +374,41 @@ export async function proposeAddSigner({
     }
 
     const client = createFilecoinRpcClient(msigAddress);
+
+    console.log('Proposing AddSigner:', proposalId);
     
-    // Method 5 is "AddSigner" for multisig
-    const addSignerParams = {
-      ID: proposalId,
-      // Additional params would be needed for actual signer addition
+    const f080Code = await client.getActorCode('f080');
+    const msigCode = await client.getActorCode(msigAddress);
+    const innerParamsB64 = await client.encodeParams(f080Code, 5, {Signer:proposalId, Increase:false});
+    const innerParamsHex = "0x" + Buffer.from(innerParamsB64, "base64").toString("hex");
+    const outerParamsB64 = await client.encodeParams(f080Code, 2, {
+      To: 'f080',
+      Method: 5,
+      Value: "0",
+      Params: innerParamsB64,
+    });
+    const outerParamsHex = "0x" + Buffer.from(outerParamsB64, "base64").toString("hex");
+    const messageParams = await client.encodeParams(msigCode, 2, {
+      To: 'f080',
+      Method: 2,
+      Value: "0",
+      Params: outerParamsB64,
+    });
+
+    const msg: FilecoinMessage = {
+      To: msigAddress,
+      From: accountContext.account?.address || '',
+      Value: "0",
+      Method: 2, // we are PROPOSING to our msig, the ADD SIGNER is in the inner params
+      Params: messageParams,
     };
 
-    // TODO: Implement actual proposal logic
-    // 1. Create AddSigner proposal message
-    // 2. Sign with Ledger wallet
-    // 3. Submit to network via RPC provider
-    
-    console.log('Proposing AddSigner:', proposalId, 'with params:', addSignerParams);
-    
-    // Placeholder for actual implementation
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const txHash = await sendMsigMsg(msg, accountContext, msigAddress)
     
     return {
       success: true,
       message: `Successfully proposed AddSigner #${proposalId}`,
-      txHash: 'placeholder-tx-hash',
+      txHash: txHash
     };
     
   } catch (error) {
