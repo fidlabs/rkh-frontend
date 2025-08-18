@@ -11,7 +11,10 @@ import {
 } from '@/components/ui/card';
 import { PAGE_SIZE } from '../constants';
 import { useMyProposals } from '@/hooks/useMyProposals';
-import { allocatorProposalsTableColumns } from '../allocator-proposals/allocator-proposals-table-columns';
+import { createAllocatorProposalsTableColumns } from '../allocator-proposals/allocator-proposals-table-columns';
+import { ProposalActionDialog } from '../allocator-proposals/ProposalActionDialog';
+import { useProposalActions } from '@/hooks/useProposalActions';
+import { AllocatorProposal } from '@/hooks/useMyProposals';
 
 interface MyProposalsPanelProps {}
 
@@ -21,13 +24,46 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
     pageSize: 10,
   });
 
+  const [selectedProposal, setSelectedProposal] = useState<AllocatorProposal | null>(null);
+  const [dialogAction, setDialogAction] = useState<'approve' | 'reject' | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { proposals, totalCount, isLoading, isError } = useMyProposals();
+  const { approveProposal, rejectProposal } = useProposalActions();
+
+  const handleApprove = (proposal: AllocatorProposal) => {
+    setSelectedProposal(proposal);
+    setDialogAction('approve');
+    setIsDialogOpen(true);
+  };
+
+  const handleReject = (proposal: AllocatorProposal) => {
+    setSelectedProposal(proposal);
+    setDialogAction('reject');
+    setIsDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setSelectedProposal(null);
+    setDialogAction(null);
+  };
+
+  const handleConfirmAction = async (proposalId: number) => {
+    if (dialogAction === 'approve') {
+      await approveProposal(proposalId);
+    } else if (dialogAction === 'reject') {
+      await rejectProposal(proposalId);
+    }
+  };
+
   const startIndex = paginationState.pageIndex * PAGE_SIZE + 1;
   const endIndex = Math.min(startIndex + PAGE_SIZE - 1, totalCount);
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-    <Card className="mb-4">
+    <>
+      <Card className="mb-4">
       <CardHeader>
         <CardTitle>My Proposals</CardTitle>
         <CardDescription>Manage outstanding proposals for your RKH Org multisig.</CardDescription>
@@ -42,7 +78,7 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
             paginationState,
             setPaginationState,
           }}
-          columns={allocatorProposalsTableColumns}
+          columns={createAllocatorProposalsTableColumns(handleApprove, handleReject)}
         />
       </CardContent>
       <CardFooter>
@@ -55,5 +91,14 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
         </div>
       </CardFooter>
     </Card>
+
+    <ProposalActionDialog
+      isOpen={isDialogOpen}
+      onClose={handleDialogClose}
+      proposal={selectedProposal}
+      action={dialogAction || 'approve'}
+      onConfirm={handleConfirmAction}
+    />
+  </>
   );
 }
