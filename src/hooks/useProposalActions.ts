@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { createFilecoinRpcClient } from '@/lib/filecoin-rpc';
 import { filecoinConfig } from '@/config/filecoin';
 import { 
-  approveAddVerifierIndirect,
-  rejectAddVerifierIndirect,
-  approveAddSignerIndirect,
-  rejectAddSignerIndirect,
+  approvePendingTransaction,
+  cancelPendingTransaction,
   proposeAddSigner,
   rejectAddSigner,
 } from '@/lib/multisig-actions';
@@ -29,25 +27,12 @@ export function useProposalActions() {
   const approveProposal = async (proposalId: number, method: number): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
     setIsLoading(true);
     try {
-      let result;
-
-      if (method === 2) {
-        // Method 2: AddVerifierIndirect
-        result = await approveAddVerifierIndirect({
-          proposalId,
-          msigAddress: accountContext.account?.parentMsigAddress || '',
-          accountContext,
-        });
-      } else if (method === 5) {
-        // Method 5: AddSignerIndirect
-        result = await approveAddSignerIndirect({
-          proposalId,
-          msigAddress: accountContext.account?.parentMsigAddress || '',
-          accountContext,
-        });
-      } else {
-        throw new Error(`Unsupported method ${method} for approval`);
-      }
+      // All approval methods use the same generic function since they all call f080.Method3 (Approve)
+      const result = await approvePendingTransaction({
+        proposalId,
+        msigAddress: accountContext.account?.parentMsigAddress || '',
+        accountContext,
+      });
 
       if (!result.success) {
         throw new Error(result.error || 'Approval failed');
@@ -67,25 +52,12 @@ export function useProposalActions() {
   const rejectProposal = async (proposalId: number, method: number): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
     setIsLoading(true);
     try {
-      let result;
-
-      if (method === 2) {
-        // Method 2: AddVerifierIndirect
-        result = await rejectAddVerifierIndirect({
-          proposalId,
-          msigAddress: accountContext.account?.parentMsigAddress || '',
-          accountContext,
-        });
-      } else if (method === 5) {
-        // Method 5: AddSignerIndirect
-        result = await rejectAddSignerIndirect({
-          proposalId,
-          msigAddress: accountContext.account?.parentMsigAddress || '',
-          accountContext,
-        });
-      } else {
-        throw new Error(`Unsupported method ${method} for rejection`);
-      }
+      // All rejection methods use the same generic function since they all call f080.Method4 (Cancel)
+      const result = await cancelPendingTransaction({
+        proposalId,
+        msigAddress: accountContext.account?.parentMsigAddress || '',
+        accountContext,
+      });
 
       if (!result.success) {
         throw new Error(result.error || 'Rejection failed');
