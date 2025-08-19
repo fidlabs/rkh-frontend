@@ -3,7 +3,9 @@ import { Signer } from '@/hooks/useSignerManagement';
 import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
 
-export const signerManagementTableColumns: ColumnDef<Signer>[] = [
+export const createSignerManagementTableColumns = (
+  onRevoke: (signerAddress: string) => void
+): ColumnDef<Signer>[] => [
   {
     accessorKey: 'address',
     header: 'Signer Address',
@@ -37,7 +39,7 @@ export const signerManagementTableColumns: ColumnDef<Signer>[] = [
             size="sm"
             variant="outline"
             className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50"
-            onClick={() => handleRevoke(signer.address)}
+            onClick={() => onRevoke(signer.address)}
             title="Revoke Signer"
             disabled={!signer.isActive}
           >
@@ -49,9 +51,3 @@ export const signerManagementTableColumns: ColumnDef<Signer>[] = [
     },
   },
 ];
-
-// TODO: Implement revoke handler
-function handleRevoke(signerAddress: string) {
-  console.log('Revoke signer:', signerAddress);
-  // TODO: Implement signer revocation logic
-}

@@ -152,9 +152,9 @@ function hexToBytes(hex: string): Uint8Array {
 }
 
 /**
- * Approve an AddVerifierIndirect proposal
+ * Approve any pending transaction proposal
  */
-export async function approveAddVerifierIndirect({
+export async function approvePendingTransaction({
   proposalId,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
@@ -167,19 +167,14 @@ export async function approveAddVerifierIndirect({
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
-    console.log('Approving AddVerifierIndirect proposal:', proposalId, 'with msigAddress:', msigAddress, 'and accountContext:', accountContext);
-
-    // Method 3 is "Approve" for multisig
-    const approveParams = {
-      ID: proposalId,
-    };
-    
-    console.log('Approving AddVerifierIndirect proposal:', proposalId, 'with params:', approveParams);
+    console.log('Approving pending transaction proposal:', proposalId, 'with msigAddress:', msigAddress);
 
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
+    
+    // Method 3 is "Approve" for multisig
     const InnerParamsB64 = await client.encodeParams(f080Code, 3, {ID: proposalId});
-    const OuterParamsB64 = await client.encodeParams(msigCode, 2, {
+    const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
       Method: 3,
       Value: "0",
@@ -198,94 +193,45 @@ export async function approveAddVerifierIndirect({
     
     return {
       success: true,
-      message: `Successfully approved AddVerifierIndirect proposal #${proposalId}`,
+      message: `Successfully approved pending transaction proposal #${proposalId}`,
       txHash: txHash,
     };
     
   } catch (error) {
-    console.error('Failed to approve AddVerifierIndirect proposal:', error);
+    console.error('Failed to approve pending transaction proposal:', error);
     return {
       success: false,
-      message: 'Failed to approve AddVerifierIndirect proposal',
+      message: 'Failed to approve pending transaction proposal',
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 /**
- * Reject an AddVerifierIndirect proposal
+ * Cancel any pending transaction proposal
  */
-export async function rejectAddVerifierIndirect({
+export async function cancelPendingTransaction({
   proposalId,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
     if (!accountContext.account?.wallet?.filecoinApp) {
-      throw new Error('No Ledger account available');
+      throw new Error('No Ledger wallet available');
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
-    // Method 4 is "Cancel" for multisig (rejecting)
-    const rejectParams = {
-      ID: proposalId,
-    };
+    console.log('Cancelling pending transaction proposal:', proposalId, 'with msigAddress:', msigAddress);
 
-    // TODO: Implement actual rejection logic
-    // 1. Create cancellation message using the proposal ID
-    // 2. Sign with Ledger wallet
-    // 3. Submit to network via RPC provider
-    
-    console.log('Rejecting AddVerifierIndirect proposal:', proposalId, 'with params:', rejectParams);
-    
-    // Placeholder for actual implementation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      success: true,
-      message: `Successfully rejected AddVerifierIndirect proposal #${proposalId}`,
-      txHash: 'placeholder-tx-hash',
-    };
-    
-  } catch (error) {
-    console.error('Failed to reject AddVerifierIndirect proposal:', error);
-    return {
-      success: false,
-      message: 'Failed to reject AddVerifierIndirect proposal',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-  }
-}
-
-/**
- * Approve an AddSignerIndirect proposal
- */
-export async function approveAddSignerIndirect({
-  proposalId,
-  accountContext,
-}: MultisigActionParams): Promise<MultisigActionResult> {
-  try {
-    if (!accountContext.account?.wallet?.filecoinApp) {
-      throw new Error('No Ledger account available');
-    }
-
-    const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
-    
-    // Method 3 is "Approve" for multisig
-    const approveParams = {
-      ID: proposalId,
-    };
-    
-    console.log('Approving AddSignerIndirect proposal:', proposalId, 'with params:', approveParams);
-    
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
-    const InnerParamsB64 = await client.encodeParams(f080Code, 3, {ID: proposalId});
-    const OuterParamsB64 = await client.encodeParams(msigCode, 2, {
+    
+    // Method 4 is "Cancel" for multisig
+    const InnerParamsB64 = await client.encodeParams(f080Code, 4, {ID: proposalId});
+    const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
-      Method: 3,
+      Method: 4,
       Value: "0",
       Params: InnerParamsB64,
     });
@@ -294,7 +240,7 @@ export async function approveAddSignerIndirect({
       To: msigAddress,
       From: accountContext.account?.address || '',
       Value: "0",
-      Method: 2, // we are PROPOSING to our msig, the APPROVE is in the inner params
+      Method: 2, // we are PROPOSING to our msig, the CANCEL is in the inner params
       Params: OuterParamsB64,
     };
 
@@ -302,65 +248,23 @@ export async function approveAddSignerIndirect({
     
     return {
       success: true,
-      message: `Successfully approved AddSignerIndirect proposal #${proposalId}`,
+      message: `Successfully cancelled pending transaction proposal #${proposalId}`,
       txHash: txHash,
     };
     
   } catch (error) {
-    console.error('Failed to approve AddSignerIndirect proposal:', error);
+    console.error('Failed to cancel pending transaction proposal:', error);
     return {
       success: false,
-      message: 'Failed to approve AddSignerIndirect proposal',
+      message: 'Failed to cancel pending transaction proposal',
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
-/**
- * Reject an AddSignerIndirect proposal
- */
-export async function rejectAddSignerIndirect({
-  proposalId,
-  accountContext,
-}: MultisigActionParams): Promise<MultisigActionResult> {
-  try {
-    if (!accountContext.account?.wallet?.filecoinApp) {
-      throw new Error('No Ledger account available');
-    }
 
-    const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
-    
-    // Method 4 is "Cancel" for multisig (rejecting)
-    const rejectParams = {
-      ID: proposalId,
-    };
 
-    // TODO: Implement actual rejection logic
-    // 1. Create cancellation message using the proposal ID
-    // 2. Sign with Ledger wallet
-    // 3. Submit to network via RPC provider
-    
-    console.log('Rejecting AddSignerIndirect proposal:', proposalId, 'with params:', rejectParams);
-    
-    // Placeholder for actual implementation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      success: false,
-      message: `Successfully rejected AddSignerIndirect proposal #${proposalId}`,
-      txHash: 'placeholder-tx-hash',
-    };
-    
-  } catch (error) {
-    console.error('Failed to reject AddSignerIndirect proposal:', error);
-    return {
-      success: false,
-      message: 'Failed to reject AddSignerIndirect proposal',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-  }
-}
+
 
 /**
  * Propose adding a new signer
@@ -464,6 +368,67 @@ export async function rejectAddSigner({
     return {
       success: false,
       message: 'Failed to reject AddSigner proposal',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Propose removing a signer from f080
+ */
+export async function proposeRemoveSigner({
+  proposalId,
+  accountContext,
+}: MultisigActionParams): Promise<MultisigActionResult> {
+  try {
+    if (!accountContext.account?.wallet?.filecoinApp) {
+      throw new Error('No Ledger wallet available');
+    }
+
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
+    const client = createFilecoinRpcClient(msigAddress);
+
+    console.log('Proposing RemoveSigner:', proposalId);
+    
+    const f080Code = await client.getActorCode('f080');
+    const msigCode = await client.getActorCode(msigAddress);
+    
+    // Method 6 is "RemoveSigner" for multisig
+    const innerParamsB64 = await client.encodeParams(f080Code, 6, {Signer: proposalId, Decrease: false});
+    const outerParamsB64 = await client.encodeParams(f080Code, 2, {
+      To: 'f080',
+      Method: 6,
+      Value: "0",
+      Params: innerParamsB64,
+    });
+    const messageParams = await client.encodeParams(msigCode, 2, {
+      To: 'f080',
+      Method: 2,
+      Value: "0",
+      Params: outerParamsB64,
+    });
+
+    const msg: FilecoinMessage = {
+      To: msigAddress,
+      From: accountContext.account?.address || '',
+      Value: "0",
+      Method: 2, // we are PROPOSING to our msig, the REMOVE SIGNER is in the inner params
+      Params: messageParams,
+    };
+
+    const txHash = await sendMsigMsg(msg, accountContext)
+    
+    return {
+      success: true,
+      message: `Successfully proposed RemoveSigner for ${proposalId}`,
+      txHash: txHash
+    };
+    
+  } catch (error) {
+    console.error('Failed to propose RemoveSigner:', error);
+    return {
+      success: false,
+      message: 'Failed to propose RemoveSigner',
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
