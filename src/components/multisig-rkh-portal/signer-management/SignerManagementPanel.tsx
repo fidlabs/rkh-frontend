@@ -29,9 +29,10 @@ export function SignerManagementPanel({}: SignerManagementPanelProps) {
     try {
       if (!accountContext.account?.parentMsigAddress) {
         toast({
-          title: "Error",
-          description: "No parent multisig address found. Please ensure you're connected as an indirect root key holder.",
-          variant: "destructive",
+          title: 'Error',
+          description:
+            "No parent multisig address found. Please ensure you're connected as an indirect root key holder.",
+          variant: 'destructive',
         });
         return;
       }
@@ -44,22 +45,22 @@ export function SignerManagementPanel({}: SignerManagementPanelProps) {
 
       if (result.success) {
         toast({
-          title: "Success",
+          title: 'Success',
           description: `Successfully proposed removal of signer ${signerAddress}`,
         });
         // Optionally refresh the signer list here
       } else {
         toast({
-          title: "Error",
-          description: result.error || "Failed to propose signer removal",
-          variant: "destructive",
+          title: 'Error',
+          description: result.error || 'Failed to propose signer removal',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: `Failed to propose signer removal: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -72,7 +73,7 @@ export function SignerManagementPanel({}: SignerManagementPanelProps) {
             <div>
               <CardTitle>Root Key Holders Management</CardTitle>
               <CardDescription>
-                Manage multisig signers and their permissions. 
+                Manage multisig signers and their permissions.
                 {threshold > 0 && ` Current threshold: ${threshold} approvals required.`}
               </CardDescription>
             </div>
@@ -83,12 +84,12 @@ export function SignerManagementPanel({}: SignerManagementPanelProps) {
           </div>
         </CardHeader>
         <CardContent>
-                  <TableGenerator
-          isLoading={isLoading}
-          isError={isError}
-          data={signers}
-          columns={createSignerManagementTableColumns(handleRevokeSigner)}
-        />
+          <TableGenerator
+            isLoading={isLoading}
+            isError={isError}
+            data={signers}
+            columns={createSignerManagementTableColumns(handleRevokeSigner)}
+          />
         </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground">

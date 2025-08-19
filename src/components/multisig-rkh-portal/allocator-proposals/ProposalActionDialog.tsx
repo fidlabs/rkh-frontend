@@ -17,7 +17,9 @@ interface ProposalActionDialogProps {
   onClose: () => void;
   proposal: AllocatorProposal | null;
   action: 'approve' | 'reject';
-  onConfirm: (proposalId: number) => Promise<{ success: boolean; message: string; txHash?: string; error?: string }>;
+  onConfirm: (
+    proposalId: number,
+  ) => Promise<{ success: boolean; message: string; txHash?: string; error?: string }>;
 }
 
 export function ProposalActionDialog({
@@ -38,13 +40,13 @@ export function ProposalActionDialog({
       setIsLoading(true);
       setError(null);
       setSuccess(null);
-      
+
       const result = await onConfirm(proposal.id);
-      
+
       if (result && result.success) {
         setSuccess({
           message: result.message,
-          txHash: result.txHash || 'No transaction hash available'
+          txHash: result.txHash || 'No transaction hash available',
         });
       } else {
         setError(result?.error || 'Action failed');
@@ -57,7 +59,8 @@ export function ProposalActionDialog({
   };
 
   const actionText = action === 'approve' ? 'Approve' : 'Reject';
-  const actionColor = action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700';
+  const actionColor =
+    action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -67,7 +70,8 @@ export function ProposalActionDialog({
             {actionText} Proposal #{proposal.id}
           </DialogTitle>
           <DialogDescription>
-            Please review the proposal details before {action === 'approve' ? 'approving' : 'rejecting'}.
+            Please review the proposal details before{' '}
+            {action === 'approve' ? 'approving' : 'rejecting'}.
           </DialogDescription>
         </DialogHeader>
 
@@ -121,7 +125,9 @@ export function ProposalActionDialog({
               {proposal.approved.length > 0 ? (
                 <div className="space-y-1">
                   {proposal.approved.map((signer, index) => (
-                    <div key={index} className="font-mono text-sm">{signer}</div>
+                    <div key={index} className="font-mono text-sm">
+                      {signer}
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -138,9 +144,7 @@ export function ProposalActionDialog({
 
           {success && (
             <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-              <div className="text-sm text-green-600 font-medium mb-2">
-                ✅ {success.message}
-              </div>
+              <div className="text-sm text-green-600 font-medium mb-2">✅ {success.message}</div>
               <div className="text-xs text-green-700">
                 <strong>Transaction Hash:</strong>
                 <div className="font-mono bg-green-100 p-2 rounded mt-1 break-all">
@@ -161,11 +165,7 @@ export function ProposalActionDialog({
               <Button variant="outline" onClick={onClose} disabled={isLoading}>
                 Cancel
               </Button>
-              <Button
-                className={actionColor}
-                onClick={handleConfirm}
-                disabled={isLoading}
-              >
+              <Button className={actionColor} onClick={handleConfirm} disabled={isLoading}>
                 {isLoading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
                 {actionText} Proposal
               </Button>

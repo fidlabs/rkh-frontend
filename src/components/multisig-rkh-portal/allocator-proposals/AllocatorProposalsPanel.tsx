@@ -22,7 +22,7 @@ export function AllocatorProposalsPanel({}: AllocatorProposalsPanelProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { proposals, totalCount, isLoading, isError } = useAllocatorProposals();
-  const { approveProposal, rejectProposal } = useProposalActions(); 
+  const { approveProposal, rejectProposal } = useProposalActions();
 
   const handleApprove = (proposal: AllocatorProposal) => {
     setSelectedProposal(proposal);
@@ -43,8 +43,9 @@ export function AllocatorProposalsPanel({}: AllocatorProposalsPanelProps) {
   };
 
   const handleConfirmAction = async (proposalId: number) => {
-    if (!selectedProposal) return { success: false, message: 'No proposal selected', error: 'No proposal selected' };
-    
+    if (!selectedProposal)
+      return { success: false, message: 'No proposal selected', error: 'No proposal selected' };
+
     try {
       if (dialogAction === 'approve') {
         const result = await approveProposal(proposalId, selectedProposal.method);
@@ -55,10 +56,10 @@ export function AllocatorProposalsPanel({}: AllocatorProposalsPanelProps) {
       }
       return { success: false, message: 'Unknown action', error: 'Unknown action' };
     } catch (error) {
-      return { 
-        success: false, 
-        message: 'Action failed', 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        message: 'Action failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   };
@@ -66,23 +67,25 @@ export function AllocatorProposalsPanel({}: AllocatorProposalsPanelProps) {
   return (
     <>
       <Card className="mb-4">
-      <CardHeader>
-        <CardTitle>RKH & Allocator Proposals</CardTitle>
-        <CardDescription>Review and manage allocator proposals requiring multisig approval.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <TableGenerator
-          isLoading={isLoading}
-          isError={isError}
-          data={proposals}
-          columns={createAllocatorProposalsTableColumns(handleApprove, handleReject)}
-        />
-      </CardContent>
-      <CardFooter>
-        <div className="text-xs text-muted-foreground">
-          Total: <strong>{totalCount}</strong> proposals
-        </div>
-      </CardFooter>
+        <CardHeader>
+          <CardTitle>RKH & Allocator Proposals</CardTitle>
+          <CardDescription>
+            Review and manage allocator proposals requiring multisig approval.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TableGenerator
+            isLoading={isLoading}
+            isError={isError}
+            data={proposals}
+            columns={createAllocatorProposalsTableColumns(handleApprove, handleReject)}
+          />
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Total: <strong>{totalCount}</strong> proposals
+          </div>
+        </CardFooter>
       </Card>
 
       <ProposalActionDialog

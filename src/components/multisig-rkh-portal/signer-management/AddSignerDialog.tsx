@@ -21,21 +21,17 @@ interface AddSignerDialogProps {
   onSuccess: () => void;
 }
 
-export function AddSignerDialog({
-  isOpen,
-  onClose,
-  onSuccess,
-}: AddSignerDialogProps) {
+export function AddSignerDialog({ isOpen, onClose, onSuccess }: AddSignerDialogProps) {
   const [newSignerAddress, setNewSignerAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<{ message: string; txHash: string } | null>(null);
-  
+
   const accountContext = useAccount();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newSignerAddress.trim()) {
       setError('Please enter a valid Filecoin address');
       return;
@@ -61,7 +57,7 @@ export function AddSignerDialog({
       if (result.success) {
         setSuccess({
           message: result.message,
-          txHash: result.txHash || 'No transaction hash available'
+          txHash: result.txHash || 'No transaction hash available',
         });
         onSuccess();
       } else {
@@ -89,7 +85,8 @@ export function AddSignerDialog({
         <DialogHeader>
           <DialogTitle>Add New Signer</DialogTitle>
           <DialogDescription>
-            Add a new signer to the multisig. The proposal will need to be approved by existing signers.
+            Add a new signer to the multisig. The proposal will need to be approved by existing
+            signers.
           </DialogDescription>
         </DialogHeader>
 
@@ -102,7 +99,7 @@ export function AddSignerDialog({
                 type="text"
                 placeholder="t1..."
                 value={newSignerAddress}
-                onChange={(e) => setNewSignerAddress(e.target.value)}
+                onChange={e => setNewSignerAddress(e.target.value)}
                 disabled={isLoading}
                 className="font-mono"
               />
@@ -116,9 +113,7 @@ export function AddSignerDialog({
 
             {success && (
               <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                <div className="text-sm text-green-600 font-medium mb-2">
-                  ✅ {success.message}
-                </div>
+                <div className="text-sm text-green-600 font-medium mb-2">✅ {success.message}</div>
                 <div className="text-xs text-green-700">
                   <strong>Transaction Hash:</strong>
                   <div className="font-mono bg-green-100 p-2 rounded mt-1 break-all">

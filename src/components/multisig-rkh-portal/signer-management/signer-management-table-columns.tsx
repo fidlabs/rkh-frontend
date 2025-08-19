@@ -4,16 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
 
 export const createSignerManagementTableColumns = (
-  onRevoke: (signerAddress: string) => void
+  onRevoke: (signerAddress: string) => void,
 ): ColumnDef<Signer>[] => [
   {
     accessorKey: 'address',
     header: 'Signer Address',
-    cell: ({ row }) => (
-      <div className="font-mono text-sm">
-        {row.getValue('address')}
-      </div>
-    ),
+    cell: ({ row }) => <div className="font-mono text-sm">{row.getValue('address')}</div>,
   },
   {
     accessorKey: 'isActive',
@@ -32,7 +28,7 @@ export const createSignerManagementTableColumns = (
     header: 'Actions',
     cell: ({ row }) => {
       const signer = row.original;
-      
+
       return (
         <div className="flex space-x-2">
           <Button

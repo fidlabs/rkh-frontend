@@ -1,6 +1,7 @@
 # Apply.Allocator.Tech - Backend Documentation
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Architecture](#architecture)
 3. [Project Structure](#project-structure)
@@ -17,6 +18,7 @@
 The backend service is built with Node.js, TypeScript, and follows an event-driven architecture with CQRS (Command Query Responsibility Segregation) pattern. It manages the entire lifecycle of Filecoin Plus DataCap allocation applications.
 
 ### Key Features
+
 - **Event-Driven Architecture**: Event sourcing with CQRS
 - **External Integrations**: GitHub, Airtable, Zyphe KYC
 - **Message Queue**: RabbitMQ for event processing
@@ -27,6 +29,7 @@ The backend service is built with Node.js, TypeScript, and follows an event-driv
 ## Architecture
 
 ### High-Level Architecture
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Frontend      │    │   External      │    │   Blockchain    │
@@ -51,9 +54,10 @@ The backend service is built with Node.js, TypeScript, and follows an event-driv
 ```
 
 ### Event Flow
+
 ```
-Application Submitted → KYC Started → KYC Approved → 
-Governance Review Started → Governance Review Approved → 
+Application Submitted → KYC Started → KYC Approved →
+Governance Review Started → Governance Review Approved →
 RKH/Meta Approval Started → Approval Completed → DataCap Allocated
 ```
 
@@ -110,6 +114,7 @@ allocator-rkh-backend/
 ### 1. Application Service
 
 #### DatacapAllocator Aggregate
+
 ```typescript
 // packages/application/src/domain/application/application.ts
 export class DatacapAllocator extends AggregateRoot {
@@ -120,50 +125,50 @@ export class DatacapAllocator extends AggregateRoot {
   public applicationInstructions: ApplicationInstruction[] = [];
   public rkhApprovals: string[] = [];
   public rkhApprovalThreshold: number = 2;
-  
+
   constructor(guid: string) {
     super(guid);
   }
-  
+
   createApplication(command: CreateApplicationCommand): void {
     const event = new ApplicationCreated(
       this.guid,
       command.applicationNumber,
       command.applicantName,
       command.applicantAddress,
-      command.timestamp
+      command.timestamp,
     );
-    
+
     this.apply(event);
     this.addDomainEvent(event);
   }
-  
+
   applyApplicationCreated(event: ApplicationCreated): void {
     this.applicationNumber = event.applicationNumber;
     this.applicantName = event.applicantName;
     this.applicantAddress = event.applicantAddress;
     this.applicationStatus = ApplicationStatus.KYC_PHASE;
   }
-  
+
   approveGovernanceReview(command: ApproveGovernanceReviewCommand): void {
     const event = new GovernanceReviewApproved(
       this.guid,
       command.applicationInstructions,
-      command.timestamp
+      command.timestamp,
     );
-    
+
     this.apply(event);
     this.addDomainEvent(event);
   }
-  
+
   applyGovernanceReviewApproved(event: GovernanceReviewApproved): void {
     this.applicationInstructions = event.applicationInstructions;
-    
+
     // Determine approval pathway
     const hasMetaAllocator = event.applicationInstructions.some(
-      instruction => instruction.method === ApplicationAllocator.META_ALLOCATOR
+      instruction => instruction.method === ApplicationAllocator.META_ALLOCATOR,
     );
-    
+
     if (hasMetaAllocator) {
       this.applicationStatus = ApplicationStatus.META_APPROVAL_PHASE;
       const metaEvent = new MetaAllocatorApprovalStarted(this.guid);
@@ -182,53 +187,63 @@ export class DatacapAllocator extends AggregateRoot {
 ### 2. Command Handlers
 
 #### CreateApplicationCommandHandler
+
 ```typescript
 // packages/application/src/application/commands/create-application/create-application.command.ts
 @injectable()
 export class CreateApplicationCommandHandler implements ICommandHandler<CreateApplicationCommand> {
   constructor(
-    @inject(TYPES.DatacapAllocatorRepository) private readonly repository: IDatacapAllocatorRepository,
+    @inject(TYPES.DatacapAllocatorRepository)
+    private readonly repository: IDatacapAllocatorRepository,
     @inject(TYPES.PullRequestService) private readonly pullRequestService: IPullRequestService,
-    @inject(TYPES.Logger) private readonly logger: Logger
+    @inject(TYPES.Logger) private readonly logger: Logger,
   ) {}
-  
+
   async handle(command: CreateApplicationCommand): Promise<void> {
-    this.logger.info(`Handling create application command for application ${command.applicationNumber}`);
-    
+    this.logger.info(
+      `Handling create application command for application ${command.applicationNumber}`,
+    );
+
     const application = new DatacapAllocator(command.guid);
     application.createApplication(command);
-    
+
     await this.repository.save(application, -1);
-    
+
     // Create GitHub PR
     await this.pullRequestService.createPullRequest(command);
-    
+
     this.logger.info(`Application ${command.guid} created successfully`);
   }
 }
 ```
 
 #### ApproveGovernanceReviewCommandHandler
+
 ```typescript
 // packages/application/src/application/commands/submit-governance-review/submit-governance-review.command.ts
 @injectable()
-export class ApproveGovernanceReviewCommandHandler implements ICommandHandler<ApproveGovernanceReviewCommand> {
+export class ApproveGovernanceReviewCommandHandler
+  implements ICommandHandler<ApproveGovernanceReviewCommand>
+{
   constructor(
-    @inject(TYPES.DatacapAllocatorRepository) private readonly repository: IDatacapAllocatorRepository,
-    @inject(TYPES.Logger) private readonly logger: Logger
+    @inject(TYPES.DatacapAllocatorRepository)
+    private readonly repository: IDatacapAllocatorRepository,
+    @inject(TYPES.Logger) private readonly logger: Logger,
   ) {}
-  
+
   async handle(command: ApproveGovernanceReviewCommand): Promise<void> {
-    this.logger.info(`Handling approve governance review command for application ${command.applicationId}`);
-    
+    this.logger.info(
+      `Handling approve governance review command for application ${command.applicationId}`,
+    );
+
     const application = await this.repository.getById(command.applicationId);
     if (!application) {
       throw new Error('Application not found');
     }
-    
+
     application.approveGovernanceReview(command);
     await this.repository.save(application, -1);
-    
+
     this.logger.info(`Governance review approved for application ${command.applicationId}`);
   }
 }
@@ -237,17 +252,18 @@ export class ApproveGovernanceReviewCommandHandler implements ICommandHandler<Ap
 ### 3. Event Handlers
 
 #### ApplicationCreatedEventHandler
+
 ```typescript
 // packages/application/src/application/events/handlers/application-created.event.ts
 @injectable()
 export class ApplicationCreatedEventHandler implements IEventHandler<ApplicationCreated> {
   public event = ApplicationCreated.name;
-  
+
   constructor(@inject(TYPES.Db) private readonly _db: Db) {}
-  
+
   async handle(event: ApplicationCreated): Promise<void> {
     console.log('ApplicationCreatedEventHandler', event);
-    
+
     await this._db.collection('applicationDetails').insertOne({
       id: event.aggregateId,
       applicationNumber: event.applicationNumber,
@@ -262,21 +278,26 @@ export class ApplicationCreatedEventHandler implements IEventHandler<Application
 ```
 
 #### GovernanceReviewApprovedEventHandler
+
 ```typescript
 // packages/application/src/application/events/handlers/governance-review-approved.event.ts
 @injectable()
-export class GovernanceReviewApprovedEventHandler implements IEventHandler<GovernanceReviewApproved> {
+export class GovernanceReviewApprovedEventHandler
+  implements IEventHandler<GovernanceReviewApproved>
+{
   public event = GovernanceReviewApproved.name;
-  
+
   constructor(@inject(TYPES.Db) private readonly _db: Db) {}
-  
+
   async handle(event: GovernanceReviewApproved): Promise<void> {
     console.log('GovernanceReviewApprovedEventHandler', event);
-    
+
     const status = event.applicationInstructions.some(
-      instruction => instruction.method === ApplicationAllocator.META_ALLOCATOR
-    ) ? ApplicationStatus.META_APPROVAL_PHASE : ApplicationStatus.RKH_APPROVAL_PHASE;
-    
+      instruction => instruction.method === ApplicationAllocator.META_ALLOCATOR,
+    )
+      ? ApplicationStatus.META_APPROVAL_PHASE
+      : ApplicationStatus.RKH_APPROVAL_PHASE;
+
     await this._db.collection('applicationDetails').updateOne(
       { id: event.aggregateId },
       {
@@ -285,7 +306,7 @@ export class GovernanceReviewApprovedEventHandler implements IEventHandler<Gover
           applicationInstructions: event.applicationInstructions,
           updatedAt: event.timestamp,
         },
-      }
+      },
     );
   }
 }
@@ -294,6 +315,7 @@ export class GovernanceReviewApprovedEventHandler implements IEventHandler<Gover
 ## Event-Driven Workflow
 
 ### Event Flow Diagram
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Application   │    │   KYC Process   │    │   Governance    │
@@ -322,6 +344,7 @@ export class GovernanceReviewApprovedEventHandler implements IEventHandler<Gover
 ### Event Types
 
 #### Application Events
+
 ```typescript
 // packages/application/src/domain/application/application.events.ts
 export class ApplicationCreated extends Event {
@@ -330,7 +353,7 @@ export class ApplicationCreated extends Event {
     public readonly applicationNumber: number,
     public readonly applicantName: string,
     public readonly applicantAddress: string,
-    public readonly timestamp: Date
+    public readonly timestamp: Date,
   ) {
     super(aggregateId, ApplicationCreated.name);
   }
@@ -339,7 +362,7 @@ export class ApplicationCreated extends Event {
 export class KYCApproved extends Event {
   constructor(
     public readonly aggregateId: string,
-    public readonly timestamp: Date
+    public readonly timestamp: Date,
   ) {
     super(aggregateId, KYCApproved.name);
   }
@@ -349,7 +372,7 @@ export class GovernanceReviewApproved extends Event {
   constructor(
     public readonly aggregateId: string,
     public readonly applicationInstructions: ApplicationInstruction[],
-    public readonly timestamp: Date
+    public readonly timestamp: Date,
   ) {
     super(aggregateId, GovernanceReviewApproved.name);
   }
@@ -359,7 +382,7 @@ export class RKHApprovalCompleted extends Event {
   constructor(
     public readonly aggregateId: string,
     public readonly applicationInstructions: ApplicationInstruction[],
-    public readonly timestamp: Date
+    public readonly timestamp: Date,
   ) {
     super(aggregateId, RKHApprovalCompleted.name);
   }
@@ -371,7 +394,7 @@ export class MetaAllocatorApprovalCompleted extends Event {
     public readonly applicationInstructions: ApplicationInstruction[],
     public readonly blockNumber: number,
     public readonly txHash: string,
-    public readonly timestamp: Date
+    public readonly timestamp: Date,
   ) {
     super(aggregateId, MetaAllocatorApprovalCompleted.name);
   }
@@ -383,12 +406,13 @@ export class MetaAllocatorApprovalCompleted extends Event {
 ### 1. GitHub Integration
 
 #### GitHub Client
+
 ```typescript
 // packages/application/src/infrastructure/clients/github.ts
 @injectable()
 export class GithubClient implements IGithubClient {
   private octokit: Octokit;
-  
+
   constructor(@inject(TYPES.GithubClientConfig) config: GithubClientConfig) {
     this.octokit = new Octokit({
       appId: config.appId,
@@ -396,10 +420,10 @@ export class GithubClient implements IGithubClient {
       installationId: config.installationId,
     });
   }
-  
+
   async createPullRequest(data: CreatePullRequestData): Promise<string> {
     const { owner, repo, title, body, head, base } = data;
-    
+
     const response = await this.octokit.rest.pulls.create({
       owner,
       repo,
@@ -408,38 +432,39 @@ export class GithubClient implements IGithubClient {
       head,
       base,
     });
-    
+
     return response.data.html_url;
   }
-  
+
   async getPullRequestReviews(owner: string, repo: string, pullNumber: number): Promise<any[]> {
     const response = await this.octokit.rest.pulls.listReviews({
       owner,
       repo,
       pull_number: pullNumber,
     });
-    
+
     return response.data;
   }
 }
 ```
 
 #### Pull Request Service
+
 ```typescript
 // packages/application/src/application/services/pull-request.service.ts
 @injectable()
 export class PullRequestService implements IPullRequestService {
   constructor(
     @inject(TYPES.GithubClient) private readonly githubClient: IGithubClient,
-    @inject(TYPES.Logger) private readonly logger: Logger
+    @inject(TYPES.Logger) private readonly logger: Logger,
   ) {}
-  
+
   async createPullRequest(command: CreateApplicationCommand): Promise<void> {
     const title = `Add allocator: ${command.applicantName}`;
     const body = this.generatePullRequestBody(command);
     const head = `allocator-${command.applicationNumber}`;
     const base = 'main';
-    
+
     try {
       const prUrl = await this.githubClient.createPullRequest({
         owner: process.env.GITHUB_OWNER!,
@@ -449,14 +474,14 @@ export class PullRequestService implements IPullRequestService {
         head,
         base,
       });
-      
+
       this.logger.info(`Created PR for application ${command.applicationNumber}: ${prUrl}`);
     } catch (error) {
       this.logger.error(`Failed to create PR for application ${command.applicationNumber}:`, error);
       throw error;
     }
   }
-  
+
   private generatePullRequestBody(command: CreateApplicationCommand): string {
     return `
 # Allocator Application: ${command.applicantName}
@@ -481,27 +506,30 @@ This PR will be reviewed by the governance team and approved by root key holders
 ### 2. Airtable Integration
 
 #### Airtable Client
+
 ```typescript
 // packages/application/src/infrastructure/clients/airtable.ts
 @injectable()
 export class AirtableClient implements IAirtableClient {
   private base: Airtable.Base;
-  
+
   constructor(@inject(TYPES.AirtableClientConfig) config: AirtableClientConfig) {
     this.base = new Airtable({ apiKey: config.apiKey }).base(config.baseId);
   }
-  
+
   async getApplications(): Promise<any[]> {
-    const records = await this.base(config.tableName).select({
-      view: 'Public View', // GDPR compliant public view
-    }).all();
-    
+    const records = await this.base(config.tableName)
+      .select({
+        view: 'Public View', // GDPR compliant public view
+      })
+      .all();
+
     return records.map(record => ({
       id: record.id,
       fields: record.fields,
     }));
   }
-  
+
   async getApplicationById(recordId: string): Promise<any> {
     const record = await this.base(config.tableName).find(recordId);
     return {
@@ -515,21 +543,22 @@ export class AirtableClient implements IAirtableClient {
 ### 3. Zyphe KYC Integration
 
 #### KYC Webhook Handler
+
 ```typescript
 // packages/application/src/api/http/controllers/kyc.controller.ts
 @injectable()
 export class KYCController {
   constructor(
     @inject(TYPES.CommandBus) private readonly commandBus: ICommandBus,
-    @inject(TYPES.Logger) private readonly logger: Logger
+    @inject(TYPES.Logger) private readonly logger: Logger,
   ) {}
-  
+
   async handleKYCWebhook(req: Request, res: Response): Promise<void> {
     try {
       const { applicationId, status, timestamp } = req.body;
-      
+
       this.logger.info(`Received KYC webhook for application ${applicationId}: ${status}`);
-      
+
       if (status === 'approved') {
         const command = new KYCApprovedCommand(applicationId, new Date(timestamp));
         await this.commandBus.send(command);
@@ -537,7 +566,7 @@ export class KYCController {
         const command = new KYCRejectedCommand(applicationId, new Date(timestamp));
         await this.commandBus.send(command);
       }
-      
+
       res.status(200).json({ success: true });
     } catch (error) {
       this.logger.error('Error handling KYC webhook:', error);
@@ -552,54 +581,57 @@ export class KYCController {
 ### MongoDB Collections
 
 #### applicationDetails Collection
+
 ```typescript
 interface ApplicationDetails {
   _id: ObjectId;
-  id: string;                    // Application GUID
-  applicationNumber: number;     // Sequential application number
-  applicantName: string;         // Applicant full name
-  applicantAddress: string;      // Filecoin address
-  applicantOrgName: string;      // Organization name
+  id: string; // Application GUID
+  applicationNumber: number; // Sequential application number
+  applicantName: string; // Applicant full name
+  applicantAddress: string; // Filecoin address
+  applicantOrgName: string; // Organization name
   applicantGithubHandle: string; // GitHub username
-  status: ApplicationStatus;     // Current application status
+  status: ApplicationStatus; // Current application status
   applicationInstructions: ApplicationInstruction[];
-  rkhApprovals: string[];        // RKH approval addresses
-  rkhApprovalThreshold: number;  // Required approvals
+  rkhApprovals: string[]; // RKH approval addresses
+  rkhApprovalThreshold: number; // Required approvals
   metaAllocator?: {
     blockNumber: number;
     txHash: string;
   };
-  githubPrNumber: string;        // GitHub PR number
-  githubPrLink: string;          // GitHub PR URL
+  githubPrNumber: string; // GitHub PR number
+  githubPrLink: string; // GitHub PR URL
   createdAt: Date;
   updatedAt: Date;
 }
 ```
 
 #### ApplicationInstruction Interface
+
 ```typescript
 interface ApplicationInstruction {
-  method: ApplicationAllocator;  // RKH_ALLOCATOR or META_ALLOCATOR
-  datacap_amount: number;        // DataCap amount in PiB
-  startTimestamp: number;        // Start timestamp
-  endTimestamp?: number;         // End timestamp (optional)
-  allocatedTimestamp?: number;   // Allocation timestamp
-  status: string;                // PENDING, APPROVED, REJECTED
+  method: ApplicationAllocator; // RKH_ALLOCATOR or META_ALLOCATOR
+  datacap_amount: number; // DataCap amount in PiB
+  startTimestamp: number; // Start timestamp
+  endTimestamp?: number; // End timestamp (optional)
+  allocatedTimestamp?: number; // Allocation timestamp
+  status: string; // PENDING, APPROVED, REJECTED
 }
 ```
 
 ### Event Store
 
 #### Event Document
+
 ```typescript
 interface EventDocument {
   _id: ObjectId;
-  aggregateId: string;           // Aggregate GUID
-  eventType: string;             // Event class name
-  eventData: any;                // Event payload
-  version: number;               // Event version
-  timestamp: Date;               // Event timestamp
-  metadata?: any;                // Additional metadata
+  aggregateId: string; // Aggregate GUID
+  eventType: string; // Event class name
+  eventData: any; // Event payload
+  version: number; // Event version
+  timestamp: Date; // Event timestamp
+  metadata?: any; // Additional metadata
 }
 ```
 
@@ -608,42 +640,53 @@ interface EventDocument {
 ### REST API Structure
 
 #### Base API Configuration
+
 ```typescript
 // packages/application/src/api/http/index.ts
 @injectable()
 export class ApiServer {
   private app: express.Application;
-  
+
   constructor(
-    @inject(TYPES.ApplicationController) private readonly applicationController: ApplicationController,
+    @inject(TYPES.ApplicationController)
+    private readonly applicationController: ApplicationController,
     @inject(TYPES.RoleController) private readonly roleController: RoleController,
     @inject(TYPES.KYCController) private readonly kycController: KYCController,
-    @inject(TYPES.Logger) private readonly logger: Logger
+    @inject(TYPES.Logger) private readonly logger: Logger,
   ) {
     this.app = express();
     this.setupMiddleware();
     this.setupRoutes();
   }
-  
+
   private setupMiddleware(): void {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(errorHandler);
   }
-  
+
   private setupRoutes(): void {
     // Application routes
-    this.app.get('/applications', this.applicationController.getApplications.bind(this.applicationController));
-    this.app.get('/applications/:id', this.applicationController.getApplication.bind(this.applicationController));
-    this.app.post('/applications', this.applicationController.createApplication.bind(this.applicationController));
-    
+    this.app.get(
+      '/applications',
+      this.applicationController.getApplications.bind(this.applicationController),
+    );
+    this.app.get(
+      '/applications/:id',
+      this.applicationController.getApplication.bind(this.applicationController),
+    );
+    this.app.post(
+      '/applications',
+      this.applicationController.createApplication.bind(this.applicationController),
+    );
+
     // Role routes
     this.app.get('/roles', this.roleController.getRole.bind(this.roleController));
-    
+
     // KYC webhook
     this.app.post('/kyc/webhook', this.kycController.handleKYCWebhook.bind(this.kycController));
   }
-  
+
   start(port: number): void {
     this.app.listen(port, () => {
       this.logger.info(`API server started on port ${port}`);
@@ -653,6 +696,7 @@ export class ApiServer {
 ```
 
 #### Application Controller
+
 ```typescript
 // packages/application/src/api/http/controllers/application.controller.ts
 @injectable()
@@ -660,22 +704,22 @@ export class ApplicationController {
   constructor(
     @inject(TYPES.QueryBus) private readonly queryBus: IQueryBus,
     @inject(TYPES.CommandBus) private readonly commandBus: ICommandBus,
-    @inject(TYPES.Logger) private readonly logger: Logger
+    @inject(TYPES.Logger) private readonly logger: Logger,
   ) {}
-  
+
   async getApplications(req: Request, res: Response): Promise<void> {
     try {
       const { search, filters, page, limit } = req.query;
-      
+
       const query = new GetApplicationsQuery(
         search as string,
         (filters as string)?.split(',') || [],
         parseInt(page as string) || 1,
-        parseInt(limit as string) || 10
+        parseInt(limit as string) || 10,
       );
-      
+
       const result = await this.queryBus.send(query);
-      
+
       res.json({
         success: true,
         data: result,
@@ -688,14 +732,14 @@ export class ApplicationController {
       });
     }
   }
-  
+
   async getApplication(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      
+
       const query = new GetApplicationQuery(id);
       const result = await this.queryBus.send(query);
-      
+
       if (!result) {
         res.status(404).json({
           success: false,
@@ -703,7 +747,7 @@ export class ApplicationController {
         });
         return;
       }
-      
+
       res.json({
         success: true,
         data: result,
@@ -722,6 +766,7 @@ export class ApplicationController {
 ### API Response Format
 
 #### Success Response
+
 ```typescript
 interface ApiResponse<T> {
   success: true;
@@ -731,6 +776,7 @@ interface ApiResponse<T> {
 ```
 
 #### Error Response
+
 ```typescript
 interface ApiErrorResponse {
   success: false;
@@ -744,6 +790,7 @@ interface ApiErrorResponse {
 ### Unit Testing
 
 #### Command Handler Testing
+
 ```typescript
 // packages/application/src/application/commands/create-application/create-application.command.test.ts
 import { CreateApplicationCommandHandler } from './create-application.command';
@@ -755,54 +802,55 @@ describe('CreateApplicationCommandHandler', () => {
   let mockRepository: jest.Mocked<IDatacapAllocatorRepository>;
   let mockPullRequestService: jest.Mocked<IPullRequestService>;
   let mockLogger: jest.Mocked<Logger>;
-  
+
   beforeEach(() => {
     mockRepository = {
       save: jest.fn(),
     } as any;
-    
+
     mockPullRequestService = {
       createPullRequest: jest.fn(),
     } as any;
-    
+
     mockLogger = {
       info: jest.fn(),
       error: jest.fn(),
     } as any;
-    
+
     handler = new CreateApplicationCommandHandler(
       mockRepository,
       mockPullRequestService,
-      mockLogger
+      mockLogger,
     );
   });
-  
+
   it('should create application successfully', async () => {
     const command = new CreateApplicationCommand(
       'test-guid',
       123,
       'Test Applicant',
       'f1testaddress',
-      new Date()
+      new Date(),
     );
-    
+
     await handler.handle(command);
-    
+
     expect(mockRepository.save).toHaveBeenCalledWith(
       expect.objectContaining({
         guid: 'test-guid',
         applicationNumber: 123,
         applicantName: 'Test Applicant',
       }),
-      -1
+      -1,
     );
-    
+
     expect(mockPullRequestService.createPullRequest).toHaveBeenCalledWith(command);
   });
 });
 ```
 
 #### Event Handler Testing
+
 ```typescript
 // packages/application/src/application/events/handlers/application-created.event.test.ts
 import { ApplicationCreatedEventHandler } from './application-created.event';
@@ -811,28 +859,28 @@ import { ApplicationCreated } from '@src/domain/application/application.events';
 describe('ApplicationCreatedEventHandler', () => {
   let handler: ApplicationCreatedEventHandler;
   let mockDb: jest.Mocked<Db>;
-  
+
   beforeEach(() => {
     mockDb = {
       collection: jest.fn().mockReturnValue({
         insertOne: jest.fn(),
       }),
     } as any;
-    
+
     handler = new ApplicationCreatedEventHandler(mockDb);
   });
-  
+
   it('should handle ApplicationCreated event', async () => {
     const event = new ApplicationCreated(
       'test-guid',
       123,
       'Test Applicant',
       'f1testaddress',
-      new Date()
+      new Date(),
     );
-    
+
     await handler.handle(event);
-    
+
     expect(mockDb.collection).toHaveBeenCalledWith('applicationDetails');
     expect(mockDb.collection('applicationDetails').insertOne).toHaveBeenCalledWith({
       id: 'test-guid',
@@ -850,6 +898,7 @@ describe('ApplicationCreatedEventHandler', () => {
 ### Integration Testing
 
 #### Application Workflow Testing
+
 ```typescript
 // packages/application/src/testing/create-app.ts
 import { initialize } from '@src/startup';
@@ -860,22 +909,22 @@ async function testApplicationWorkflow() {
   const container = await initialize();
   const commandBus = container.get<ICommandBus>(TYPES.CommandBus);
   const repository = container.get<IDatacapAllocatorRepository>(TYPES.DatacapAllocatorRepository);
-  
+
   // Create application
   const createCommand = new CreateApplicationCommand(
     'test-guid',
     123,
     'Test Applicant',
     'f1testaddress',
-    new Date()
+    new Date(),
   );
-  
+
   await commandBus.send(createCommand);
-  
+
   // Verify application created
   const application = await repository.getById('test-guid');
   expect(application.applicationStatus).toBe(ApplicationStatus.KYC_PHASE);
-  
+
   // Approve governance review
   const approveCommand = new ApproveGovernanceReviewCommand(
     'test-guid',
@@ -887,11 +936,11 @@ async function testApplicationWorkflow() {
         status: 'PENDING',
       },
     ],
-    new Date()
+    new Date(),
   );
-  
+
   await commandBus.send(approveCommand);
-  
+
   // Verify status updated
   const updatedApplication = await repository.getById('test-guid');
   expect(updatedApplication.applicationStatus).toBe(ApplicationStatus.RKH_APPROVAL_PHASE);
@@ -903,6 +952,7 @@ async function testApplicationWorkflow() {
 ### Docker Configuration
 
 #### Dockerfile
+
 ```dockerfile
 # Dockerfile
 FROM node:18-alpine
@@ -930,6 +980,7 @@ CMD ["npm", "start"]
 ```
 
 #### Docker Compose
+
 ```yaml
 # docker-compose.yml
 version: '3.8'
@@ -938,7 +989,7 @@ services:
   backend:
     build: .
     ports:
-      - "3001:3001"
+      - '3001:3001'
     environment:
       - API_PORT=3001
       - MONGODB_URI=mongodb://mongodb:27017/filecoin-plus
@@ -957,7 +1008,7 @@ services:
   mongodb:
     image: mongo:6.0
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongodb_data:/data/db
     environment:
@@ -966,8 +1017,8 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     environment:
@@ -982,6 +1033,7 @@ volumes:
 ### Environment Variables
 
 #### Required Environment Variables
+
 ```bash
 # API Configuration
 API_PORT=3001
@@ -1021,6 +1073,7 @@ MA_ADDRESSES=0xcontract1,0xcontract2
 ### Production Deployment
 
 #### Kubernetes Deployment
+
 ```yaml
 # k8s/deployment.yaml
 apiVersion: apps/v1
@@ -1038,45 +1091,46 @@ spec:
         app: allocator-backend
     spec:
       containers:
-      - name: backend
-        image: allocator-backend:latest
-        ports:
-        - containerPort: 3001
-        env:
-        - name: API_PORT
-          value: "3001"
-        - name: MONGODB_URI
-          valueFrom:
-            secretKeyRef:
-              name: allocator-secrets
-              key: mongodb-uri
-        - name: GITHUB_APP_PRIVATE_KEY
-          valueFrom:
-            secretKeyRef:
-              name: allocator-secrets
-              key: github-private-key
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3001
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: backend
+          image: allocator-backend:latest
+          ports:
+            - containerPort: 3001
+          env:
+            - name: API_PORT
+              value: '3001'
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: allocator-secrets
+                  key: mongodb-uri
+            - name: GITHUB_APP_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: allocator-secrets
+                  key: github-private-key
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 #### Service Configuration
+
 ```yaml
 # k8s/service.yaml
 apiVersion: v1
@@ -1087,15 +1141,16 @@ spec:
   selector:
     app: allocator-backend
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 3001
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
   type: LoadBalancer
 ```
 
 ### Monitoring and Logging
 
 #### Health Check Endpoints
+
 ```typescript
 // packages/application/src/api/http/controllers/health.controller.ts
 @injectable()
@@ -1107,12 +1162,12 @@ export class HealthController {
       version: process.env.npm_package_version,
     });
   }
-  
+
   async ready(req: Request, res: Response): Promise<void> {
     // Check database connection
     // Check message queue connection
     // Check external services
-    
+
     res.json({
       status: 'ready',
       checks: {
@@ -1126,6 +1181,7 @@ export class HealthController {
 ```
 
 #### Logging Configuration
+
 ```typescript
 // packages/application/src/infrastructure/logger.ts
 import pino from 'pino';

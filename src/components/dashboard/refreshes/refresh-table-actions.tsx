@@ -28,9 +28,11 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
           View on Filfox
         </Link>
       );
-    case (role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) && isWaitingForRkhSign(row):
+    case (role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
+      isWaitingForRkhSign(row):
       return <RkhSignTransactionButton address={row.original.msigAddress} />;
-    case (role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) && isWaitingForRkhApprove(row):
+    case (role === AccountRole.ROOT_KEY_HOLDER || role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
+      isWaitingForRkhApprove(row):
       return (
         <RkhApproveTransactionButton
           address={row.original.msigAddress}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createFilecoinRpcClient } from '@/lib/filecoin-rpc';
 import { filecoinConfig } from '@/config/filecoin';
-import { 
+import {
   approvePendingTransaction,
   cancelPendingTransaction,
   proposeAddSigner,
@@ -24,7 +24,10 @@ export function useProposalActions() {
   const [isLoading, setIsLoading] = useState(false);
   const accountContext = useAccount();
 
-  const approveProposal = async (proposalId: number, method: number): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
+  const approveProposal = async (
+    proposalId: number,
+    method: number,
+  ): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
     setIsLoading(true);
     try {
       // All approval methods use the same generic function since they all call f080.Method3 (Approve)
@@ -39,16 +42,20 @@ export function useProposalActions() {
       }
 
       return result;
-      
     } catch (error) {
       console.error('Failed to approve proposal:', error);
-      throw new Error(`Failed to approve proposal: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to approve proposal: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const rejectProposal = async (proposalId: number, method: number): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
+  const rejectProposal = async (
+    proposalId: number,
+    method: number,
+  ): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
     setIsLoading(true);
     try {
       // All rejection methods use the same generic function since they all call f080.Method4 (Cancel)
@@ -63,10 +70,11 @@ export function useProposalActions() {
       }
 
       return result;
-      
     } catch (error) {
       console.error('Failed to reject proposal:', error);
-      throw new Error(`Failed to reject proposal: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to reject proposal: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     } finally {
       setIsLoading(false);
     }

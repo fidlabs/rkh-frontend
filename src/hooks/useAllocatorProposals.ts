@@ -20,7 +20,9 @@ export interface AllocatorProposalsData {
   error: string | null;
 }
 
-export function useAllocatorProposals(msigAddress: string = filecoinConfig.defaultMsigAddress): AllocatorProposalsData {
+export function useAllocatorProposals(
+  msigAddress: string = filecoinConfig.defaultMsigAddress,
+): AllocatorProposalsData {
   const [proposals, setProposals] = useState<AllocatorProposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -34,7 +36,7 @@ export function useAllocatorProposals(msigAddress: string = filecoinConfig.defau
         setError(null);
 
         const client = createFilecoinRpcClient(msigAddress);
-       
+
         let pendingTransactions;
         try {
           pendingTransactions = await client.getPendingTransactions();
@@ -45,7 +47,7 @@ export function useAllocatorProposals(msigAddress: string = filecoinConfig.defau
 
         // Process and decode each pending transaction
         const processedProposals: AllocatorProposal[] = [];
- 
+
         for (const tx of pendingTransactions) {
           try {
             // First decode the outer params (the proposal to the multisig)
@@ -53,7 +55,7 @@ export function useAllocatorProposals(msigAddress: string = filecoinConfig.defau
             const decodedParams = await client.decodeParams(tx.To, tx.Method, tx.Params);
             // For multisig proposals, the outer params contain an inner message
             // We need to decode the inner message's params to get the actual proposal details
-            
+
             processedProposals.push({
               id: tx.ID,
               to: tx.To,

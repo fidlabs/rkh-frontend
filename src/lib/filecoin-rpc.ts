@@ -1,5 +1,5 @@
-import { JsonRpcProvider, FetchRequest } from "ethers";
-import { filecoinConfig } from "@/config/filecoin";
+import { JsonRpcProvider, FetchRequest } from 'ethers';
+import { filecoinConfig } from '@/config/filecoin';
 
 export interface FilecoinActor {
   Balance: string;
@@ -32,39 +32,39 @@ export class FilecoinRpcClient {
 
   constructor(lotusUrl: string, token: string, msigAddress: string, chainId: number = 314) {
     const req = new FetchRequest(lotusUrl);
-    req.setHeader("Content-Type", "application/json");
-    req.setHeader("Authorization", `Bearer ${token}`);
-    this.provider = new JsonRpcProvider(req, { chainId, name: "filecoin" });
+    req.setHeader('Content-Type', 'application/json');
+    req.setHeader('Authorization', `Bearer ${token}`);
+    this.provider = new JsonRpcProvider(req, { chainId, name: 'filecoin' });
     this.msigAddress = msigAddress;
   }
 
   async getActorInfo(): Promise<FilecoinActor> {
-    return await this.provider.send("Filecoin.StateGetActor", [this.msigAddress, null]);
+    return await this.provider.send('Filecoin.StateGetActor', [this.msigAddress, null]);
   }
 
   async getAvailableBalance(): Promise<string> {
-    return await this.provider.send("Filecoin.MsigGetAvailableBalance", [this.msigAddress, null]);
+    return await this.provider.send('Filecoin.MsigGetAvailableBalance', [this.msigAddress, null]);
   }
 
   async getState(): Promise<FilecoinState> {
-    const { State } = await this.provider.send("Filecoin.StateReadState", [this.msigAddress, null]);
+    const { State } = await this.provider.send('Filecoin.StateReadState', [this.msigAddress, null]);
     return State;
   }
 
   async getPendingTransactions(): Promise<PendingTransaction[]> {
-    return await this.provider.send("Filecoin.MsigGetPending", [this.msigAddress, null]);
+    return await this.provider.send('Filecoin.MsigGetPending', [this.msigAddress, null]);
   }
 
   async decodeParams(actor: string, method: number, params: string): Promise<DecodedParams> {
-    return await this.provider.send("Filecoin.StateDecodeParams", [actor, method, params, null]);
+    return await this.provider.send('Filecoin.StateDecodeParams', [actor, method, params, null]);
   }
 
   async encodeParams(actor: string, method: number, params: any): Promise<string> {
-    return await this.provider.send("Filecoin.StateEncodeParams", [actor, method, params]);
+    return await this.provider.send('Filecoin.StateEncodeParams', [actor, method, params]);
   }
 
   async getActorCode(actorAddress: string): Promise<any> {
-    const actor = await this.provider.send("Filecoin.StateGetActor", [actorAddress, null]);
+    const actor = await this.provider.send('Filecoin.StateGetActor', [actorAddress, null]);
     return actor.Code;
   }
 
@@ -82,6 +82,6 @@ export class FilecoinRpcClient {
 // Factory function to create client with environment config
 export function createFilecoinRpcClient(msigAddress: string): FilecoinRpcClient {
   const { lotus } = filecoinConfig;
-  
+
   return new FilecoinRpcClient(lotus.url, lotus.token, msigAddress, lotus.chainId);
 }
