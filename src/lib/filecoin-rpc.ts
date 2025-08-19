@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { JsonRpcProvider, FetchRequest } from "ethers";
 import { filecoinConfig } from "@/config/filecoin";
 
 export interface FilecoinActor {
@@ -27,14 +27,14 @@ export interface DecodedParams {
 }
 
 export class FilecoinRpcClient {
-  private provider: ethers.JsonRpcProvider;
+  private provider: JsonRpcProvider;
   private msigAddress: string;
 
   constructor(lotusUrl: string, token: string, msigAddress: string, chainId: number = 314) {
-    const req = new ethers.FetchRequest(lotusUrl);
+    const req = new FetchRequest(lotusUrl);
     req.setHeader("Content-Type", "application/json");
     req.setHeader("Authorization", `Bearer ${token}`);
-    this.provider = new ethers.JsonRpcProvider(req, { chainId, name: "filecoin" });
+    this.provider = new JsonRpcProvider(req, { chainId, name: "filecoin" });
     this.msigAddress = msigAddress;
   }
 
