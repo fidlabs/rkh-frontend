@@ -1,11 +1,12 @@
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 // @ts-ignore
-import FilecoinApp from '@zondax/ledger-filecoin';
+import { FilecoinApp } from '@zondax/ledger-filecoin/dist/app';
 
 import { fetchRole } from '@/lib/api';
 import { Connector } from '@/types/connector';
-import { Account } from '@/types/account';
+import { Account, AccountRole } from '@/types/account';
 import { LedgerWallet } from '../wallets/ledger-wallet';
+import { checkMultisigRole } from '../multisig-role-checker';
 
 export class LedgerConnector implements Connector {
   name = 'ledger';
@@ -41,13 +42,31 @@ export class LedgerConnector implements Connector {
       const { addrString: address, compressed_pk: pubkey } =
         await this.filecoinApp.getAddressAndPubKey(path);
 
-      const role = await fetchRole(address);
+      // Check if the logged-in wallet is a signer to f080 or any of its multisig signers
+      const multisigRoleResult = await checkMultisigRole(address);
+
+      let role;
+      let parentMsigAddress;
+
+      if (
+        multisigRoleResult.role === AccountRole.ROOT_KEY_HOLDER ||
+        multisigRoleResult.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER
+      ) {
+        // Use the multisig role result
+        role = multisigRoleResult.role;
+        parentMsigAddress = multisigRoleResult.parentMsigAddress;
+      } else {
+        // Fall back to the default role fetching
+        role = await fetchRole(address);
+      }
+
       this.account = {
         index: this.accountIndex,
         address,
         isConnected: true,
         wallet: new LedgerWallet(this.filecoinApp, address, pubkey),
         role,
+        parentMsigAddress,
       };
       this.connected = true;
       return this.account;

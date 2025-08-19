@@ -3,7 +3,7 @@ import { createContext } from 'react';
 import { Account } from '@/types/account';
 import { Connector } from '@/types/connector';
 
-interface AccountContextType {
+export interface AccountContextType {
   account: Account | null;
   connectors: { [key: string]: Connector };
   connect: (connectorName: string, accountIndex?: number) => Promise<void>;

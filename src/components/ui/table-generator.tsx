@@ -61,7 +61,7 @@ export function TableGenerator<TData>({
     onPaginationChange: pagination?.setPaginationState,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(pagination ? { getPaginationRowModel: getPaginationRowModel() } : {}),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,

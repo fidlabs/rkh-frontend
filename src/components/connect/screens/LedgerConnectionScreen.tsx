@@ -47,7 +47,6 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
     try {
       const ledgerConnector = connectors['ledger'] as LedgerConnector;
       const accounts = await ledgerConnector.fetchAccounts();
-      console.log('accounts', accounts);
       setLedgerAccounts(accounts);
     } catch (error) {
       console.error('Connection error:', error);
