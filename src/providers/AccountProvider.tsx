@@ -188,7 +188,11 @@ export const AccountProvider: React.FC<{
       } else {
         // Go the multisig way - requires some torture to get the message in the right shape
         //FIXME need to get this from some ind of setting
-        const msigAddress ='t2q4zeevbw6twcqd2gm7b25bg3wydq7qq72qhmy5y'
+        const msigAddress = account.parentMsigAddress;
+
+        if (!msigAddress) {
+          throw new Error('Not a multisig account, cannot propose');
+        }
 
         // Prepare RPC access}
         const req = new FetchRequest(env.rpcUrl);
@@ -206,7 +210,6 @@ export const AccountProvider: React.FC<{
         // Encode INNER message (what will be send to f06) as base64
         // lotus chain encode params t06 2 '{"address":"<allocatoraddress>","allowance":"<datacapamount>"}'
         const vract = await rpcProvider.send("Filecoin.StateGetActor", ["t06", null]);
-  console.log('vract ...', vract);
         const innerB64 = await rpcProvider.send("Filecoin.StateEncodeParams", [
           vract.Code,
           2,
@@ -216,29 +219,22 @@ export const AccountProvider: React.FC<{
           },
         ]
       );
-  console.log('8 ...', innerB64);
-
 
       // Encode MIDDLE message
       const rkhAct = await rpcProvider.send("Filecoin.StateGetActor", ["t080", null]);
-  console.log('rkhAct ...', rkhAct);
-        const middleB64 = await rpcProvider.send("Filecoin.StateEncodeParams", [
-          rkhAct.Code,
-          2,
-          {
-            To: "t06",
-            Method: 2,
-            Value: "0",
-            Params: innerB64,
-          },
-        ]
-      );
-  console.log('8 ...', middleB64);
-
+      const middleB64 = await rpcProvider.send("Filecoin.StateEncodeParams", [
+        rkhAct.Code,
+        2,
+        {
+          To: "t06",
+          Method: 2,
+          Value: "0",
+          Params: innerB64,
+        },
+      ]);
 
       // Encode OUTER message
       const msigAct = await rpcProvider.send("Filecoin.StateGetActor", ["t080", null]);
-  console.log('msigAct ...', msigAct);
       const payload = {
         To: "t080",
         Value: "0",
@@ -250,13 +246,9 @@ export const AccountProvider: React.FC<{
         2,
         payload
       ]);
-  console.log('outerB64 ...', outerB64);
-      const outerHex = Buffer.from(outerB64, "base64").toString("hex");
-  console.log('outerHex ...', outerHex);
 
       // Now prepare the final proposal
       const nonce: number = await rpcProvider.send("Filecoin.MpoolGetNonce", [account.address]);
-  console.log('nonce ...', nonce);
       const msg: Msg = {
         Version: 0,
         To: msigAddress,
@@ -269,9 +261,7 @@ export const AccountProvider: React.FC<{
       };
       
       //Sign and send...
-  console.log('filecoinApp ...', account.wallet.filecoinApp); 
       const est: Msg = await rpcProvider.send("Filecoin.GasEstimateMessageGas", [msg, { MaxFee: "20000000000000000" }, null]);
-
       const msgZondax = {
         To: msg.To,
         From: msg.From,
@@ -302,12 +292,8 @@ export const AccountProvider: React.FC<{
         },
       };
 
-  console.log('tbs ...', tbs);
-      tbs.Message.Params = msg.Params; //JAGMEM - try to hack this in...but it wasn't signed, was it?
-  console.log('tbs mod...', tbs);
-      //JAGMEM it seems like the Params ARE NOT sent to MpoolPush - see browser netwrok trace and the settled transaction - both have Params = ""
+      tbs.Message.Params = msg.Params;
       const cid = await rpcProvider.send("Filecoin.MpoolPush", [tbs]);
-  console.log('Returned CID ...', cid);
       return cid["/"]  || 'ERROR';
       }
     },
