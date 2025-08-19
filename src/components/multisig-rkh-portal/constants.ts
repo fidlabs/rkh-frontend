@@ -9,5 +9,3 @@ export const availableFilters: Record<MultisigRkhPortalTabs, string[]> = {
   [MultisigRkhPortalTabs.ALLOCATOR_PROPOSALS]: [],
   [MultisigRkhPortalTabs.MY_PROPOSALS]: [],
 };
-
-export const PAGE_SIZE = 10;
