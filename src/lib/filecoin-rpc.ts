@@ -55,8 +55,8 @@ export class FilecoinRpcClient {
     return await this.provider.send("Filecoin.MsigGetPending", [this.msigAddress, null]);
   }
 
-  async decodeParams(method: number, params: string): Promise<DecodedParams> {
-    return await this.provider.send("Filecoin.StateDecodeParams", [this.msigAddress, method, params, null]);
+  async decodeParams(actor: string, method: number, params: string): Promise<DecodedParams> {
+    return await this.provider.send("Filecoin.StateDecodeParams", [actor, method, params, null]);
   }
 
   async encodeParams(actor: string, method: number, params: any): Promise<string> {

@@ -95,10 +95,17 @@ export function ProposalActionDialog({
             <label className="text-sm font-medium text-muted-foreground">Decoded Parameters</label>
             {proposal.decodedParams ? (
               <div className="mt-1 p-3 bg-muted rounded-md text-sm">
-                <div><strong>To:</strong> {proposal.decodedParams.To}</div>
-                <div><strong>Method:</strong> {proposal.decodedParams.Method}</div>
-                {proposal.decodedParams.Params && (
-                  <div><strong>Params:</strong> <pre className="mt-1 text-xs">{JSON.stringify(proposal.decodedParams.Params, null, 2)}</pre></div>
+                {typeof proposal.decodedParams === 'object' ? (
+                  Object.entries(proposal.decodedParams).map(([key, value]) => (
+                    <div key={key} className="mb-2">
+                      <strong>{key}:</strong>
+                      <span className="font-mono ml-2">
+                        {typeof value === 'string' && value.startsWith('t') ? value : String(value)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-muted-foreground">Invalid parameter format</div>
                 )}
               </div>
             ) : (
