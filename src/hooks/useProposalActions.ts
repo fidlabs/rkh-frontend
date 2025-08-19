@@ -22,7 +22,7 @@ export interface ProposalActionParams {
   method: number;
 }
 
-export function useProposalActions(msigAddress: string = filecoinConfig.defaultMsigAddress) {
+export function useProposalActions() {
   const [isLoading, setIsLoading] = useState(false);
   const accountContext = useAccount();
 
@@ -35,14 +35,14 @@ export function useProposalActions(msigAddress: string = filecoinConfig.defaultM
         // Method 2: AddVerifierIndirect
         result = await approveAddVerifierIndirect({
           proposalId,
-          msigAddress,
+          msigAddress: accountContext.account?.parentMsigAddress || '',
           accountContext,
         });
       } else if (method === 5) {
         // Method 5: AddSignerIndirect
         result = await approveAddSignerIndirect({
           proposalId,
-          msigAddress,
+          msigAddress: accountContext.account?.parentMsigAddress || '',
           accountContext,
         });
       } else {
@@ -73,14 +73,14 @@ export function useProposalActions(msigAddress: string = filecoinConfig.defaultM
         // Method 2: AddVerifierIndirect
         result = await rejectAddVerifierIndirect({
           proposalId,
-          msigAddress,
+          msigAddress: accountContext.account?.parentMsigAddress || '',
           accountContext,
         });
       } else if (method === 5) {
         // Method 5: AddSignerIndirect
         result = await rejectAddSignerIndirect({
           proposalId,
-          msigAddress,
+          msigAddress: accountContext.account?.parentMsigAddress || '',
           accountContext,
         });
       } else {

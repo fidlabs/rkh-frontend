@@ -54,7 +54,7 @@ export function AddSignerDialog({
 
       const result = await proposeAddSigner({
         proposalId: newSignerAddress, // The signer address is passed as proposalId
-        msigAddress: 't01027', //JAGTAG this needs to come from logged in context
+        msigAddress: accountContext.account?.parentMsigAddress || '',
         accountContext,
       });
 

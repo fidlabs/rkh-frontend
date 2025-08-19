@@ -13,6 +13,7 @@ export enum AccountRole {
 
 export interface Account {
   address: string;
+  parentMsigAddress?: string;
   isConnected: boolean;
   role: AccountRole;
   wallet: Wallet;

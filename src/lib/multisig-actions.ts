@@ -55,13 +55,13 @@ const signerPromise = import('@zondax/filecoin-signing-tools/js').then(
 export async function sendMsigMsg(
   message: FilecoinMessage,
   accountContext: AccountContextType,
-  msigAddress: string = "t080"
 ): Promise<string> {
   try {
     if (!accountContext.account?.wallet?.filecoinApp) {
       throw new Error('No Ledger account available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     const account = accountContext.account;
 
@@ -156,17 +156,19 @@ function hexToBytes(hex: string): Uint8Array {
  */
 export async function approveAddVerifierIndirect({
   proposalId,
-  msigAddress,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
-    console.log('Approving AddVerifierIndirect proposal:', proposalId, 'with msigAddress:', msigAddress, 'and accountContext:', accountContext);
+    
     if (!accountContext.account?.wallet?.filecoinApp) {
       throw new Error('No Ledger wallet available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
+    console.log('Approving AddVerifierIndirect proposal:', proposalId, 'with msigAddress:', msigAddress, 'and accountContext:', accountContext);
+
     // Method 3 is "Approve" for multisig
     const approveParams = {
       ID: proposalId,
@@ -192,7 +194,7 @@ export async function approveAddVerifierIndirect({
       Params: OuterParamsB64,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext, msigAddress)
+    const txHash = await sendMsigMsg(msg, accountContext)
     
     return {
       success: true,
@@ -215,7 +217,6 @@ export async function approveAddVerifierIndirect({
  */
 export async function rejectAddVerifierIndirect({
   proposalId,
-  msigAddress,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
@@ -223,6 +224,7 @@ export async function rejectAddVerifierIndirect({
       throw new Error('No Ledger account available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
     // Method 4 is "Cancel" for multisig (rejecting)
@@ -261,7 +263,6 @@ export async function rejectAddVerifierIndirect({
  */
 export async function approveAddSignerIndirect({
   proposalId,
-  msigAddress,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
@@ -269,6 +270,7 @@ export async function approveAddSignerIndirect({
       throw new Error('No Ledger account available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
     // Method 3 is "Approve" for multisig
@@ -296,7 +298,7 @@ export async function approveAddSignerIndirect({
       Params: OuterParamsB64,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext, msigAddress)
+    const txHash = await sendMsigMsg(msg, accountContext)
     
     return {
       success: true,
@@ -319,7 +321,6 @@ export async function approveAddSignerIndirect({
  */
 export async function rejectAddSignerIndirect({
   proposalId,
-  msigAddress,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
@@ -327,6 +328,7 @@ export async function rejectAddSignerIndirect({
       throw new Error('No Ledger account available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
     // Method 4 is "Cancel" for multisig (rejecting)
@@ -365,7 +367,6 @@ export async function rejectAddSignerIndirect({
  */
 export async function proposeAddSigner({
   proposalId,
-  msigAddress,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
@@ -373,6 +374,7 @@ export async function proposeAddSigner({
       throw new Error('No Ledger account available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
 
     console.log('Proposing AddSigner:', proposalId);
@@ -403,7 +405,7 @@ export async function proposeAddSigner({
       Params: messageParams,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext, msigAddress)
+    const txHash = await sendMsigMsg(msg, accountContext)
     
     return {
       success: true,
@@ -426,7 +428,6 @@ export async function proposeAddSigner({
  */
 export async function rejectAddSigner({
   proposalId,
-  msigAddress,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
@@ -434,6 +435,7 @@ export async function rejectAddSigner({
       throw new Error('No Ledger account available');
     }
 
+    const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
     
     // Method 4 is "Cancel" for multisig (rejecting)
