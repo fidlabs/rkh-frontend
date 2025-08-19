@@ -10,7 +10,7 @@ import {
 import { AccountContext } from '@/contexts/AccountContext';
 import * as cbor from 'cbor';
 import * as address from '@glif/filecoin-address';
-import { ethers } from 'ethers';
+import { JsonRpcProvider, FetchRequest } from "ethers";
 import { hexToBytes } from '@noble/hashes/utils';
 
 import { Connector } from '@/types/connector';
@@ -191,11 +191,11 @@ export const AccountProvider: React.FC<{
         const msigAddress ='t2q4zeevbw6twcqd2gm7b25bg3wydq7qq72qhmy5y'
 
         // Prepare RPC access}
-        const req = new ethers.FetchRequest(env.rpcUrl);
+        const req = new FetchRequest(env.rpcUrl);
         req.setHeader("Authorization", `Bearer ${env.rpcToken}`);
         req.setHeader("Content-Type", "application/json");
 
-        const rpcProvider = new ethers.JsonRpcProvider(
+        const rpcProvider = new JsonRpcProvider(
           req, 
           {
             chainId: 31415926, // neti test ID, need to get from config

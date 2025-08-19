@@ -1,5 +1,5 @@
 // @ts-ignore
-import FilecoinApp from '@zondax/ledger-filecoin';
+import { FilecoinApp } from '@zondax/ledger-filecoin/dist/app';
 import { Wallet } from '@/types/wallet';
 import { encode as cborEncode } from 'cbor';
 import { Signature, verify } from '@noble/secp256k1';
@@ -45,15 +45,15 @@ export class LedgerWallet implements Wallet {
 
     return await this.generateSignedMessage(message, signedMessage);
   }
-
+  
   async getAccounts(): Promise<string[]> {
     const accounts: LedgerAccount[] = [];
     for (let i = 0; i < 5; i++) {
       const path = `m/44'/461'/0'/0/${i}`;
-      const { addrString, pk } = await this.filecoinApp.getAddressAndPubKey(path);
-      console.log(`At index ${i}: ${addrString}`);
-      console.log(pk);
-      accounts.push({ address: addrString, pubKey: pk, index: i, path });
+      const apk = await this.filecoinApp.getAddressAndPubKey(path);
+      console.log(`At index ${i}: ${apk.addrString}`);
+      console.log(apk.compressed_pk);
+      accounts.push({ address: apk.addrString, pubKey: apk.compressed_pk, index: i, path });
     }
 
     return accounts.map(account => account.address);
@@ -87,7 +87,7 @@ export class LedgerWallet implements Wallet {
     const serializedHex = transactionSerialize(fakeMessage);
     const serializedBytes = hexToBytes(serializedHex);
 
-    const { signature_compact } = await this.filecoinApp.sign(derivationPath, serializedBytes);
+    const { signature_compact } = await this.filecoinApp.sign(derivationPath, Buffer.from(serializedBytes));
     if (signature_compact.length !== 65) {
       throw new Error(`Ledger returned bad signature length ${signature_compact.length}`);
     }

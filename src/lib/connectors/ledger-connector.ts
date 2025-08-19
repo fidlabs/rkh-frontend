@@ -1,6 +1,6 @@
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 // @ts-ignore
-import FilecoinApp from '@zondax/ledger-filecoin';
+import { FilecoinApp } from '@zondax/ledger-filecoin/dist/app';
 
 import { fetchRole } from '@/lib/api';
 import { Connector } from '@/types/connector';
