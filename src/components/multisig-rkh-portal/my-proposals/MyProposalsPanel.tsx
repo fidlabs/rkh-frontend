@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { PaginationState } from '@tanstack/react-table';
 import { TableGenerator } from '@/components/ui/table-generator';
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { PAGE_SIZE } from '../constants';
 import { useMyProposals } from '@/hooks/useMyProposals';
 import { createAllocatorProposalsTableColumns } from '../allocator-proposals/allocator-proposals-table-columns';
 import { ProposalActionDialog } from '../allocator-proposals/ProposalActionDialog';
@@ -19,11 +17,6 @@ import { AllocatorProposal } from '@/hooks/useMyProposals';
 interface MyProposalsPanelProps {}
 
 export function MyProposalsPanel({}: MyProposalsPanelProps) {
-  const [paginationState, setPaginationState] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
   const [selectedProposal, setSelectedProposal] = useState<AllocatorProposal | null>(null);
   const [dialogAction, setDialogAction] = useState<'approve' | 'reject' | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -70,10 +63,6 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
     }
   };
 
-  const startIndex = paginationState.pageIndex * PAGE_SIZE + 1;
-  const endIndex = Math.min(startIndex + PAGE_SIZE - 1, totalCount);
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-
   return (
     <>
       <Card className="mb-4">
@@ -86,21 +75,12 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
           isLoading={isLoading}
           isError={isError}
           data={proposals}
-          pagination={{
-            totalPages,
-            paginationState,
-            setPaginationState,
-          }}
           columns={createAllocatorProposalsTableColumns(handleApprove, handleReject)}
         />
       </CardContent>
       <CardFooter>
         <div className="text-xs text-muted-foreground">
-          Showing{' '}
-          <strong>
-            {startIndex}-{endIndex}
-          </strong>{' '}
-          of <strong>{totalCount}</strong> proposals
+          Total: <strong>{totalCount}</strong> proposals
         </div>
       </CardFooter>
     </Card>

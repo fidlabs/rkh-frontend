@@ -58,13 +58,13 @@ export function MultisigRkhPortalPage() {
         <Tabs value={tab} onValueChange={value => setTab(value as MultisigRkhPortalTabs)}>
           <TabsList className="w-full mt-4">
             <TabsTrigger className="flex-1" value={MultisigRkhPortalTabs.SIGNER_MANAGEMENT}>
-              Signer Management
+              Root Key Holders Management
             </TabsTrigger>
             <TabsTrigger className="flex-1" value={MultisigRkhPortalTabs.ALLOCATOR_PROPOSALS}>
-              Allocator Proposals
+              RKH & Allocator Proposals
             </TabsTrigger>
             <TabsTrigger className="flex-1" value={MultisigRkhPortalTabs.MY_PROPOSALS}>
-              My Proposals
+              My Multisig Proposals
             </TabsTrigger>
           </TabsList>
 
