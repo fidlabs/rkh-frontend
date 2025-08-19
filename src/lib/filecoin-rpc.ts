@@ -63,7 +63,7 @@ export class FilecoinRpcClient {
     return await this.provider.send("Filecoin.StateEncodeParams", [actor, method, params]);
   }
 
-  async getActorCode(actorAddress: string): Promise<string> {
+  async getActorCode(actorAddress: string): Promise<any> {
     const actor = await this.provider.send("Filecoin.StateGetActor", [actorAddress, null]);
     return actor.Code;
   }

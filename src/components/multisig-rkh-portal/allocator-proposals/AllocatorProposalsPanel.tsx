@@ -29,7 +29,7 @@ export function AllocatorProposalsPanel({}: AllocatorProposalsPanelProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { proposals, totalCount, isLoading, isError } = useAllocatorProposals();
-  const { approveProposal, rejectProposal } = useProposalActions('t01027'); //JAGTAG this needs to coe from logged in context
+  const { approveProposal, rejectProposal } = useProposalActions(); 
 
   const handleApprove = (proposal: AllocatorProposal) => {
     setSelectedProposal(proposal);
