@@ -67,7 +67,6 @@ export async function sendMsigMsg(
 
     // Get nonce for the sender address
     const nonce: number = await client.sendRpc("Filecoin.MpoolGetNonce", [account.address]);
-    console.log('Nonce:', nonce);
 
     // Prepare the message with nonce
     const msg: Msg = {
@@ -84,7 +83,6 @@ export async function sendMsigMsg(
     };
 
     // Estimate gas
-    console.log('Estimating gas for message:', msg);
     const est: Msg = await client.sendRpc("Filecoin.GasEstimateMessageGas", [
       msg, 
       { MaxFee: "20000000000000000" }, 
@@ -104,8 +102,6 @@ export async function sendMsigMsg(
       Method: msg.Method,
       Params: msg.Params,
     };
-
-    console.log('Zondax message:', msgZondax);
 
     // Get the signer and serialize the transaction
     const transactionSerialize = await signerPromise;
@@ -128,12 +124,8 @@ export async function sendMsigMsg(
       },
     };
 
-    console.log('Signed message:', signedMessage);
-
     // Submit to mempool
     const cid = await client.sendRpc("Filecoin.MpoolPush", [signedMessage]);
-    console.log('Transaction submitted, CID:', cid);
-
     return cid["/"] || 'ERROR';
 
   } catch (error) {
@@ -166,9 +158,6 @@ export async function approvePendingTransaction({
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
-    
-    console.log('Approving pending transaction proposal:', proposalId, 'with msigAddress:', msigAddress);
-
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
     
@@ -221,9 +210,6 @@ export async function cancelPendingTransaction({
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
-    
-    console.log('Cancelling pending transaction proposal:', proposalId, 'with msigAddress:', msigAddress);
-
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
     
@@ -280,13 +266,9 @@ export async function proposeAddSigner({
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
-
-    console.log('Proposing AddSigner:', proposalId);
-    
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
     const innerParamsB64 = await client.encodeParams(f080Code, 5, {Signer:proposalId, Increase:false});
-    const innerParamsHex = "0x" + Buffer.from(innerParamsB64, "base64").toString("hex");
     const outerParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
       Method: 5,
@@ -352,8 +334,6 @@ export async function rejectAddSigner({
     // 2. Sign with Ledger wallet
     // 3. Submit to network via RPC provider
     
-    console.log('Rejecting AddSigner proposal:', proposalId, 'with params:', rejectParams);
-    
     // Placeholder for actual implementation
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -387,9 +367,6 @@ export async function proposeRemoveSigner({
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
-
-    console.log('Proposing RemoveSigner:', proposalId);
-    
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
     

@@ -62,8 +62,6 @@ export function ConnectWalletDialog({ isOpen, setIsOpen, handleClose }: ConnectW
   };
 
   const handleConnect = () => {
-    console.log('connect');
-
     setCurrentStep('select-role');
     setSelectedRole(undefined);
     setSelectedProvider(undefined);
