@@ -38,7 +38,6 @@ export function useProposalActions() {
         throw new Error(result.error || 'Approval failed');
       }
 
-      console.log('Proposal approved successfully:', result.message);
       return result;
       
     } catch (error) {
@@ -63,7 +62,6 @@ export function useProposalActions() {
         throw new Error(result.error || 'Rejection failed');
       }
 
-      console.log('Proposal rejected successfully:', result.message);
       return result;
       
     } catch (error) {

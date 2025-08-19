@@ -51,8 +51,6 @@ export class LedgerWallet implements Wallet {
     for (let i = 0; i < 5; i++) {
       const path = `m/44'/461'/0'/0/${i}`;
       const apk = await this.filecoinApp.getAddressAndPubKey(path);
-      console.log(`At index ${i}: ${apk.addrString}`);
-      console.log(apk.compressed_pk);
       accounts.push({ address: apk.addrString, pubKey: apk.compressed_pk, index: i, path });
     }
 

@@ -17,14 +17,11 @@ export async function checkMultisigRole(address: string): Promise<MultisigRoleRe
     const f080State = await f080Client.getState();
     const f080Signers = f080State.Signers;
     
-    console.log('f080Signers ...', f080Signers);
-    
     // Get the ActorID for the logged-in address
     let actorId: string | null = null;
     try {
       const actorInfo = await f080Client.sendRpc("Filecoin.StateLookupID", [address, null]);
       actorId = actorInfo;
-      console.log('actorId ...', actorId);
     } catch (error) {
       console.warn(`Could not get ActorID for address ${address}:`, error);
     }
@@ -54,8 +51,6 @@ export async function checkMultisigRole(address: string): Promise<MultisigRoleRe
         continue;
       }
     }
-    
-    console.log('f080 multisig signers ...', multisigSigners);    
     
     // For each multisig signer, check if our address or ActorID is a signer
     for (const multisigAddress of multisigSigners) {

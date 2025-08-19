@@ -63,7 +63,7 @@ export const createAllocatorProposalsTableColumns = (
       if (!decodedParams) {
         return <div className="text-muted-foreground text-sm">Failed to decode</div>;
       }
-      console.log('render decodedParams ...', decodedParams);
+
       // Display the decoded params in a neat, compact format
       if (decodedParams && typeof decodedParams === 'object') {
         const paramEntries = Object.entries(decodedParams);
