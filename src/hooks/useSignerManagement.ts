@@ -29,9 +29,9 @@ export function useSignerManagement(): SignerManagementData {
         setIsError(false);
         setError(null);
 
-        const client = createFilecoinRpcClient("t080"); // F080 multisig
+        const client = createFilecoinRpcClient('t080'); // F080 multisig
         const state = await client.getState();
-        
+
         const signerList: Signer[] = state.Signers.map(address => ({
           address,
           isActive: true, // All signers in the state are active

@@ -44,12 +44,14 @@ export class LedgerConnector implements Connector {
 
       // Check if the logged-in wallet is a signer to f080 or any of its multisig signers
       const multisigRoleResult = await checkMultisigRole(address);
-      
+
       let role;
       let parentMsigAddress;
-      
-      if (multisigRoleResult.role === AccountRole.ROOT_KEY_HOLDER || 
-          multisigRoleResult.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) {
+
+      if (
+        multisigRoleResult.role === AccountRole.ROOT_KEY_HOLDER ||
+        multisigRoleResult.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER
+      ) {
         // Use the multisig role result
         role = multisigRoleResult.role;
         parentMsigAddress = multisigRoleResult.parentMsigAddress;
@@ -57,7 +59,7 @@ export class LedgerConnector implements Connector {
         // Fall back to the default role fetching
         role = await fetchRole(address);
       }
-      
+
       this.account = {
         index: this.accountIndex,
         address,

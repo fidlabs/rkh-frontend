@@ -46,8 +46,8 @@ export interface SignedMessage {
 
 // Import the signer as a dynamic import
 const signerPromise = import('@zondax/filecoin-signing-tools/js').then(
-    module => module.transactionSerialize,
-  );
+  module => module.transactionSerialize,
+);
 
 /**
  * Send a multisig message with complete flow: gas estimation, signing, and submission
@@ -66,7 +66,7 @@ export async function sendMsigMsg(
     const account = accountContext.account;
 
     // Get nonce for the sender address
-    const nonce: number = await client.sendRpc("Filecoin.MpoolGetNonce", [account.address]);
+    const nonce: number = await client.sendRpc('Filecoin.MpoolGetNonce', [account.address]);
 
     // Prepare the message with nonce
     const msg: Msg = {
@@ -76,17 +76,17 @@ export async function sendMsigMsg(
       Nonce: nonce,
       Value: message.Value,
       GasLimit: 0, // Will be estimated
-      GasFeeCap: "0", // Will be estimated
-      GasPremium: "0", // Will be estimated
+      GasFeeCap: '0', // Will be estimated
+      GasPremium: '0', // Will be estimated
       Method: message.Method,
-      Params: message.Params
+      Params: message.Params,
     };
 
     // Estimate gas
-    const est: Msg = await client.sendRpc("Filecoin.GasEstimateMessageGas", [
-      msg, 
-      { MaxFee: "20000000000000000" }, 
-      null
+    const est: Msg = await client.sendRpc('Filecoin.GasEstimateMessageGas', [
+      msg,
+      { MaxFee: '20000000000000000' },
+      null,
     ]);
 
     // Create Zondax-friendly message with estimated gas
@@ -110,7 +110,10 @@ export async function sendMsigMsg(
     const serializedBytes = hexToBytes(serializedHex);
 
     // Sign with Ledger
-    const { signature_compact } = await account.wallet.filecoinApp.sign(derivationPath, serializedBytes);
+    const { signature_compact } = await account.wallet.filecoinApp.sign(
+      derivationPath,
+      serializedBytes,
+    );
     if (signature_compact.length !== 65) {
       throw new Error(`Ledger returned bad signature length ${signature_compact.length}`);
     }
@@ -125,12 +128,13 @@ export async function sendMsigMsg(
     };
 
     // Submit to mempool
-    const cid = await client.sendRpc("Filecoin.MpoolPush", [signedMessage]);
-    return cid["/"] || 'ERROR';
-
+    const cid = await client.sendRpc('Filecoin.MpoolPush', [signedMessage]);
+    return cid['/'] || 'ERROR';
   } catch (error) {
     console.error('Failed to send multisig message:', error);
-    throw new Error(`Failed to send multisig message: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to send multisig message: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 }
 
@@ -151,7 +155,6 @@ export async function approvePendingTransaction({
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
   try {
-    
     if (!accountContext.account?.wallet?.filecoinApp) {
       throw new Error('No Ledger wallet available');
     }
@@ -160,32 +163,31 @@ export async function approvePendingTransaction({
     const client = createFilecoinRpcClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
-    
+
     // Method 3 is "Approve" for multisig
-    const InnerParamsB64 = await client.encodeParams(f080Code, 3, {ID: proposalId});
+    const InnerParamsB64 = await client.encodeParams(f080Code, 3, { ID: proposalId });
     const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
       Method: 3,
-      Value: "0",
+      Value: '0',
       Params: InnerParamsB64,
     });
 
     const msg: FilecoinMessage = {
       To: msigAddress,
       From: accountContext.account?.address || '',
-      Value: "0",
+      Value: '0',
       Method: 2, // we are PROPOSING to our msig, the APPROVE is in the inner params
       Params: OuterParamsB64,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext)
-    
+    const txHash = await sendMsigMsg(msg, accountContext);
+
     return {
       success: true,
       message: `Successfully approved pending transaction proposal #${proposalId}`,
       txHash: txHash,
     };
-    
   } catch (error) {
     console.error('Failed to approve pending transaction proposal:', error);
     return {
@@ -212,32 +214,31 @@ export async function cancelPendingTransaction({
     const client = createFilecoinRpcClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
-    
+
     // Method 4 is "Cancel" for multisig
-    const InnerParamsB64 = await client.encodeParams(f080Code, 4, {ID: proposalId});
+    const InnerParamsB64 = await client.encodeParams(f080Code, 4, { ID: proposalId });
     const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
       Method: 4,
-      Value: "0",
+      Value: '0',
       Params: InnerParamsB64,
     });
 
     const msg: FilecoinMessage = {
       To: msigAddress,
       From: accountContext.account?.address || '',
-      Value: "0",
+      Value: '0',
       Method: 2, // we are PROPOSING to our msig, the CANCEL is in the inner params
       Params: OuterParamsB64,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext)
-    
+    const txHash = await sendMsigMsg(msg, accountContext);
+
     return {
       success: true,
       message: `Successfully cancelled pending transaction proposal #${proposalId}`,
       txHash: txHash,
     };
-    
   } catch (error) {
     console.error('Failed to cancel pending transaction proposal:', error);
     return {
@@ -247,10 +248,6 @@ export async function cancelPendingTransaction({
     };
   }
 }
-
-
-
-
 
 /**
  * Propose adding a new signer
@@ -268,37 +265,39 @@ export async function proposeAddSigner({
     const client = createFilecoinRpcClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
-    const innerParamsB64 = await client.encodeParams(f080Code, 5, {Signer:proposalId, Increase:false});
+    const innerParamsB64 = await client.encodeParams(f080Code, 5, {
+      Signer: proposalId,
+      Increase: false,
+    });
     const outerParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
       Method: 5,
-      Value: "0",
+      Value: '0',
       Params: innerParamsB64,
     });
-    const outerParamsHex = "0x" + Buffer.from(outerParamsB64, "base64").toString("hex");
+    const outerParamsHex = '0x' + Buffer.from(outerParamsB64, 'base64').toString('hex');
     const messageParams = await client.encodeParams(msigCode, 2, {
       To: 'f080',
       Method: 2,
-      Value: "0",
+      Value: '0',
       Params: outerParamsB64,
     });
 
     const msg: FilecoinMessage = {
       To: msigAddress,
       From: accountContext.account?.address || '',
-      Value: "0",
+      Value: '0',
       Method: 2, // we are PROPOSING to our msig, the ADD SIGNER is in the inner params
       Params: messageParams,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext)
-    
+    const txHash = await sendMsigMsg(msg, accountContext);
+
     return {
       success: true,
       message: `Successfully proposed AddSigner #${proposalId}`,
-      txHash: txHash
+      txHash: txHash,
     };
-    
   } catch (error) {
     console.error('Failed to propose AddSigner:', error);
     return {
@@ -323,7 +322,7 @@ export async function rejectAddSigner({
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcClient(msigAddress);
-    
+
     // Method 4 is "Cancel" for multisig (rejecting)
     const rejectParams = {
       ID: proposalId,
@@ -333,16 +332,15 @@ export async function rejectAddSigner({
     // 1. Create cancellation message using the proposal ID
     // 2. Sign with Ledger wallet
     // 3. Submit to network via RPC provider
-    
+
     // Placeholder for actual implementation
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     return {
       success: true,
       message: `Successfully rejected AddSigner proposal #${proposalId}`,
       txHash: 'placeholder-tx-hash',
     };
-    
   } catch (error) {
     console.error('Failed to reject AddSigner proposal:', error);
     return {
@@ -369,38 +367,40 @@ export async function proposeRemoveSigner({
     const client = createFilecoinRpcClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
-    
+
     // Method 6 is "RemoveSigner" for multisig
-    const innerParamsB64 = await client.encodeParams(f080Code, 6, {Signer: proposalId, Decrease: false});
+    const innerParamsB64 = await client.encodeParams(f080Code, 6, {
+      Signer: proposalId,
+      Decrease: false,
+    });
     const outerParamsB64 = await client.encodeParams(f080Code, 2, {
       To: 'f080',
       Method: 6,
-      Value: "0",
+      Value: '0',
       Params: innerParamsB64,
     });
     const messageParams = await client.encodeParams(msigCode, 2, {
       To: 'f080',
       Method: 2,
-      Value: "0",
+      Value: '0',
       Params: outerParamsB64,
     });
 
     const msg: FilecoinMessage = {
       To: msigAddress,
       From: accountContext.account?.address || '',
-      Value: "0",
+      Value: '0',
       Method: 2, // we are PROPOSING to our msig, the REMOVE SIGNER is in the inner params
       Params: messageParams,
     };
 
-    const txHash = await sendMsigMsg(msg, accountContext)
-    
+    const txHash = await sendMsigMsg(msg, accountContext);
+
     return {
       success: true,
       message: `Successfully proposed RemoveSigner for ${proposalId}`,
-      txHash: txHash
+      txHash: txHash,
     };
-    
   } catch (error) {
     console.error('Failed to propose RemoveSigner:', error);
     return {

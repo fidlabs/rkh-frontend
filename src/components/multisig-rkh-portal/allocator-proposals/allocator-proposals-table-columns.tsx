@@ -18,14 +18,14 @@ function getMethodName(method: number): string {
     9: 'LockBalance',
     10: 'UnlockBalance',
   };
-  
+
   return methodNames[method] || `Method ${method}`;
 }
 
 // This function will be passed from the parent component
 export const createAllocatorProposalsTableColumns = (
   onApprove: (proposal: AllocatorProposal) => void,
-  onReject: (proposal: AllocatorProposal) => void
+  onReject: (proposal: AllocatorProposal) => void,
 ): ColumnDef<AllocatorProposal>[] => [
   {
     accessorKey: 'id',
@@ -35,11 +35,7 @@ export const createAllocatorProposalsTableColumns = (
   {
     accessorKey: 'to',
     header: 'To Address',
-    cell: ({ row }) => (
-      <div className="font-mono text-sm">
-        {row.getValue('to')}
-      </div>
-    ),
+    cell: ({ row }) => <div className="font-mono text-sm">{row.getValue('to')}</div>,
   },
 
   {
@@ -47,11 +43,7 @@ export const createAllocatorProposalsTableColumns = (
     header: 'Method',
     cell: ({ row }) => {
       const method = row.getValue('method') as number;
-      return (
-        <div className="font-mono text-sm">
-          {getMethodName(method)}
-        </div>
-      );
+      return <div className="font-mono text-sm">{getMethodName(method)}</div>;
     },
   },
   {
@@ -59,7 +51,7 @@ export const createAllocatorProposalsTableColumns = (
     header: 'Proposal Details',
     cell: ({ row }) => {
       const decodedParams = row.getValue('decodedParams') as any;
-      
+
       if (!decodedParams) {
         return <div className="text-muted-foreground text-sm">Failed to decode</div>;
       }
@@ -67,12 +59,12 @@ export const createAllocatorProposalsTableColumns = (
       // Display the decoded params in a neat, compact format
       if (decodedParams && typeof decodedParams === 'object') {
         const paramEntries = Object.entries(decodedParams);
-        
+
         return (
           <div className="text-xs space-y-1">
             {paramEntries.map(([key, value]) => (
               <div key={key}>
-                <strong>{key}:</strong> 
+                <strong>{key}:</strong>
                 <span className="font-mono ml-1">
                   {typeof value === 'string' && value.startsWith('t') ? value : String(value)}
                 </span>
@@ -81,13 +73,9 @@ export const createAllocatorProposalsTableColumns = (
           </div>
         );
       }
-      
+
       // Fallback if no params or unexpected structure
-      return (
-        <div className="text-xs text-muted-foreground">
-          No params available
-        </div>
-      );
+      return <div className="text-xs text-muted-foreground">No params available</div>;
     },
   },
   {
@@ -100,7 +88,9 @@ export const createAllocatorProposalsTableColumns = (
           {approved.length > 0 ? (
             <div className="space-y-1">
               {approved.map((signer, index) => (
-                <div key={index} className="font-mono">{signer}</div>
+                <div key={index} className="font-mono">
+                  {signer}
+                </div>
               ))}
             </div>
           ) : (
@@ -115,7 +105,7 @@ export const createAllocatorProposalsTableColumns = (
     header: 'Actions',
     cell: ({ row }) => {
       const proposal = row.original;
-      
+
       return (
         <div className="flex space-x-2">
           <Button
@@ -141,5 +131,3 @@ export const createAllocatorProposalsTableColumns = (
     },
   },
 ];
-
-

@@ -45,14 +45,10 @@ export function MultisigRkhPortalPage() {
 
         <Button variant="outline">
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            <Link href="/dashboard">
-              Back to Dashboard
-            </Link>
+            <Link href="/dashboard">Back to Dashboard</Link>
           </span>
         </Button>
       </header>
-
-
 
       <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
         <Tabs value={tab} onValueChange={value => setTab(value as MultisigRkhPortalTabs)}>

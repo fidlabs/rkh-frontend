@@ -43,8 +43,9 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
   };
 
   const handleConfirmAction = async (proposalId: number) => {
-    if (!selectedProposal) return { success: false, message: 'No proposal selected', error: 'No proposal selected' };
-    
+    if (!selectedProposal)
+      return { success: false, message: 'No proposal selected', error: 'No proposal selected' };
+
     try {
       if (dialogAction === 'approve') {
         const result = await approveProposal(proposalId, selectedProposal.method);
@@ -55,10 +56,10 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
       }
       return { success: false, message: 'Unknown action', error: 'Unknown action' };
     } catch (error) {
-      return { 
-        success: false, 
-        message: 'Action failed', 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        message: 'Action failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   };
@@ -66,32 +67,32 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
   return (
     <>
       <Card className="mb-4">
-      <CardHeader>
-        <CardTitle>My Proposals</CardTitle>
-        <CardDescription>Manage outstanding proposals for your RKH Org multisig.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <TableGenerator
-          isLoading={isLoading}
-          isError={isError}
-          data={proposals}
-          columns={createAllocatorProposalsTableColumns(handleApprove, handleReject)}
-        />
-      </CardContent>
-      <CardFooter>
-        <div className="text-xs text-muted-foreground">
-          Total: <strong>{totalCount}</strong> proposals
-        </div>
-      </CardFooter>
-    </Card>
+        <CardHeader>
+          <CardTitle>My Proposals</CardTitle>
+          <CardDescription>Manage outstanding proposals for your RKH Org multisig.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TableGenerator
+            isLoading={isLoading}
+            isError={isError}
+            data={proposals}
+            columns={createAllocatorProposalsTableColumns(handleApprove, handleReject)}
+          />
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Total: <strong>{totalCount}</strong> proposals
+          </div>
+        </CardFooter>
+      </Card>
 
-    <ProposalActionDialog
-      isOpen={isDialogOpen}
-      onClose={handleDialogClose}
-      proposal={selectedProposal}
-      action={dialogAction || 'approve'}
-      onConfirm={handleConfirmAction}
-    />
-  </>
+      <ProposalActionDialog
+        isOpen={isDialogOpen}
+        onClose={handleDialogClose}
+        proposal={selectedProposal}
+        action={dialogAction || 'approve'}
+        onConfirm={handleConfirmAction}
+      />
+    </>
   );
 }

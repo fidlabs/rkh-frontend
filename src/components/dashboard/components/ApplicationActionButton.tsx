@@ -53,7 +53,11 @@ function getActionConfig(application: Application, account?: { role: AccountRole
 
     case 'RKH_APPROVAL_PHASE':
       label = `(${application.rkhApprovals?.length ?? 0}/${application.rkhApprovalsThreshold ?? 2}) Approve`;
-      if (account?.role === AccountRole.ROOT_KEY_HOLDER || account?.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER || account?.role === AccountRole.ADMIN) {
+      if (
+        account?.role === AccountRole.ROOT_KEY_HOLDER ||
+        account?.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER ||
+        account?.role === AccountRole.ADMIN
+      ) {
         return {
           label,
           component: SignRkhTransactionButton,

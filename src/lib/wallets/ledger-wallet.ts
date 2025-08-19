@@ -45,7 +45,7 @@ export class LedgerWallet implements Wallet {
 
     return await this.generateSignedMessage(message, signedMessage);
   }
-  
+
   async getAccounts(): Promise<string[]> {
     const accounts: LedgerAccount[] = [];
     for (let i = 0; i < 5; i++) {
@@ -85,7 +85,10 @@ export class LedgerWallet implements Wallet {
     const serializedHex = transactionSerialize(fakeMessage);
     const serializedBytes = hexToBytes(serializedHex);
 
-    const { signature_compact } = await this.filecoinApp.sign(derivationPath, Buffer.from(serializedBytes));
+    const { signature_compact } = await this.filecoinApp.sign(
+      derivationPath,
+      Buffer.from(serializedBytes),
+    );
     if (signature_compact.length !== 65) {
       throw new Error(`Ledger returned bad signature length ${signature_compact.length}`);
     }
