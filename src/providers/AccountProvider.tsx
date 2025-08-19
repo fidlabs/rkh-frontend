@@ -177,7 +177,7 @@ export const AccountProvider: React.FC<{
       }
 
       // Is this a direct RKH or a multisig member?
-      if (account.role !== AccountRole.ROOT_KEY_HOLDER) { //FIXME get the check right
+      if (account.role === AccountRole.ROOT_KEY_HOLDER) {
       const messageId = await api.proposeVerifier(
         verifierAddress,
         fullDataCap,

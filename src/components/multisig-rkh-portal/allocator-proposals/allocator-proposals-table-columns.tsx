@@ -56,20 +56,36 @@ export const createAllocatorProposalsTableColumns = (
   },
   {
     accessorKey: 'decodedParams',
-    header: 'Decoded Params',
+    header: 'Proposal Details',
     cell: ({ row }) => {
       const decodedParams = row.getValue('decodedParams') as any;
+      
       if (!decodedParams) {
         return <div className="text-muted-foreground text-sm">Failed to decode</div>;
       }
+      console.log('render decodedParams ...', decodedParams);
+      // Display the decoded params in a neat, compact format
+      if (decodedParams && typeof decodedParams === 'object') {
+        const paramEntries = Object.entries(decodedParams);
+        
+        return (
+          <div className="text-xs space-y-1">
+            {paramEntries.map(([key, value]) => (
+              <div key={key}>
+                <strong>{key}:</strong> 
+                <span className="font-mono ml-1">
+                  {typeof value === 'string' && value.startsWith('t') ? value : String(value)}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+      }
       
+      // Fallback if no params or unexpected structure
       return (
-        <div className="text-xs">
-          <div><strong>To:</strong> {decodedParams.To}</div>
-          <div><strong>Method:</strong> {decodedParams.Method}</div>
-          {decodedParams.Params && (
-            <div><strong>Params:</strong> {JSON.stringify(decodedParams.Params, null, 2)}</div>
-          )}
+        <div className="text-xs text-muted-foreground">
+          No params available
         </div>
       );
     },
