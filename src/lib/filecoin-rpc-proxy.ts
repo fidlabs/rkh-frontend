@@ -32,7 +32,7 @@ export class FilecoinRpcProxyClient {
   constructor(msigAddress: string) {
     this.msigAddress = msigAddress;
     // Always route through the backend proxy
-    this.proxyUrl = `${env.apiBaseUrl.replace('/api/v1', '')}/api/v1/rpc`;
+    this.proxyUrl = `${env.rpcUrl}`;
   }
 
   private async makeRpcCall(method: string, params: any[]): Promise<any> {
