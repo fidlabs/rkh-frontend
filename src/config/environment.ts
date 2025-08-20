@@ -37,12 +37,12 @@ export const testNetSafeContracts: SafeContractAddresses = {
 
 const environments: { [key: string]: Environment } = {
   development: {
-    apiBaseUrl: 'http://localhost:3001/api/v1',
+    apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api/v1',
     useTestData: false,
     testNetChainId: Number(process.env.NEXT_PUBLIC_LOCAL_TEST_NET_CHAIN_ID) || 31415926,
-    useTestnet: Boolean(process.env.NEXT_PUBLIC_USE_TEST_NET) || false,
-    rpcUrl: process.env.RPC_URL || 'http://84.70.152.51:1234/rpc/v0',
-    rpcToken: process.env.RPC_TOKEN || '',
+    useTestnet: Boolean(process.env.NEXT_PUBLIC_USE_TEST_NET) || true,
+    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'http://84.70.152.51:1234/rpc/v0',
+    rpcToken: process.env.NEXT_PUBLIC_RPC_TOKEN || '',
     metaAllocatorContractAddress:
       process.env.NEXT_PUBLIC_META_ALLOCATOR_CONTRACT_ADDRESS ||
       '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
@@ -51,25 +51,32 @@ const environments: { [key: string]: Environment } = {
       process.env.NEXT_PUBLIC_SAFE_ADDRESS || '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e',
   },
   staging: {
-    apiBaseUrl: 'https://allocator-rkh-testenv-8dphx.ondigitalocean.app/api/v1',
+    apiBaseUrl:
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'https://allocator-rkh-testenv-8dphx.ondigitalocean.app/api/v1',
     useTestData: false,
-    useTestnet: false,
+    useTestnet: Boolean(process.env.NEXT_PUBLIC_USE_TEST_NET) || false,
     rpcUrl: 'https://allocator-rkh-testenv-8dphx.ondigitalocean.app/api/v1/rpc',
-    rpcToken: process.env.RPC_TOKEN || '',
+    rpcToken: process.env.NEXT_PUBLIC_RPC_TOKEN || '',
     metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
-    githubOwner: process.env.GITHUB_OWNER || 'filecoin-project',
+    githubOwner: process.env.NEXT_PUBLIC_GITHUB_OWNER || 'filecoin-project',
     safeAddress: '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e',
     testNetChainId: 31415926,
   },
   production: {
-    apiBaseUrl: 'https://allocator-rkh-backend-utcn6.ondigitalocean.app/api/v1',
+    apiBaseUrl:
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'https://allocator-rkh-backend-utcn6.ondigitalocean.app/api/v1',
     useTestData: false,
-    useTestnet: false,
+    useTestnet: Boolean(process.env.NEXT_PUBLIC_USE_TEST_NET) || false,
     rpcUrl:
-      process.env.RPC_URL || 'https://allocator-rkh-backend-utcn6.ondigitalocean.app/api/v1/rpc',
-    rpcToken: process.env.RPC_TOKEN || '',
-    metaAllocatorContractAddress: '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
-    githubOwner: process.env.GITHUB_OWNER || 'filecoin-project',
+      process.env.NEXT_PUBLIC_RPC_URL ||
+      'https://allocator-rkh-backend-utcn6.ondigitalocean.app/api/v1/rpc',
+    rpcToken: process.env.NEXT_PUBLIC_RPC_TOKEN || '',
+    metaAllocatorContractAddress:
+      process.env.NEXT_PUBLIC_META_ALLOCATOR_CONTRACT_ADDRESS ||
+      '0xB6F5d279AEad97dFA45209F3E53969c2EF43C21d',
+    githubOwner: process.env.NEXT_PUBLIC_GITHUB_OWNER || 'filecoin-project',
     safeAddress: '0x2e25A2f6bC2C0b7669DFB25180Ed57e07dAabe9e',
     testNetChainId: 31415926,
   },
