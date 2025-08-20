@@ -45,8 +45,8 @@ export class FilecoinRpcProxyClient {
         jsonrpc: '2.0',
         id: 1,
         method,
-        params
-      })
+        params,
+      }),
     });
 
     if (!response.ok) {
@@ -54,7 +54,7 @@ export class FilecoinRpcProxyClient {
     }
 
     const data = await response.json();
-    
+
     if (data.error) {
       throw new Error(`RPC error: ${data.error.message} (code: ${data.error.code})`);
     }
