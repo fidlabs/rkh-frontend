@@ -6,7 +6,7 @@ import { AccountRole } from '@/types/account';
 import { RefreshTableActions } from './refresh-table-actions';
 
 const mocks = vi.hoisted(() => ({
-  mockUseAccountRole: vi.fn(),
+  mockUseAccount: vi.fn(),
   mockUseStateWaitMsg: vi.fn(),
   mockUseProposeRKHTransaction: vi.fn(),
   mockUseApproveRKHTransaction: vi.fn(),
@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/hooks', () => ({
-  useAccountRole: mocks.mockUseAccountRole,
+  useAccount: mocks.mockUseAccount,
   useStateWaitMsg: mocks.mockUseStateWaitMsg.mockReturnValue({
     stateWaitMsg: '',
     checkTransactionState: vi.fn(),
@@ -58,7 +58,10 @@ describe('RefreshTableActions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.mockUseAccountRole.mockReturnValue(undefined);
+    mocks.mockUseAccount.mockReturnValue({
+      account: null,
+      selectedMetaAllocator: null,
+    });
   });
 
   describe('when refresh is allocated', () => {
@@ -82,7 +85,10 @@ describe('RefreshTableActions', () => {
 
   describe('when user is ROOT_KEY_HOLDER', () => {
     beforeEach(() => {
-      mocks.mockUseAccountRole.mockReturnValue(AccountRole.ROOT_KEY_HOLDER);
+      mocks.mockUseAccount.mockReturnValue({
+        account: { role: AccountRole.ROOT_KEY_HOLDER },
+        selectedMetaAllocator: null,
+      });
     });
 
     it('should render RKH sign button when waiting for RKH sign', () => {
@@ -133,7 +139,12 @@ describe('RefreshTableActions', () => {
 
   describe('when user is METADATA_ALLOCATOR', () => {
     beforeEach(() => {
-      mocks.mockUseAccountRole.mockReturnValue(AccountRole.METADATA_ALLOCATOR);
+      mocks.mockUseAccount.mockReturnValue({
+        account: { role: AccountRole.METADATA_ALLOCATOR },
+        selectedMetaAllocator: {
+          ethAddress: '0xmaaddress',
+        },
+      });
     });
 
     it('should render MA approve button when waiting for MA approve', () => {
@@ -147,6 +158,19 @@ describe('RefreshTableActions', () => {
       render(<RefreshTableActions row={row} />);
 
       expect(screen.getByRole('button', { name: /approve/i })).toBeInTheDocument();
+    });
+
+    it('should not render MA approve button when not the selected MA', () => {
+      const row = createMockRow({
+        refreshStatus: RefreshStatus.PENDING,
+        metapathwayType: MetapathwayType.MDMA,
+        msigAddress: 'f1maaddress',
+        maAddress: '0xothermaaddress' as `0x${string}`,
+      });
+
+      const { container } = render(<RefreshTableActions row={row} />);
+
+      expect(container.firstChild).toBeNull();
     });
 
     it.each`

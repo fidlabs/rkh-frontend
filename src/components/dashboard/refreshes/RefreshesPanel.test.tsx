@@ -7,14 +7,14 @@ import { AccountRole } from '@/types/account';
 
 const mocks = vi.hoisted(() => ({
   mockUseGetRefreshes: vi.fn(),
-  mockUseAccountRole: vi.fn(),
+  mockUseAccount: vi.fn(),
   mockUseStateWaitMsg: vi.fn(),
   mockUseProposeRKHTransaction: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({
   useGetRefreshes: mocks.mockUseGetRefreshes,
-  useAccountRole: mocks.mockUseAccountRole,
+  useAccount: mocks.mockUseAccount,
   useStateWaitMsg: mocks.mockUseStateWaitMsg.mockReturnValue({
     stateWaitMsg: '',
     checkTransactionState: vi.fn(),
@@ -59,11 +59,15 @@ describe('RefreshesPanel', () => {
   const wrapper = createWrapper();
 
   beforeEach(() => {
-    vi.clearAllMocks();
     mocks.mockUseGetRefreshes.mockReturnValue({
       data: mockData,
       isLoading: false,
-    } as any);
+    });
+
+    mocks.mockUseAccount.mockReturnValue({
+      account: null,
+      selectedMetaAllocator: null,
+    });
   });
 
   afterEach(() => {
@@ -103,7 +107,10 @@ describe('RefreshesPanel', () => {
   });
 
   it('should render actions for logged in user', () => {
-    mocks.mockUseAccountRole.mockReturnValue(AccountRole.ROOT_KEY_HOLDER);
+    mocks.mockUseAccount.mockReturnValue({
+      account: { role: AccountRole.ROOT_KEY_HOLDER },
+      selectedMetaAllocator: null,
+    });
     render(<RefreshesPanel searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('button', { name: 'RKH Sign' })).toBeInTheDocument();

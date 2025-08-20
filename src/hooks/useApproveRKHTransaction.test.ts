@@ -1,13 +1,17 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useApproveRKHTransaction } from './useApproveRKHTransaction';
-import { useAccount } from '@/hooks';
 import { createWrapper } from '@/test-utils';
 
-vi.mock('@/hooks');
+const mocks = vi.hoisted(() => ({
+  useAccountMock: vi.fn(),
+}));
+
+vi.mock('@/hooks', () => ({
+  useAccount: mocks.useAccountMock,
+}));
 
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-const mockUseAccount = useAccount as Mock;
 
 describe('useApproveRKHTransaction', () => {
   const mockAcceptVerifierProposal = vi.fn();
@@ -19,7 +23,7 @@ describe('useApproveRKHTransaction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockUseAccount.mockReturnValue({
+    mocks.useAccountMock.mockReturnValue({
       acceptVerifierProposal: mockAcceptVerifierProposal,
     });
   });

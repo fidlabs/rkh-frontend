@@ -2,19 +2,24 @@ import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { useAccount } from '@/hooks';
+import { MetaAllocator } from '@/types/ma';
 
 interface MetamaskConnectionScreenProps {
   onConnect: () => void;
+  metaAllocator?: MetaAllocator;
 }
 
-export const MetamaskConnectionScreen = ({ onConnect }: MetamaskConnectionScreenProps) => {
+export const MetamaskConnectionScreen = ({
+  onConnect,
+  metaAllocator,
+}: MetamaskConnectionScreenProps) => {
   const { account, connect } = useAccount();
 
   useEffect(() => {
     if (account) {
       onConnect();
     } else {
-      connect('metamask', 0);
+      connect('metamask', 0, metaAllocator);
     }
   }, [account]);
 

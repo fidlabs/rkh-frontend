@@ -2,17 +2,20 @@ import { useToast } from '@/components/ui/use-toast';
 import { FilsnapConnectionScreen } from './FilsnapConnectionScreen';
 import { LedgerConnectionScreen } from './LedgerConnectionScreen';
 import { MetamaskConnectionScreen } from './MetamaskConnectionScreen';
+import { MetaAllocator } from '@/types/ma';
 
 interface WalletConnectionScreenProps {
   provider: string;
   onConnect: () => void;
   onError: () => void;
+  metaAllocator?: MetaAllocator;
 }
 
 export const WalletConnectionScreen = ({
   provider,
   onConnect,
   onError,
+  metaAllocator,
 }: WalletConnectionScreenProps) => {
   const { toast } = useToast();
 
@@ -27,7 +30,7 @@ export const WalletConnectionScreen = ({
 
   switch (provider) {
     case 'metamask':
-      return <MetamaskConnectionScreen onConnect={onConnect} />;
+      return <MetamaskConnectionScreen onConnect={onConnect} metaAllocator={metaAllocator} />;
     case 'filsnap':
       return <FilsnapConnectionScreen onConnect={onConnect} onError={handleError} />;
     case 'ledger':

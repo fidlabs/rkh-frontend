@@ -1,6 +1,7 @@
 import { env, testApplications } from '@/config/environment';
 import { AccountRole } from '@/types/account';
 import { ApplicationsResponse } from '@/types/application';
+import { MaAddressesResponse } from '@/types/ma';
 
 /**
  * API base URL for fetching applications.
@@ -189,3 +190,8 @@ export async function getRefreshes(searchTerm: string, page: number, pageLimit: 
     throw new Error('Failed to fetch refresh applications');
   }
 }
+
+export const fetchMaAddresses = async (): Promise<MaAddressesResponse> => {
+  const response = await fetch(`${env.apiBaseUrl}/ma`);
+  return response.json();
+};

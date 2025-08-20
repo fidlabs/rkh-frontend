@@ -28,13 +28,13 @@ const validateTestNetSafeContracts = (): boolean => {
   return true;
 };
 
-export const getSafeKit = async (provider: any): Promise<Safe> => {
+export const getSafeKit = async (provider: any, safeAddress?: string | null): Promise<Safe> => {
   if (env.useTestnet && !validateTestNetSafeContracts())
     throw new Error('Missing Safe environment variables for test');
 
   return await Safe.init({
     provider: provider as Eip1193Provider,
-    safeAddress: env.safeAddress,
+    safeAddress: safeAddress || env.safeAddress,
     ...(env.useTestnet
       ? {
           contractNetworks: {
