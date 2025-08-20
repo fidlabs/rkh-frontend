@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createFilecoinRpcClient } from '@/lib/filecoin-rpc';
+import { createFilecoinRpcProxyClient } from '@/lib/filecoin-rpc-proxy';
 import { filecoinConfig } from '@/config/filecoin';
 import {
   approvePendingTransaction,
