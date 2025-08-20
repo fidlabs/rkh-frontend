@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { createFilecoinRpcClient, PendingTransaction, DecodedParams } from '@/lib/filecoin-rpc';
+import { createFilecoinRpcProxyClient } from '@/lib/filecoin-rpc-proxy';
+import { PendingTransaction, DecodedParams } from '@/lib/filecoin-rpc';
 import { filecoinConfig } from '@/config/filecoin';
 
 export interface AllocatorProposal {
@@ -35,7 +36,7 @@ export function useAllocatorProposals(
         setIsError(false);
         setError(null);
 
-        const client = createFilecoinRpcClient(msigAddress);
+        const client = createFilecoinRpcProxyClient(msigAddress);
 
         let pendingTransactions;
         try {

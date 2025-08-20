@@ -1,5 +1,5 @@
 import { AccountContextType } from '@/contexts/AccountContext';
-import { createFilecoinRpcClient } from './filecoin-rpc';
+import { createFilecoinRpcProxyClient } from './filecoin-rpc-proxy';
 import { filecoinConfig } from '@/config/filecoin';
 
 export interface MultisigActionParams {
@@ -62,7 +62,7 @@ export async function sendMsigMsg(
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
+    const client = createFilecoinRpcProxyClient(msigAddress);
     const account = accountContext.account;
 
     // Get nonce for the sender address
@@ -160,7 +160,7 @@ export async function approvePendingTransaction({
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
+    const client = createFilecoinRpcProxyClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
 
@@ -211,7 +211,7 @@ export async function cancelPendingTransaction({
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
+    const client = createFilecoinRpcProxyClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
 
@@ -262,7 +262,7 @@ export async function proposeAddSigner({
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
+    const client = createFilecoinRpcProxyClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
     const innerParamsB64 = await client.encodeParams(f080Code, 5, {
@@ -321,7 +321,7 @@ export async function rejectAddSigner({
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
+    const client = createFilecoinRpcProxyClient(msigAddress);
 
     // Method 4 is "Cancel" for multisig (rejecting)
     const rejectParams = {
@@ -364,7 +364,7 @@ export async function proposeRemoveSigner({
     }
 
     const msigAddress = accountContext.account?.parentMsigAddress || '';
-    const client = createFilecoinRpcClient(msigAddress);
+    const client = createFilecoinRpcProxyClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
     const msigCode = await client.getActorCode(msigAddress);
 

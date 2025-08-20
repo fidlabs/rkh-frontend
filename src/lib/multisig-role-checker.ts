@@ -1,4 +1,4 @@
-import { createFilecoinRpcClient } from './filecoin-rpc';
+import { createFilecoinRpcProxyClient } from './filecoin-rpc-proxy';
 import { AccountRole } from '@/types/account';
 
 export interface MultisigRoleResult {
@@ -11,7 +11,7 @@ export interface MultisigRoleResult {
  */
 export async function checkMultisigRole(address: string): Promise<MultisigRoleResult> {
   try {
-    const f080Client = createFilecoinRpcClient('f080');
+    const f080Client = createFilecoinRpcProxyClient('f080');
 
     // Get f080 signers
     const f080State = await f080Client.getState();
@@ -55,7 +55,7 @@ export async function checkMultisigRole(address: string): Promise<MultisigRoleRe
     // For each multisig signer, check if our address or ActorID is a signer
     for (const multisigAddress of multisigSigners) {
       try {
-        const msigClient = createFilecoinRpcClient(multisigAddress);
+        const msigClient = createFilecoinRpcProxyClient(multisigAddress);
         const msigState = await msigClient.getState();
 
         if (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { createFilecoinRpcClient, FilecoinState } from '@/lib/filecoin-rpc';
+import { createFilecoinRpcProxyClient } from '@/lib/filecoin-rpc-proxy';
+import { FilecoinState } from '@/lib/filecoin-rpc';
 
 export interface Signer {
   address: string;
@@ -29,7 +30,7 @@ export function useSignerManagement(): SignerManagementData {
         setIsError(false);
         setError(null);
 
-        const client = createFilecoinRpcClient('t080'); // F080 multisig
+        const client = createFilecoinRpcProxyClient('t080'); // F080 multisig
         const state = await client.getState();
 
         const signerList: Signer[] = state.Signers.map(address => ({
