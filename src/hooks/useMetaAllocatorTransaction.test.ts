@@ -1,26 +1,52 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { useMetaAllocatorTransaction } from './useMetaAllocatorTransaction';
-import { useAccount as useAccountWagmi, useSwitchChain } from 'wagmi';
-import { useFilecoinPublicClient } from '@/hooks/use-filecoin-public-client';
-import { getSafeKit } from '@/lib/safe';
-import { isFilecoinAddress } from '@/types/filecoin';
-import { encodeFunctionData } from 'viem/utils';
+
 import { createWrapper } from '@/test-utils';
 
-vi.mock('wagmi');
-vi.mock('@/hooks/use-filecoin-public-client');
-vi.mock('@/lib/safe');
-vi.mock('@/types/filecoin');
-vi.mock('viem/utils');
+const mocks = vi.hoisted(() => ({
+  mockUseAccountWagmi: vi.fn(),
+  mockUseSwitchChain: vi.fn(),
+  mockUseFilecoinPublicClient: vi.fn(),
+  mockGetSafeKit: vi.fn(),
+  mockIsFilecoinAddress: vi.fn(),
+  mockEncodeFunctionData: vi.fn(),
+  mockSigningTools: {
+    default: {
+      generateMnemonic: vi.fn(() => 'test mnemonic'),
+      generateKeyPair: vi.fn(() => ({
+        privateKey: 'test-private-key',
+        publicKey: 'test-public-key',
+      })),
+    },
+    transactionSerialize: vi.fn(() => 'mock-serialized-transaction'),
+  },
+}));
+
+vi.mock('@zondax/filecoin-signing-tools/js', () => mocks.mockSigningTools);
+
+vi.mock('wagmi', () => ({
+  useAccount: mocks.mockUseAccountWagmi,
+  useSwitchChain: mocks.mockUseSwitchChain,
+}));
+
+vi.mock('@/hooks/use-filecoin-public-client', () => ({
+  useFilecoinPublicClient: mocks.mockUseFilecoinPublicClient,
+}));
+
+vi.mock('@/lib/safe', () => ({
+  getSafeKit: mocks.mockGetSafeKit,
+}));
+
+vi.mock('@/types/filecoin', () => ({
+  isFilecoinAddress: mocks.mockIsFilecoinAddress,
+}));
+
+vi.mock('viem/utils', () => ({
+  encodeFunctionData: mocks.mockEncodeFunctionData,
+}));
 
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-const mockUseAccountWagmi = useAccountWagmi as Mock;
-const mockUseSwitchChain = useSwitchChain as Mock;
-const mockUseFilecoinPublicClient = useFilecoinPublicClient as Mock;
-const mockGetSafeKit = getSafeKit as Mock;
-const mockIsFilecoinAddress = isFilecoinAddress as unknown as Mock;
-const mockEncodeFunctionData = encodeFunctionData as Mock;
 
 describe('useMetaAllocatorTransaction', () => {
   const mockConnector = {
@@ -49,21 +75,21 @@ describe('useMetaAllocatorTransaction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockUseAccountWagmi.mockReturnValue({
+    mocks.mockUseAccountWagmi.mockReturnValue({
       connector: mockConnector,
     });
 
-    mockUseSwitchChain.mockReturnValue({
+    mocks.mockUseSwitchChain.mockReturnValue({
       chains: [{ id: 314 }],
       switchChain: mockSwitchChain,
     });
 
-    mockUseFilecoinPublicClient.mockReturnValue(mockClient);
+    mocks.mockUseFilecoinPublicClient.mockReturnValue(mockClient);
 
     mockConnector.getProvider.mockResolvedValue(mockProvider);
-    mockGetSafeKit.mockResolvedValue(mockSafeKit);
-    mockIsFilecoinAddress.mockReturnValue(false);
-    mockEncodeFunctionData.mockReturnValue('0x123456');
+    mocks.mockGetSafeKit.mockResolvedValue(mockSafeKit);
+    mocks.mockIsFilecoinAddress.mockReturnValue(false);
+    mocks.mockEncodeFunctionData.mockReturnValue('0x123456');
 
     mockSafeKit.createTransaction.mockResolvedValue({ id: 'safe-tx-123' });
     mockSafeKit.signTransaction.mockResolvedValue({ id: 'signed-tx-123' });
@@ -134,8 +160,8 @@ describe('useMetaAllocatorTransaction', () => {
 
     expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
     expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
-    expect(mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
-    expect(mockEncodeFunctionData).toHaveBeenCalledWith({
+    expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
+    expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
       functionName: 'addAllowance',
       args: [transactionParams.address, BigInt(100 * 1_125_899_906_842_624)],
@@ -157,7 +183,7 @@ describe('useMetaAllocatorTransaction', () => {
   });
 
   it('should handle successful transaction with Filecoin address conversion', async () => {
-    mockIsFilecoinAddress
+    mocks.mockIsFilecoinAddress
       .mockReturnValueOnce(true) // for address
       .mockReturnValueOnce(true); // for metaAllocatorContractAddress
 
@@ -203,7 +229,7 @@ describe('useMetaAllocatorTransaction', () => {
   });
 
   it('should handle address conversion error', async () => {
-    mockIsFilecoinAddress.mockReturnValueOnce(true);
+    mocks.mockIsFilecoinAddress.mockReturnValueOnce(true);
 
     const conversionError = new Error('Conversion failed');
     mockClient.request.mockRejectedValue(conversionError);
@@ -237,7 +263,7 @@ describe('useMetaAllocatorTransaction', () => {
   });
 
   it('should handle unknown conversion error', async () => {
-    mockIsFilecoinAddress.mockReturnValueOnce(true);
+    mocks.mockIsFilecoinAddress.mockReturnValueOnce(true);
     mockClient.request.mockRejectedValue('Unknown error');
 
     const transactionParams = {
@@ -267,7 +293,7 @@ describe('useMetaAllocatorTransaction', () => {
 
   it('should handle invalid address validation error', async () => {
     // Mock conversion that returns invalid address
-    mockIsFilecoinAddress.mockReturnValueOnce(true);
+    mocks.mockIsFilecoinAddress.mockReturnValueOnce(true);
     mockClient.request.mockResolvedValue('invalid-address'); // Not 42 chars or doesn't start with 0x
 
     const transactionParams = {
@@ -408,7 +434,7 @@ describe('useMetaAllocatorTransaction', () => {
     // 5 PiB = 5 * 2^50 = 5 * 1_125_899_906_842_624
     const expectedDatacap = BigInt(5 * 1_125_899_906_842_624);
 
-    expect(mockEncodeFunctionData).toHaveBeenCalledWith({
+    expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
       functionName: 'addAllowance',
       args: [transactionParams.address, expectedDatacap],
@@ -456,8 +482,8 @@ describe('useMetaAllocatorTransaction', () => {
 
     expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
     expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
-    expect(mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
-    expect(mockEncodeFunctionData).toHaveBeenCalledWith({
+    expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
+    expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
       functionName: 'addAllowance',
       args: [transactionParams.address, BigInt(100 * 1_125_899_906_842_624)],

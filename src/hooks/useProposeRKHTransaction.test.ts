@@ -4,10 +4,15 @@ import { useProposeRKHTransaction } from './useProposeRKHTransaction';
 import { useAccount } from '@/hooks';
 import { createWrapper } from '@/test-utils';
 
-vi.mock('@/hooks');
+const mocks = vi.hoisted(() => ({
+  useAccountMock: vi.fn(),
+}));
+
+vi.mock('@/hooks', () => ({
+  useAccount: mocks.useAccountMock,
+}));
 
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-const mockUseAccount = useAccount as Mock;
 
 describe('useProposeRKHTransaction', () => {
   const mockProposeAddVerifier = vi.fn();
@@ -19,7 +24,7 @@ describe('useProposeRKHTransaction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockUseAccount.mockReturnValue({
+    mocks.useAccountMock.mockReturnValue({
       proposeAddVerifier: mockProposeAddVerifier,
     });
   });
