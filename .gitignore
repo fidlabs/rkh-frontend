@@ -40,3 +40,7 @@ certificates
 
 #jetbrains IDE
 .idea
+
+#cursor
+.cursor
+.cursorrules
