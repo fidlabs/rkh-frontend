@@ -6,15 +6,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogErrorCard,
+  DialogLoadingCard,
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
-import {
-  RefreshAllocatorErrorStep,
-  RefreshAllocatorLoadingStep,
-  RefreshAllocatorSuccessStep,
-  SignTransactionFormStep,
-} from '@/components/refresh/steps';
+import { RefreshAllocatorSuccessStep, SignTransactionFormStep } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useMetaAllocatorTransaction } from '@/hooks';
 
@@ -78,9 +75,7 @@ export function MetaAllocatorSignTransactionDialog({
         onCancel={() => onOpenChange(false)}
       />
     ),
-    [RefreshAllocatorSteps.LOADING]: (
-      <RefreshAllocatorLoadingStep loadingMessage={loadingMessage} />
-    ),
+    [RefreshAllocatorSteps.LOADING]: <DialogLoadingCard loadingMessage={loadingMessage} />,
     [RefreshAllocatorSteps.SUCCESS]: (
       <RefreshAllocatorSuccessStep
         blockNumber={blockNumber}
@@ -89,7 +84,7 @@ export function MetaAllocatorSignTransactionDialog({
       />
     ),
     [RefreshAllocatorSteps.ERROR]: (
-      <RefreshAllocatorErrorStep
+      <DialogErrorCard
         errorMessage={errorMessage}
         onGoBack={() => setStep(RefreshAllocatorSteps.FORM)}
         onClose={() => onOpenChange(false)}

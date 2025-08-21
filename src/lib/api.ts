@@ -147,7 +147,7 @@ export async function overrideKYC(id: string, payload: any) {
   }
 }
 
-export async function governanceReview(id: string, payload: any) {
+export async function governanceReview(id: string, payload: any): Promise<void> {
   const url = `${API_BASE_URL}/applications/${id}/approveGovernanceReview`;
 
   try {

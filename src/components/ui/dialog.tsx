@@ -2,9 +2,10 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
+import { CircleCheck, CircleXIcon, Loader2, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { Button } from './button';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -90,6 +91,83 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
+interface DialogLoadingCardProps {
+  loadingMessage?: string | null;
+}
+
+interface DialogErrorProps {
+  onGoBack: () => void;
+  onClose: () => void;
+  errorMessage?: string | null;
+}
+
+interface DialogSuccessCardProps {
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+function DialogLoadingCard({ loadingMessage }: DialogLoadingCardProps) {
+  const message = loadingMessage || 'Loading...';
+
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <Loader2 className="h-8 w-8 animate-spin" />
+      <p data-testid="loading-message">{message}</p>
+    </div>
+  );
+}
+
+function DialogSuccessCard({ onClose, children }: DialogSuccessCardProps) {
+  return (
+    <>
+      <div
+        data-testid="success-header"
+        className="flex flex-col items-center pt-4 pb-4 min-w-48 text-xl text-green-600"
+      >
+        <CircleCheck size="60px" /> Success!
+      </div>
+      {children}
+      <DialogFooter className="gap-2">
+        <Button variant="outline" onClick={onClose}>
+          Close
+        </Button>
+      </DialogFooter>
+    </>
+  );
+}
+
+function DialogErrorCard({ onGoBack, onClose, errorMessage }: DialogErrorProps) {
+  const message = errorMessage || 'An unknown error occurred.';
+
+  return (
+    <>
+      <div
+        data-testid="error-header"
+        className="flex flex-col items-center pt-4 pb-4 min-w-48 text-xl text-red-500"
+      >
+        <CircleXIcon size="60px" /> Error
+      </div>
+
+      <div data-testid="error-message" className="text-sm pb-4 text-center">
+        {message}
+      </div>
+
+      <DialogFooter className="gap-2">
+        <Button variant="outline" onClick={onGoBack}>
+          Go back
+        </Button>
+        <Button variant="outline" onClick={onClose}>
+          Close
+        </Button>
+      </DialogFooter>
+    </>
+  );
+}
+
+DialogLoadingCard.displayName = 'DialogLoadingCard';
+DialogSuccessCard.displayName = 'DialogSuccessCard';
+DialogErrorCard.displayName = 'DialogErrorCard';
+
 export {
   Dialog,
   DialogPortal,
@@ -101,4 +179,7 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  DialogLoadingCard,
+  DialogErrorCard,
+  DialogSuccessCard,
 };

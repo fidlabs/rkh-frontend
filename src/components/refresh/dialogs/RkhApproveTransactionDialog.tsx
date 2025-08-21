@@ -4,14 +4,14 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogErrorCard,
   DialogHeader,
+  DialogLoadingCard,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ApproveTransactionDetailsStep,
-  RefreshAllocatorErrorStep,
-  RefreshAllocatorLoadingStep,
   RefreshAllocatorSuccessStep,
 } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
@@ -70,14 +70,12 @@ export function RkhApproveTransactionDialog({
         onCancel={() => onOpenChange(false)}
       />
     ),
-    [RefreshAllocatorSteps.LOADING]: (
-      <RefreshAllocatorLoadingStep loadingMessage={loadingMessage} />
-    ),
+    [RefreshAllocatorSteps.LOADING]: <DialogLoadingCard loadingMessage={loadingMessage} />,
     [RefreshAllocatorSteps.SUCCESS]: (
       <RefreshAllocatorSuccessStep messageId={messageId} onClose={() => onOpenChange(false)} />
     ),
     [RefreshAllocatorSteps.ERROR]: (
-      <RefreshAllocatorErrorStep
+      <DialogErrorCard
         errorMessage={errorMessage}
         onGoBack={() => setStep(RefreshAllocatorSteps.FORM)}
         onClose={() => onOpenChange(false)}
