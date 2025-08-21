@@ -21,8 +21,7 @@ describe('Input', () => {
   });
 
   it('should apply error styling when error prop is provided', () => {
-    const error = { type: 'required', message: 'Field is required' };
-    render(<Input error={error} />);
+    render(<Input error />);
 
     const input = screen.getByRole('textbox');
     expect(input).toHaveClass('text-red-500', 'border-red-500');
