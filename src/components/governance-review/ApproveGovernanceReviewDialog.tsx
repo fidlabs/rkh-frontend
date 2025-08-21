@@ -57,7 +57,7 @@ const ApproveGovernanceReviewDialog = ({
 
   useEffect(() => {
     if (open) {
-      setStep(GovApproveSteps.SUCCESS);
+      setStep(GovApproveSteps.FORM);
       setLoadingMessage('');
       setErrorMessage('');
       reset();
