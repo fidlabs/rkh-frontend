@@ -30,8 +30,6 @@ ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 ENV NEXT_PUBLIC_RPC_URL=${NEXT_PUBLIC_RPC_URL}
 ENV NEXT_PUBLIC_RPC_TOKEN=${NEXT_PUBLIC_RPC_TOKEN}
 
-# Note: RPC_URL and RPC_TOKEN are NOT set here - they will be runtime variables
-
 RUN npm run build
 
 # Production Stage 
@@ -47,9 +45,6 @@ COPY --from=builder /app/.next/static ./.next/static
 # Set only the essential environment variables
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}
-
-# Note: All other environment variables (including RPC_URL, RPC_TOKEN) 
-# will be set at runtime via docker-compose or docker run
 
 EXPOSE 3000
 
