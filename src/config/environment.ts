@@ -67,7 +67,7 @@ const environments: { [key: string]: Environment } = {
   },
 };
 
-const currentEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'development';
+const currentEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'production';
 console.log(`Current environment: ${currentEnv}`);
 
 export const env: Environment = environments[currentEnv];
