@@ -175,7 +175,7 @@ export const AccountProvider: React.FC<{
 
       const api = new VerifyAPI(
         VerifyAPI.browserProvider(env.rpcUrl, {
-          token: async () => env.rpcToken,
+          token: async () => 'dummy-token', // Backend ignores this, uses its own LOTUS_RPC_TOKEN
         }),
         account.wallet,
         env.useTestnet,
@@ -208,7 +208,6 @@ export const AccountProvider: React.FC<{
 
         // Prepare RPC access}
         const req = new FetchRequest(env.rpcUrl);
-        req.setHeader('Authorization', `Bearer ${env.rpcToken}`);
         req.setHeader('Content-Type', 'application/json');
 
         const rpcProvider = new JsonRpcProvider(req, {
@@ -330,7 +329,7 @@ export const AccountProvider: React.FC<{
 
       const api = new VerifyAPI(
         VerifyAPI.browserProvider(env.rpcUrl, {
-          token: async () => env.rpcToken,
+          token: async () => 'dummy-token', // Backend ignores this, uses its own LOTUS_RPC_TOKEN
         }),
         account.wallet,
         env.useTestnet,

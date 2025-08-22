@@ -1,4 +1,4 @@
-import { JsonRpcProvider, FetchRequest } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { filecoinConfig } from '@/config/filecoin';
 
 export interface FilecoinActor {
@@ -31,10 +31,8 @@ export class FilecoinRpcClient {
   private msigAddress: string;
 
   constructor(lotusUrl: string, token: string, msigAddress: string, chainId: number = 314) {
-    const req = new FetchRequest(lotusUrl);
-    req.setHeader('Content-Type', 'application/json');
-    req.setHeader('Authorization', `Bearer ${token}`);
-    this.provider = new JsonRpcProvider(req, { chainId, name: 'filecoin' });
+    // Use direct URL constructor to avoid FetchRequest content-type issues
+    this.provider = new JsonRpcProvider(lotusUrl, { chainId, name: 'filecoin' });
     this.msigAddress = msigAddress;
   }
 
@@ -83,5 +81,6 @@ export class FilecoinRpcClient {
 export function createFilecoinRpcClient(msigAddress: string): FilecoinRpcClient {
   const { lotus } = filecoinConfig;
 
-  return new FilecoinRpcClient(lotus.url, lotus.token, msigAddress, lotus.chainId);
+  // Do not pass a token here, it's in the back end already
+  return new FilecoinRpcClient(lotus.url, '', msigAddress, lotus.chainId);
 }
