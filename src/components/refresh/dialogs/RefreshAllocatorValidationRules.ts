@@ -8,12 +8,12 @@ export interface FormFields {
 }
 
 export const validationRules = {
-  allocatorAddress: (): RegisterOptions<FieldValues, 'allocatorAddress'> => ({
+  allocatorAddress: (): RegisterOptions<FormFields, 'allocatorAddress'> => ({
     required: { value: true, message: 'Allocator address is required' },
     pattern: { value: filecoinAddresRegex, message: 'Allocator address have wrong format' },
   }),
 
-  dataCap: (): RegisterOptions<FieldValues, 'dataCap'> => ({
+  dataCap: (): RegisterOptions<FormFields, 'dataCap'> => ({
     required: { value: true, message: 'Data Cap is required' },
     min: { value: 1, message: 'Data Cap must be at least 1' },
     max: { value: Number.MAX_SAFE_INTEGER, message: 'Value is too high' },
