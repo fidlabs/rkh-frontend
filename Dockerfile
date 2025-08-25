@@ -8,7 +8,11 @@ RUN npm ci
 
 COPY . .
 
-ENV NEXT_PUBLIC_APP_ENV=production
+# Accept build argument for environment only
+ARG NEXT_PUBLIC_APP_ENVIRONMENT
+
+# Set the environment variable during build
+ENV NEXT_PUBLIC_APP_ENVIRONMENT=${NEXT_PUBLIC_APP_ENVIRONMENT:-production}
 
 RUN npm run build
 
@@ -16,15 +20,18 @@ RUN npm run build
 
 FROM node:18-alpine AS production
 
+# Accept build argument for environment in production stage too
+ARG NEXT_PUBLIC_APP_ENVIRONMENT
+
 WORKDIR /app
 
 # Copy the built artifacts from the builder stage
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Set the environment variables (if needed)
+# Set only the essential environment variables
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_APP_ENV=production
+ENV NEXT_PUBLIC_APP_ENVIRONMENT=${NEXT_PUBLIC_APP_ENVIRONMENT:-production}
 
 EXPOSE 3000
 

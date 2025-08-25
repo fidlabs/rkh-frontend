@@ -7,7 +7,6 @@ export const filecoinConfig = {
   // Lotus RPC configuration
   lotus: {
     url: env.rpcUrl,
-    token: env.rpcToken,
     chainId: env.testNetChainId,
   },
 
