@@ -1,5 +1,5 @@
 import { CircleCheck, Copy } from 'lucide-react';
-import { DialogFooter } from '@/components/ui/dialog';
+import { DialogFooter, DialogSuccessCard } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 import { useToast } from '@/components/ui/use-toast';
@@ -34,14 +34,7 @@ export function RefreshAllocatorSuccessStep({
   };
 
   return (
-    <>
-      <div
-        data-testid="success-header"
-        className="flex flex-col items-center pt-4 pb-4 min-w-48 text-xl text-green-600"
-      >
-        <CircleCheck size="60px" /> Success!
-      </div>
-
+    <DialogSuccessCard onClose={onClose}>
       {messageId ? (
         <div data-testid="transaction-id-section" className="flex flex-col gap-2 text-sm">
           <div className="flex items-center gap-2">
@@ -61,12 +54,6 @@ export function RefreshAllocatorSuccessStep({
           <span className="flex items-center gap-2 text-muted-foreground">{blockNumber}</span>
         </div>
       ) : null}
-
-      <DialogFooter className="gap-2">
-        <Button variant="outline" onClick={onClose}>
-          Close
-        </Button>
-      </DialogFooter>
-    </>
+    </DialogSuccessCard>
   );
 }

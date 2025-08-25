@@ -23,6 +23,13 @@ describe('Label', () => {
     expect(label).not.toHaveClass('text-red-600');
   });
 
+  it('should apply disabled styling when disabled prop is true', () => {
+    render(<Label disabled={true}>Disabled Label</Label>);
+
+    const label = screen.getByText('Disabled Label');
+    expect(label).toHaveClass('opacity-50', 'cursor-not-allowed');
+  });
+
   it('should show required asterisk when required prop is true', () => {
     render(<Label required={true}>Required Label</Label>);
 

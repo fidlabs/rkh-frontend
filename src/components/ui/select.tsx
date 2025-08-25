@@ -6,11 +6,13 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
-const Select = SelectPrimitive.Root;
+const SelectRoot = SelectPrimitive.Root;
 
 const SelectGroup = SelectPrimitive.Group;
 
 const SelectValue = SelectPrimitive.Value;
+
+const SelectPortal = SelectPrimitive.Portal;
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -139,8 +141,56 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
+interface SelectProps extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root> {
+  options: { value: string; label: string }[];
+  placeholder?: string;
+  className?: string;
+  children?: React.ReactNode;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?(value: string): void;
+  onChange?(value: string): void;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?(open: boolean): void;
+  dir?: 'ltr' | 'rtl';
+  name?: string;
+  id?: string;
+  autoComplete?: string;
+  disabled?: boolean;
+  required?: boolean;
+  onBlur?: React.FocusEventHandler<HTMLButtonElement>;
+}
+
+const Select = React.forwardRef<React.ElementRef<'div'>, SelectProps>(
+  ({ className, options, placeholder, onValueChange, onChange, onBlur, id, ...rootProps }, ref) => (
+    <SelectRoot
+      {...rootProps}
+      onValueChange={value => {
+        onChange?.(value);
+        onValueChange?.(value);
+      }}
+    >
+      <SelectTrigger id={id} onBlur={onBlur}>
+        <SelectValue placeholder={placeholder || 'Select an option'} />
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent>
+          {options.map(option => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </SelectPortal>
+    </SelectRoot>
+  ),
+);
+Select.displayName = SelectPrimitive.Root.displayName;
+
 export {
   Select,
+  SelectRoot,
   SelectGroup,
   SelectValue,
   SelectTrigger,

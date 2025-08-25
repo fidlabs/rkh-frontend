@@ -4,17 +4,14 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogErrorCard,
+  DialogLoadingCard,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
-import {
-  RefreshAllocatorErrorStep,
-  RefreshAllocatorFormStep,
-  RefreshAllocatorLoadingStep,
-  RefreshAllocatorSuccessStep,
-} from '@/components/refresh/steps';
+import { RefreshAllocatorFormStep, RefreshAllocatorSuccessStep } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useProposeRKHTransaction, useStateWaitMsg } from '@/hooks';
 
@@ -66,9 +63,7 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
     [RefreshAllocatorSteps.FORM]: (
       <RefreshAllocatorFormStep onSubmit={onSubmit} onCancel={() => onOpenChange(false)} />
     ),
-    [RefreshAllocatorSteps.LOADING]: (
-      <RefreshAllocatorLoadingStep loadingMessage={loadingMessage} />
-    ),
+    [RefreshAllocatorSteps.LOADING]: <DialogLoadingCard loadingMessage={loadingMessage} />,
     [RefreshAllocatorSteps.SUCCESS]: (
       <RefreshAllocatorSuccessStep
         messageId={messageId}
@@ -77,7 +72,7 @@ export function RefreshAllocatorDialog({ onOpenChange, open }: RefreshAllocatorB
       />
     ),
     [RefreshAllocatorSteps.ERROR]: (
-      <RefreshAllocatorErrorStep
+      <DialogErrorCard
         errorMessage={errorMessage}
         onGoBack={() => setStep(RefreshAllocatorSteps.FORM)}
         onClose={() => onOpenChange(false)}

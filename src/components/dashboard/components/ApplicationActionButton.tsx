@@ -5,7 +5,7 @@ import { useAccount } from '@/hooks';
 import { AccountRole } from '@/types/account';
 import SignRkhTransactionButton from '@/components/sign/SignRkhTransactionButton';
 import SignMetaAllocatorTransactionButton from '@/components/sign/SignMetaAllocatorTransactionButton';
-import ApproveGovernanceReviewButton from '@/components/sign/ApproveGovernanceReviewButton';
+import ApproveGovernanceReviewButton from '@/components/governance-review/ApproveGovernanceReviewButton';
 import { useState } from 'react';
 import { ConnectWalletDialog } from '@/components/connect/ConnectWalletDialog';
 import OverrideKYCButton from '@/components/sign/OverrideKYCButton';

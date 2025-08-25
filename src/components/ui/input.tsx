@@ -1,11 +1,10 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-import { FieldError } from 'react-hook-form';
 import { cva } from 'class-variance-authority';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  error?: FieldError;
+  error?: boolean;
 }
 
 const inputVariants = cva(
@@ -27,15 +26,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, error, ...props }, ref) => {
     return (
       <input
+        {...props}
         type={type}
         className={cn(
           inputVariants({
-            error: !!error,
+            error,
           }),
           className,
         )}
         ref={ref}
-        {...props}
       />
     );
   },

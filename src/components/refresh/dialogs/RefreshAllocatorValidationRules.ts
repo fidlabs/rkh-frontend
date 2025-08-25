@@ -1,4 +1,4 @@
-import { RegisterOptions } from 'react-hook-form';
+import { FieldValues, RegisterOptions } from 'react-hook-form';
 import { filecoinAddresRegex } from '@/types/filecoin';
 
 export interface FormFields {
@@ -8,12 +8,12 @@ export interface FormFields {
 }
 
 export const validationRules = {
-  allocatorAddress: (): RegisterOptions<FormFields, 'allocatorAddress'> => ({
+  allocatorAddress: (): RegisterOptions<FieldValues, 'allocatorAddress'> => ({
     required: { value: true, message: 'Allocator address is required' },
     pattern: { value: filecoinAddresRegex, message: 'Allocator address have wrong format' },
   }),
 
-  dataCap: (): RegisterOptions<FormFields, 'dataCap'> => ({
+  dataCap: (): RegisterOptions<FieldValues, 'dataCap'> => ({
     required: { value: true, message: 'Data Cap is required' },
     min: { value: 1, message: 'Data Cap must be at least 1' },
     max: { value: Number.MAX_SAFE_INTEGER, message: 'Value is too high' },

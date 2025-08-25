@@ -18,6 +18,10 @@ const labelVariants = cva(
         true: 'after:content-["*"] after:text-red-500 after:ml-1',
         false: null,
       },
+      disabled: {
+        true: 'opacity-50 cursor-not-allowed',
+        false: null,
+      },
     },
     defaultVariants: {
       required: false,
@@ -29,13 +33,14 @@ const labelVariants = cva(
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>
->(({ className, required, error, ...props }, ref) => (
+>(({ className, required, error, disabled, ...props }, ref) => (
   <LabelPrimitive.Root
     ref={ref}
     className={cn(
       labelVariants({
         error,
         required,
+        disabled,
       }),
       className,
     )}
