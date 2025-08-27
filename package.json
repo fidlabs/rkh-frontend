@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@glif/filecoin-address": "^4.0.0",
-    "@ledgerhq/hw-transport-webusb": "^6.29.2",
+    "@ledgerhq/hw-transport-webhid": "^6.30.5",
+    "@ledgerhq/hw-transport-webusb": "^6.29.9",
     "@noble/secp256k1": "^2.2.3",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
