@@ -23,7 +23,7 @@ export const useGovernanceReview = ({
     async (id: string, data: GovernanceReviewFormValues) => {
       try {
         onSignaturePending?.();
-        const signature = await signStateMessage(`Governance Review ${id} ${data.allocatorType}`);
+        const signature = await signStateMessage(`Governance ${data.intent} ${id} ${data.dataCap} ${data.allocatorType}`);
 
         const pubKey =
           account?.wallet?.getPubKey() || Buffer.from('0x0000000000000000000000000000000000000000');
