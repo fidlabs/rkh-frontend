@@ -1,6 +1,5 @@
-
-import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
-import TransportWebHID from "@ledgerhq/hw-transport-webhid";
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 // @ts-ignore
 import { FilecoinApp } from '@zondax/ledger-filecoin/dist/app';
 
@@ -25,22 +24,23 @@ export class LedgerConnector implements Connector {
   async connect(): Promise<Account> {
     try {
       if (!this.transport) {
-        const isWindows = navigator.userAgent.includes("Windows");
+        const isWindows = navigator.userAgent.includes('Windows');
         try {
           if (isWindows) {
             this.transport = await TransportWebHID.create();
-            console.log("Using WebHID");
+            console.log('Using WebHID');
           } else {
             this.transport = await TransportWebUSB.create();
-            console.log("Using WebUSB");
+            console.log('Using WebUSB');
           }
         } catch (e1) {
           // If either fails, try the other way around
           try {
-            console.log("Error: ", e1, "trying fallback ", isWindows ? "WebUSB" : "WebHID");
-            this.transport = isWindows ? await TransportWebUSB.create()
-                            : await TransportWebHID.create();
-            console.log("Fallback: Using ", isWindows ? "WebUSB" : "WebHID");
+            console.log('Error: ', e1, 'trying fallback ', isWindows ? 'WebUSB' : 'WebHID');
+            this.transport = isWindows
+              ? await TransportWebUSB.create()
+              : await TransportWebHID.create();
+            console.log('Fallback: Using ', isWindows ? 'WebUSB' : 'WebHID');
           } catch (e2) {
             // OK it's too bad to deal with
             (e2 as any).fallbackError = e1;
