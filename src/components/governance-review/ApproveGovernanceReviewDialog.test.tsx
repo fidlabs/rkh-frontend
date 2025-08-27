@@ -127,7 +127,7 @@ describe('ApproveGovernanceReviewDialog', () => {
     await waitFor(() => {
       expect(mocks.mockGovernanceReview).toHaveBeenCalled();
     });
-    expect(mocks.mockSignStateMessage).toHaveBeenCalledWith(`Governance Review test-app-123 MDMA`);
+    expect(mocks.mockSignStateMessage).toHaveBeenCalledWith(`Governance approve test-app-123 100 MDMA`);
   });
 
   it('should show loading state when transaction is pending', async () => {
@@ -150,7 +150,7 @@ describe('ApproveGovernanceReviewDialog', () => {
     const approveButton = screen.getByRole('button', { name: 'APPROVE' });
     await userEvent.click(approveButton);
 
-    expect(mocks.mockSignStateMessage).toHaveBeenCalledWith('Governance Review test-app-123 MDMA');
+    expect(mocks.mockSignStateMessage).toHaveBeenCalledWith('Governance approve test-app-123 100 MDMA');
 
     const loader = screen.getByTestId('loading-message');
     expect(loader).toHaveTextContent('Submitting review...');

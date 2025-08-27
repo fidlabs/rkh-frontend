@@ -85,7 +85,7 @@ describe('useGovernanceReview', () => {
     await result.current.mutateAsync({ id: 'test-app-123', payload: fixtureFormData });
 
     expect(mocks.mockSignStateMessage).toHaveBeenCalledWith(
-      `Governance Review test-app-123 ${fixtureFormData.allocatorType}`,
+      `Governance approve test-app-123 100 ${fixtureFormData.allocatorType}`,
     );
     expect(mocks.mockGovernanceReview).toHaveBeenCalledWith('test-app-123', {
       result: 'approve',
