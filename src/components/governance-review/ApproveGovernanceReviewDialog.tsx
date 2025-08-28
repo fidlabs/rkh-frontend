@@ -17,6 +17,7 @@ import { GovernanceReviewForm, GovernanceReviewFormValues } from './GovernanceRe
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { withFormProvider } from '@/lib/hocs/withFormProvider';
 import { useGovernanceReview } from '@/hooks/useGovernanceReview';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ApproveGovernanceReviewDialogProps {
   application: Application;
@@ -39,6 +40,8 @@ const ApproveGovernanceReviewDialog = ({
   const [step, setStep] = useState<GovApproveSteps>(GovApproveSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { toast } = useToast();
+
   const { mutateAsync: governanceReview, reset } = useGovernanceReview({
     onSignaturePending: () => {
       setStep(GovApproveSteps.LOADING);
@@ -48,10 +51,28 @@ const ApproveGovernanceReviewDialog = ({
       setStep(GovApproveSteps.LOADING);
       setLoadingMessage('Submitting review...');
     },
-    onSuccess: () => setStep(GovApproveSteps.SUCCESS),
+    onSuccess: () => {
+      setStep(GovApproveSteps.SUCCESS);
+      // Show success toast
+      toast({
+        title: 'Success',
+        description: 'Governance review submitted successfully!',
+        variant: 'default',
+      });
+      // Auto-close dialog after a short delay
+      setTimeout(() => {
+        onOpenChange(false);
+      }, 1500);
+    },
     onError: error => {
       setStep(GovApproveSteps.ERROR);
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
+      // Show error toast
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to submit governance review',
+        variant: 'destructive',
+      });
     },
   });
 

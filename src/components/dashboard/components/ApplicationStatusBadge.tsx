@@ -13,7 +13,7 @@ const phaseColors: Record<ApplicationStatus, string> = {
   KYC_PHASE: 'bg-blue-600',
   GOVERNANCE_REVIEW_PHASE: 'bg-yellow-600',
   RKH_APPROVAL_PHASE: 'bg-orange-600',
-  META_APPROVAL_PHASE: 'bg-orange-800',
+  META_APPROVAL_PHASE: 'bg-orange-800', // TODO do we want different colors for the different meta allocator types?
   DC_ALLOCATED: 'bg-green-600',
   APPROVED: 'bg-green-600',
   REJECTED: 'bg-red-600',
@@ -42,6 +42,18 @@ const phaseNames: Record<ApplicationStatus, string> = {
   IN_REFRESSH: 'In Refresh',
 };
 
+const phaseLabel = (application: Application) => {
+  console.log(application);
+  if (application.status === 'META_APPROVAL_PHASE') {
+    // Pathway shouldn't change so 1st instruction should always be right
+    const firstInstruction = application.applicationInstructions?.[0];
+    const method = firstInstruction?.method || 'META';
+    return `${method} Approval`;
+  }
+
+  return phaseNames[application.status];
+};
+
 export function ApplicationStatusBadge({ application }: ApplicationStatusBadgeProps) {
   return (
     <Badge
@@ -51,7 +63,7 @@ export function ApplicationStatusBadge({ application }: ApplicationStatusBadgePr
         'ring-2 ring-offset-2 ring-offset-white ring-gray-300',
       )}
     >
-      {phaseNames[application.status]}
+      {phaseLabel(application)}
       <Tooltip>
         <TooltipTrigger asChild>
           <HelpCircle className="w-4 h-4 text-white ml-2" />

@@ -59,6 +59,17 @@ describe('ApproveGovernanceReviewDialog', () => {
       signStateMessage: mocks.mockSignStateMessage,
     });
     mocks.mockSignStateMessage.mockResolvedValue('test-signature');
+
+    // Mock useToast to return a toast function
+    mocks.mockUseToast.mockReturnValue({
+      toast: vi.fn(),
+    });
+
+    // Mock governanceReview to return a proper Response object
+    mocks.mockGovernanceReview.mockResolvedValue({
+      ok: true,
+      status: 200,
+    });
   });
 
   it('should render dialog when open', () => {

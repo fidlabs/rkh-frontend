@@ -80,7 +80,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     mocks.mockUseSwitchChain.mockReturnValue({
-      chains: [{ id: 314 }],
+      chains: [{ id: 314 }, { id: 31415926 }], // Provide both mainnet and testnet chains
       switchChain: mockSwitchChain,
     });
 
@@ -159,7 +159,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 31415926 }); // Testnet chain ID
     expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
@@ -481,7 +481,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 31415926 }); // Testnet chain ID
     expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
