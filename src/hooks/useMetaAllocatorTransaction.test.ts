@@ -6,6 +6,7 @@ import { createWrapper } from '@/test-utils';
 import { env } from '@/config/environment';
 
 const mocks = vi.hoisted(() => ({
+  mockUseAccount: vi.fn(),
   mockUseAccountWagmi: vi.fn(),
   mockUseSwitchChain: vi.fn(),
   mockUseFilecoinPublicClient: vi.fn(),
@@ -22,6 +23,28 @@ const mocks = vi.hoisted(() => ({
     },
     transactionSerialize: vi.fn(() => 'mock-serialized-transaction'),
   },
+  mockOnSubmitSafeTransaction: vi.fn(),
+  mockOnSubmitSafeTransactionSuccess: vi.fn(),
+  mockOnSubmitSafeTransactionError: vi.fn(),
+  mockOnConvertingAddress: vi.fn(),
+  mockOnSignSafeTransaction: vi.fn(),
+  mockOnExecuteSafeTransaction: vi.fn(),
+  mockSafeKit: {
+    createTransaction: vi.fn(),
+    signTransaction: vi.fn(),
+    executeTransaction: vi.fn(),
+  },
+  mockSwitchChain: vi.fn(),
+  mockClient: {
+    request: vi.fn(),
+  },
+  mockConnector: {
+    getProvider: vi.fn(),
+  },
+}));
+
+vi.mock('@/hooks/useAccount', () => ({
+  useAccount: mocks.mockUseAccount,
 }));
 
 vi.mock('@zondax/filecoin-signing-tools/js', () => mocks.mockSigningTools);
@@ -56,51 +79,38 @@ const getExpectedChainId = () => {
 };
 
 describe('useMetaAllocatorTransaction', () => {
-  const mockConnector = {
-    getProvider: vi.fn(),
-  };
-  const mockSwitchChain = vi.fn();
-  const mockClient = {
-    request: vi.fn(),
-  };
-  const mockSafeKit = {
-    createTransaction: vi.fn(),
-    signTransaction: vi.fn(),
-    executeTransaction: vi.fn(),
-  };
-  const mockProvider = {};
-
-  const mockOnSubmitSafeTransaction = vi.fn();
-  const mockOnSubmitSafeTransactionSuccess = vi.fn();
-  const mockOnSubmitSafeTransactionError = vi.fn();
-  const mockOnConvertingAddress = vi.fn();
-  const mockOnSignSafeTransaction = vi.fn();
-  const mockOnExecuteSafeTransaction = vi.fn();
-
+  const fixtureProvider = {};
+  const fixtureSafeAddress = '0x1234567890123456789012345678901234567890';
   const wrapper = createWrapper();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
+    mocks.mockUseAccount.mockReturnValue({
+      selectedMetaAllocator: {
+        ethSafeAddress: fixtureSafeAddress,
+      },
+    });
+
     mocks.mockUseAccountWagmi.mockReturnValue({
-      connector: mockConnector,
+      connector: mocks.mockConnector,
     });
 
     mocks.mockUseSwitchChain.mockReturnValue({
-      chains: [{ id: 314 }, { id: 31415926 }], // Provide both mainnet and testnet chains
-      switchChain: mockSwitchChain,
+      chains: [{ id: 314 }, { id: 31415926 }],
+      switchChain: mocks.mockSwitchChain,
     });
 
-    mocks.mockUseFilecoinPublicClient.mockReturnValue(mockClient);
+    mocks.mockUseFilecoinPublicClient.mockReturnValue(mocks.mockClient);
 
-    mockConnector.getProvider.mockResolvedValue(mockProvider);
-    mocks.mockGetSafeKit.mockResolvedValue(mockSafeKit);
+    mocks.mockConnector.getProvider.mockResolvedValue(fixtureProvider);
+    mocks.mockGetSafeKit.mockResolvedValue(mocks.mockSafeKit);
     mocks.mockIsFilecoinAddress.mockReturnValue(false);
     mocks.mockEncodeFunctionData.mockReturnValue('0x123456');
 
-    mockSafeKit.createTransaction.mockResolvedValue({ id: 'safe-tx-123' });
-    mockSafeKit.signTransaction.mockResolvedValue({ id: 'signed-tx-123' });
-    mockSafeKit.executeTransaction.mockResolvedValue({
+    mocks.mockSafeKit.createTransaction.mockResolvedValue({ id: 'safe-tx-123' });
+    mocks.mockSafeKit.signTransaction.mockResolvedValue({ id: 'signed-tx-123' });
+    mocks.mockSafeKit.executeTransaction.mockResolvedValue({
       hash: '0xabcdef123456789',
       status: 'success',
     });
@@ -114,12 +124,12 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransaction: mockOnSubmitSafeTransaction,
-          onSubmitSafeTransactionSuccess: mockOnSubmitSafeTransactionSuccess,
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
-          onConvertingAddress: mockOnConvertingAddress,
-          onSignSafeTransaction: mockOnSignSafeTransaction,
-          onExecuteSafeTransaction: mockOnExecuteSafeTransaction,
+          onSubmitSafeTransaction: mocks.mockOnSubmitSafeTransaction,
+          onSubmitSafeTransactionSuccess: mocks.mockOnSubmitSafeTransactionSuccess,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
+          onConvertingAddress: mocks.mockOnConvertingAddress,
+          onSignSafeTransaction: mocks.mockOnSignSafeTransaction,
+          onExecuteSafeTransaction: mocks.mockOnExecuteSafeTransaction,
         }),
       { wrapper },
     );
@@ -149,10 +159,10 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransaction: mockOnSubmitSafeTransaction,
-          onSubmitSafeTransactionSuccess: mockOnSubmitSafeTransactionSuccess,
-          onSignSafeTransaction: mockOnSignSafeTransaction,
-          onExecuteSafeTransaction: mockOnExecuteSafeTransaction,
+          onSubmitSafeTransaction: mocks.mockOnSubmitSafeTransaction,
+          onSubmitSafeTransactionSuccess: mocks.mockOnSubmitSafeTransactionSuccess,
+          onSignSafeTransaction: mocks.mockOnSignSafeTransaction,
+          onExecuteSafeTransaction: mocks.mockOnExecuteSafeTransaction,
         }),
       { wrapper },
     );
@@ -165,20 +175,20 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
-    expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
+    expect(mocks.mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
+    expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(fixtureProvider, fixtureSafeAddress);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
       functionName: 'addAllowance',
       args: [transactionParams.address, BigInt(100 * 1_125_899_906_842_624)],
     });
-    expect(mockSafeKit.createTransaction).toHaveBeenCalled();
-    expect(mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSafeKit.signTransaction).toHaveBeenCalled();
-    expect(mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSafeKit.executeTransaction).toHaveBeenCalled();
-    expect(mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith(
+    expect(mocks.mockSafeKit.createTransaction).toHaveBeenCalled();
+    expect(mocks.mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSafeKit.signTransaction).toHaveBeenCalled();
+    expect(mocks.mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSafeKit.executeTransaction).toHaveBeenCalled();
+    expect(mocks.mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith(
       {
         hash: '0xabcdef123456789',
         status: 'success',
@@ -194,7 +204,7 @@ describe('useMetaAllocatorTransaction', () => {
       .mockReturnValueOnce(true) // for address
       .mockReturnValueOnce(true); // for metaAllocatorContractAddress
 
-    mockClient.request
+    mocks.mockClient.request
       .mockResolvedValueOnce('0x1234567890123456789012345678901234567890') // converted address
       .mockResolvedValueOnce('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'); // converted contract address
 
@@ -207,9 +217,9 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransaction: mockOnSubmitSafeTransaction,
-          onSubmitSafeTransactionSuccess: mockOnSubmitSafeTransactionSuccess,
-          onConvertingAddress: mockOnConvertingAddress,
+          onSubmitSafeTransaction: mocks.mockOnSubmitSafeTransaction,
+          onSubmitSafeTransactionSuccess: mocks.mockOnSubmitSafeTransactionSuccess,
+          onConvertingAddress: mocks.mockOnConvertingAddress,
         }),
       { wrapper },
     );
@@ -222,24 +232,24 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnConvertingAddress).toHaveBeenCalledTimes(2);
-    expect(mockClient.request).toHaveBeenCalledTimes(2);
-    expect(mockClient.request).toHaveBeenNthCalledWith(1, {
+    expect(mocks.mockOnConvertingAddress).toHaveBeenCalledTimes(2);
+    expect(mocks.mockClient.request).toHaveBeenCalledTimes(2);
+    expect(mocks.mockClient.request).toHaveBeenNthCalledWith(1, {
       method: 'Filecoin.FilecoinAddressToEthAddress',
       params: ['f1abc123def456'],
     });
-    expect(mockClient.request).toHaveBeenNthCalledWith(2, {
+    expect(mocks.mockClient.request).toHaveBeenNthCalledWith(2, {
       method: 'Filecoin.FilecoinAddressToEthAddress',
       params: ['f1def456abc123'],
     });
-    expect(mockOnSubmitSafeTransactionSuccess).toHaveBeenCalled();
+    expect(mocks.mockOnSubmitSafeTransactionSuccess).toHaveBeenCalled();
   });
 
   it('should handle address conversion error', async () => {
     mocks.mockIsFilecoinAddress.mockReturnValueOnce(true);
 
     const conversionError = new Error('Conversion failed');
-    mockClient.request.mockRejectedValue(conversionError);
+    mocks.mockClient.request.mockRejectedValue(conversionError);
 
     const transactionParams = {
       address: 'f1abc123def456',
@@ -250,8 +260,8 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
-          onConvertingAddress: mockOnConvertingAddress,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
+          onConvertingAddress: mocks.mockOnConvertingAddress,
         }),
       { wrapper },
     );
@@ -264,14 +274,14 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnConvertingAddress).toHaveBeenCalledTimes(1);
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(conversionError);
-    expect(mockSafeKit.createTransaction).not.toHaveBeenCalled();
+    expect(mocks.mockOnConvertingAddress).toHaveBeenCalledTimes(1);
+    expect(mocks.mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(conversionError);
+    expect(mocks.mockSafeKit.createTransaction).not.toHaveBeenCalled();
   });
 
   it('should handle unknown conversion error', async () => {
     mocks.mockIsFilecoinAddress.mockReturnValueOnce(true);
-    mockClient.request.mockRejectedValue('Unknown error');
+    mocks.mockClient.request.mockRejectedValue('Unknown error');
 
     const transactionParams = {
       address: 'f1abc123def456',
@@ -282,7 +292,7 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
         }),
       { wrapper },
     );
@@ -295,13 +305,13 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith('Unknown error');
+    expect(mocks.mockOnSubmitSafeTransactionError).toHaveBeenCalledWith('Unknown error');
   });
 
   it('should handle invalid address validation error', async () => {
     // Mock conversion that returns invalid address
     mocks.mockIsFilecoinAddress.mockReturnValueOnce(true);
-    mockClient.request.mockResolvedValue('invalid-address'); // Not 42 chars or doesn't start with 0x
+    mocks.mockClient.request.mockResolvedValue('invalid-address'); // Not 42 chars or doesn't start with 0x
 
     const transactionParams = {
       address: 'f1abc123def456',
@@ -312,7 +322,7 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
         }),
       { wrapper },
     );
@@ -325,15 +335,15 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(
+    expect(mocks.mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(
       new Error('Could not convert to Ethereum address.'),
     );
-    expect(mockSafeKit.createTransaction).not.toHaveBeenCalled();
+    expect(mocks.mockSafeKit.createTransaction).not.toHaveBeenCalled();
   });
 
   it('should handle safe transaction creation error', async () => {
     const transactionError = new Error('Transaction creation failed');
-    mockSafeKit.createTransaction.mockRejectedValue(transactionError);
+    mocks.mockSafeKit.createTransaction.mockRejectedValue(transactionError);
 
     const transactionParams = {
       address: '0x1234567890123456789012345678901234567890',
@@ -344,7 +354,7 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
         }),
       { wrapper },
     );
@@ -357,13 +367,13 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(transactionError);
+    expect(mocks.mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(transactionError);
     expect(result.current.txHash).toBe(null);
   });
 
   it('should handle safe transaction signing error', async () => {
     const signingError = new Error('Transaction signing failed');
-    mockSafeKit.signTransaction.mockRejectedValue(signingError);
+    mocks.mockSafeKit.signTransaction.mockRejectedValue(signingError);
 
     const transactionParams = {
       address: '0x1234567890123456789012345678901234567890',
@@ -374,8 +384,8 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
-          onSignSafeTransaction: mockOnSignSafeTransaction,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
+          onSignSafeTransaction: mocks.mockOnSignSafeTransaction,
         }),
       { wrapper },
     );
@@ -388,14 +398,14 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(signingError);
+    expect(mocks.mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(signingError);
     expect(result.current.txHash).toBe(null);
   });
 
   it('should handle safe transaction execution error', async () => {
     const executionError = new Error('Transaction execution failed');
-    mockSafeKit.executeTransaction.mockRejectedValue(executionError);
+    mocks.mockSafeKit.executeTransaction.mockRejectedValue(executionError);
 
     const transactionParams = {
       address: '0x1234567890123456789012345678901234567890',
@@ -406,8 +416,8 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransactionError: mockOnSubmitSafeTransactionError,
-          onExecuteSafeTransaction: mockOnExecuteSafeTransaction,
+          onSubmitSafeTransactionError: mocks.mockOnSubmitSafeTransactionError,
+          onExecuteSafeTransaction: mocks.mockOnExecuteSafeTransaction,
         }),
       { wrapper },
     );
@@ -420,8 +430,8 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(executionError);
+    expect(mocks.mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockOnSubmitSafeTransactionError).toHaveBeenCalledWith(executionError);
     expect(result.current.txHash).toBe(null);
   });
 
@@ -460,7 +470,7 @@ describe('useMetaAllocatorTransaction', () => {
       },
     };
 
-    mockSafeKit.executeTransaction.mockResolvedValue(fixtureExecuteTransactionResponse);
+    mocks.mockSafeKit.executeTransaction.mockResolvedValue(fixtureExecuteTransactionResponse);
 
     const transactionParams = {
       address: '0x1234567890123456789012345678901234567890',
@@ -471,10 +481,10 @@ describe('useMetaAllocatorTransaction', () => {
     const { result } = renderHook(
       () =>
         useMetaAllocatorTransaction({
-          onSubmitSafeTransaction: mockOnSubmitSafeTransaction,
-          onSubmitSafeTransactionSuccess: mockOnSubmitSafeTransactionSuccess,
-          onSignSafeTransaction: mockOnSignSafeTransaction,
-          onExecuteSafeTransaction: mockOnExecuteSafeTransaction,
+          onSubmitSafeTransaction: mocks.mockOnSubmitSafeTransaction,
+          onSubmitSafeTransactionSuccess: mocks.mockOnSubmitSafeTransactionSuccess,
+          onSignSafeTransaction: mocks.mockOnSignSafeTransaction,
+          onExecuteSafeTransaction: mocks.mockOnExecuteSafeTransaction,
         }),
       { wrapper },
     );
@@ -487,20 +497,20 @@ describe('useMetaAllocatorTransaction', () => {
       expect(result.current.isPending).toBe(false);
     });
 
-    expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
-    expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
+    expect(mocks.mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
+    expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(fixtureProvider, fixtureSafeAddress);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
       functionName: 'addAllowance',
       args: [transactionParams.address, BigInt(100 * 1_125_899_906_842_624)],
     });
-    expect(mockSafeKit.createTransaction).toHaveBeenCalled();
-    expect(mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSafeKit.signTransaction).toHaveBeenCalled();
-    expect(mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSafeKit.executeTransaction).toHaveBeenCalled();
-    expect(mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith(
+    expect(mocks.mockSafeKit.createTransaction).toHaveBeenCalled();
+    expect(mocks.mockOnSignSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSafeKit.signTransaction).toHaveBeenCalled();
+    expect(mocks.mockOnExecuteSafeTransaction).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSafeKit.executeTransaction).toHaveBeenCalled();
+    expect(mocks.mockOnSubmitSafeTransactionSuccess).toHaveBeenCalledWith(
       fixtureExecuteTransactionResponse,
       fixtureReceiptResponse,
     );

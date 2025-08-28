@@ -1,4 +1,5 @@
-import { Refresh } from '@/types/refresh';
+import { MetaAllocatorName } from '@/types/ma';
+import { MetapathwayType, Refresh } from '@/types/refresh';
 import { Row } from '@tanstack/react-table';
 
 export const isWaitingForRkhSign = (row: Row<Refresh>): boolean => {
@@ -18,7 +19,10 @@ export const isWaitingForRkhApprove = (row: Row<Refresh>): boolean => {
 export const isWaitingForMAApprove = (row: Row<Refresh>): boolean => {
   const { refreshStatus, metapathwayType } = row.original;
 
-  return metapathwayType === 'MDMA' && refreshStatus === 'PENDING';
+  return (
+    Object.values(MetaAllocatorName).includes(metapathwayType as unknown as MetaAllocatorName) &&
+    refreshStatus === 'PENDING'
+  );
 };
 
 export const isAllocated = (row: Row<Refresh>): boolean => {

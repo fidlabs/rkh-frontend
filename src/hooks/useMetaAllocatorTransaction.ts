@@ -2,7 +2,7 @@ import { isFilecoinAddress } from '@/types/filecoin';
 import { encodeFunctionData } from 'viem/utils';
 import { MetaTransactionData, OperationType, TransactionResult } from '@safe-global/types-kit';
 import { useAccount as useAccountWagmi } from 'wagmi';
-import { useFilecoinPublicClient } from '@/hooks';
+import { useAccount, useFilecoinPublicClient } from '@/hooks';
 import { useCallback, useState } from 'react';
 import { getSafeKit } from '@/lib/safe';
 import { useSwitchChain } from '@/hooks/useSwitchChain';
@@ -93,6 +93,7 @@ export const useMetaAllocatorTransaction = ({
   onFetchTransactionReceipt,
   onExecuteSafeTransaction,
 }: MetaAllocatorTransaction) => {
+  const { selectedMetaAllocator } = useAccount();
   const { connector } = useAccountWagmi();
   const { autoSwitchChain } = useSwitchChain();
   const client = useFilecoinPublicClient();
@@ -140,7 +141,7 @@ export const useMetaAllocatorTransaction = ({
       autoSwitchChain();
 
       const provider = await connector?.getProvider();
-      const safeKit = await getSafeKit(provider);
+      const safeKit = await getSafeKit(provider, selectedMetaAllocator?.ethSafeAddress);
 
       try {
         const txAddress = await convertToEthAddress(address);
