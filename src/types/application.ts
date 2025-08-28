@@ -35,10 +35,15 @@ export interface Application {
 
   // GOVERNANCE REVIEW PHASE
   applicationInstructions?: {
-    method: string[];
-    timestamp: number;
+    method: string;
+    startTimestamp: number;
+    endTimestamp: number;
+    allocatedTimestamp: number;
+    status: string;
     datacap_amount: number;
-  };
+    isMDMAAllocator?: boolean;
+    isMetaAllocator?: boolean;
+  }[];
 
   // KHK APPROVAL PHASE
   rkhApprovals?: string[];

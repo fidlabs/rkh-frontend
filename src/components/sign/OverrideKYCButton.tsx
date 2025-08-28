@@ -2,7 +2,6 @@
 
 import { overrideKYC } from '@/lib/api';
 import { useEffect, useState } from 'react';
-import ScaleLoader from 'react-spinners/ScaleLoader';
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -30,6 +29,7 @@ interface OverrideKYCButtonProps {
 
 export default function OverrideKYCButton({ application }: OverrideKYCButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { account, signStateMessage } = useAccount();
   const { toast } = useToast();
@@ -42,7 +42,12 @@ export default function OverrideKYCButton({ application }: OverrideKYCButtonProp
   });
 
   const handleOpenChange = (open: boolean) => {
-    reset();
+    if (!open) {
+      reset();
+      setIsSubmitting(false);
+      setApprovalSecret('');
+      setOverrideReason('No reason given');
+    }
     setIsOpen(open);
   };
 
@@ -53,7 +58,6 @@ export default function OverrideKYCButton({ application }: OverrideKYCButtonProp
         description: `${hash}`,
         variant: 'default',
       });
-      handleOpenChange(false);
     }
 
     if (isError) {
@@ -62,24 +66,64 @@ export default function OverrideKYCButton({ application }: OverrideKYCButtonProp
         description: 'Failed to submit transaction',
         variant: 'destructive',
       });
-      handleOpenChange(false);
+      setIsSubmitting(false);
     }
-  }, [isError, isConfirming]);
+  }, [isError, isConfirming, hash, toast]);
 
   const submitOverride = async () => {
-    const signature = await signStateMessage(`KYC Override for ${application.id}`);
-    const pubKey =
-      account?.wallet?.getPubKey() || Buffer.from('0x0000000000000000000000000000000000000000');
-    const safePubKey = pubKey?.toString('base64');
+    if (!account?.address || !account?.wallet) {
+      toast({
+        title: 'Error',
+        description: 'No account or wallet available',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-    const data = {
-      reason: overrideReason || 'No reason given',
-      reviewerAddress: account?.address || '0x0000000000000000000000000000000000000000',
-      reviewerPublicKey: safePubKey,
-      signature: signature,
-    };
+    setIsSubmitting(true);
 
-    overrideKYC(application.id, data);
+    try {
+      const signature = await signStateMessage(`KYC Override for ${application.id}`);
+      const pubKey =
+        account.wallet.getPubKey() || Buffer.from('0x0000000000000000000000000000000000000000');
+      const safePubKey = pubKey?.toString('base64');
+
+      const data = {
+        reason: overrideReason || 'No reason given',
+        reviewerAddress: account.address,
+        reviewerPublicKey: safePubKey,
+        signature: signature,
+      };
+
+      const response = await overrideKYC(application.id, data);
+
+      if (response.ok) {
+        // Success - API returned 200
+        toast({
+          title: 'Success',
+          description: 'KYC override submitted successfully',
+          variant: 'default',
+        });
+        handleOpenChange(false);
+      } else {
+        // Non-200 response - treat as error
+        const errorMessage = `API request failed with status ${response.status}`;
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to submit KYC override:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to submit KYC override',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -96,11 +140,27 @@ export default function OverrideKYCButton({ application }: OverrideKYCButtonProp
         </DialogHeader>
 
         <div className="flex justify-center items-center p-8">
-          {isPending && <ScaleLoader />}
-          {isConfirming && <p>Confirming transaction...</p>}
-          {isConfirmed && <p>Transaction confirmed!</p>}
+          {isSubmitting && (
+            <div className="flex flex-col items-center space-y-4">
+              <svg
+                className="lucide lucide-loader-circle h-8 w-8 animate-spin"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              <p>Submitting KYC override...</p>
+            </div>
+          )}
 
-          {!isPending && (
+          {!isSubmitting && (
             <div className="flex justify-center flex-col gap-2">
               <Label>
                 {`Overriding KYC for ${application.name} for ${application.datacap} PiBs.`}
@@ -120,14 +180,16 @@ export default function OverrideKYCButton({ application }: OverrideKYCButtonProp
               type="text"
               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
               placeholder="Give a short reason"
+              value={overrideReason}
               onChange={e => setOverrideReason(e.target.value)}
+              disabled={isSubmitting}
             />
           </div>
         </div>
 
         <div className="flex justify-center gap-2">
-          <Button className="w-[150px]" disabled={isPending} onClick={submitOverride}>
-            {isPending ? 'Approving...' : 'APPROVE'}
+          <Button className="w-[150px]" disabled={isSubmitting} onClick={submitOverride}>
+            {isSubmitting ? 'Submitting...' : 'APPROVE'}
           </Button>
         </div>
       </DialogContent>

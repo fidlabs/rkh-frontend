@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { useMetaAllocatorTransaction } from './useMetaAllocatorTransaction';
 
 import { createWrapper } from '@/test-utils';
+import { env } from '@/config/environment';
 
 const mocks = vi.hoisted(() => ({
   mockUseAccountWagmi: vi.fn(),
@@ -48,6 +49,12 @@ vi.mock('viem/utils', () => ({
 
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
+// Helper function to get expected chain ID based on environment
+const getExpectedChainId = () => {
+  // chains[0] = mainnet (314), chains[1] = testnet (31415926)
+  return env.useTestnet ? 31415926 : 314;
+};
+
 describe('useMetaAllocatorTransaction', () => {
   const mockConnector = {
     getProvider: vi.fn(),
@@ -80,7 +87,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     mocks.mockUseSwitchChain.mockReturnValue({
-      chains: [{ id: 314 }],
+      chains: [{ id: 314 }, { id: 31415926 }], // Provide both mainnet and testnet chains
       switchChain: mockSwitchChain,
     });
 
@@ -159,7 +166,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
     expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
@@ -481,7 +488,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     expect(mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
     expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(mockProvider);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),

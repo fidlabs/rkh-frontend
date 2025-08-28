@@ -60,6 +60,11 @@ describe('ApproveGovernanceReviewButton', () => {
       account: fixtureAccount,
       signStateMessage: mocks.mockSignStateMessage.mockResolvedValue('test-signature'),
     });
+
+    // Mock useToast to return a toast function
+    mocks.mockUseToast.mockReturnValue({
+      toast: mocks.mockToast,
+    });
   });
 
   it('should render approve button', () => {
