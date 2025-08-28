@@ -12,3 +12,9 @@ export interface MaAddressesResponse {
   message: string;
   status: string;
 }
+
+export enum MetaAllocatorName {
+  MDMA = 'MDMA',
+  ORMA = 'ORMA',
+  AMA = 'AMA',
+}

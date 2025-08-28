@@ -67,6 +67,8 @@ describe('table.utils', () => {
       ${RefreshStatus.PENDING}      | ${MetapathwayType.MDMA} | ${true}  | ${'MDMA pending refresh'}
       ${RefreshStatus.PENDING}      | ${MetapathwayType.RKH}  | ${false} | ${'non-MDMA refresh'}
       ${RefreshStatus.DC_ALLOCATED} | ${MetapathwayType.MDMA} | ${false} | ${'non-pending MDMA refresh'}
+      ${RefreshStatus.PENDING}      | ${MetapathwayType.ORMA} | ${true}  | ${'ORMA pending refresh'}
+      ${RefreshStatus.PENDING}      | ${MetapathwayType.AMA}  | ${true}  | ${'AMA pending refresh'}
       ${RefreshStatus.PENDING}      | ${undefined}            | ${false} | ${'undefined metapathwayType'}
       ${undefined}                  | ${MetapathwayType.MDMA} | ${false} | ${'undefined refreshStatus'}
       ${undefined}                  | ${undefined}            | ${false} | ${'undefined statuses'}

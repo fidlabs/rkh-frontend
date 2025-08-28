@@ -1,3 +1,5 @@
+import { MetaAllocatorName } from './ma';
+
 export enum RefreshStatus {
   PENDING = 'PENDING',
   DC_ALLOCATED = 'DC_ALLOCATED',
@@ -6,7 +8,9 @@ export enum RefreshStatus {
 }
 
 export enum MetapathwayType {
-  MDMA = 'MDMA',
+  MDMA = MetaAllocatorName.MDMA,
+  ORMA = MetaAllocatorName.ORMA,
+  AMA = MetaAllocatorName.AMA,
   RKH = 'RKH',
 }
 
