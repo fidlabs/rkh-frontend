@@ -97,7 +97,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     mocks.mockUseSwitchChain.mockReturnValue({
-      chains: [{ id: 314 }, { id: 31415926 }]
+      chains: [{ id: 314 }, { id: 31415926 }],
       switchChain: mocks.mockSwitchChain,
     });
 
