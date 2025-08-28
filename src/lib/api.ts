@@ -127,7 +127,7 @@ export async function fetchRole(address: string): Promise<AccountRole> {
 
 /* Note: This function is the one that allows a Governance Team member to override
  * KYC and approve an application, NOT the webhook for the formal KYC app */
-export async function overrideKYC(id: string, payload: any) {
+export async function overrideKYC(id: string, payload: any): Promise<Response> {
   const url = `${API_BASE_URL}/applications/${id}/approveKYC`;
 
   try {
@@ -138,16 +138,16 @@ export async function overrideKYC(id: string, payload: any) {
       },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+
+    // Return the response object so the caller can check status
+    return response;
   } catch (error) {
     console.error('Failed to approve KYC:', error);
     throw new Error('Failed to approve KYC');
   }
 }
 
-export async function governanceReview(id: string, payload: any): Promise<void> {
+export async function governanceReview(id: string, payload: any): Promise<Response> {
   const url = `${API_BASE_URL}/applications/${id}/approveGovernanceReview`;
 
   try {
@@ -158,9 +158,9 @@ export async function governanceReview(id: string, payload: any): Promise<void> 
       },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+
+    // Return the response object so the caller can check status
+    return response;
   } catch (error) {
     console.error('Failed to submit Governance Review:', error);
     throw new Error('Failed to submit Governance Review');

@@ -45,8 +45,19 @@ export const useGovernanceReview = ({
         };
 
         onReviewPending?.();
-        await governanceReview(id, reviewData);
-        onSuccess?.();
+
+        // Make the API call and handle the response
+        const response = await governanceReview(id, reviewData);
+
+        // Check if the response was successful
+        if (response.ok) {
+          // Success - API returned 200
+          onSuccess?.();
+        } else {
+          // Non-200 response - treat as error
+          const errorMessage = `API request failed with status ${response.status}`;
+          throw new Error(errorMessage);
+        }
       } catch (error) {
         onError?.(error as Error);
         throw error;

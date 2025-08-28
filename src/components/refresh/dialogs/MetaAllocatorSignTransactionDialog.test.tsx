@@ -87,7 +87,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
     });
 
     mocks.mockUseSwitchChain.mockReturnValue({
-      chains: [{ id: 314 }],
+      chains: [{ id: 314 }, { id: 31415926 }], // Provide both mainnet and testnet chains
       switchChain: mocks.mockSwitchChain,
     });
 

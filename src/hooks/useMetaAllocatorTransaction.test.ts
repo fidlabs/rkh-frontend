@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { useMetaAllocatorTransaction } from './useMetaAllocatorTransaction';
 
 import { createWrapper } from '@/test-utils';
+import { env } from '@/config/environment';
 
 const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
@@ -71,6 +72,12 @@ vi.mock('viem/utils', () => ({
 
 const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
+// Helper function to get expected chain ID based on environment
+const getExpectedChainId = () => {
+  // chains[0] = mainnet (314), chains[1] = testnet (31415926)
+  return env.useTestnet ? 31415926 : 314;
+};
+
 describe('useMetaAllocatorTransaction', () => {
   const fixtureProvider = {};
   const fixtureSafeAddress = '0x1234567890123456789012345678901234567890';
@@ -90,7 +97,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     mocks.mockUseSwitchChain.mockReturnValue({
-      chains: [{ id: 314 }],
+      chains: [{ id: 314 }, { id: 31415926 }]
       switchChain: mocks.mockSwitchChain,
     });
 
@@ -169,7 +176,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     expect(mocks.mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mocks.mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mocks.mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
     expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(fixtureProvider, fixtureSafeAddress);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),
@@ -491,7 +498,7 @@ describe('useMetaAllocatorTransaction', () => {
     });
 
     expect(mocks.mockOnSubmitSafeTransaction).toHaveBeenCalledTimes(1);
-    expect(mocks.mockSwitchChain).toHaveBeenCalledWith({ chainId: 314 });
+    expect(mocks.mockSwitchChain).toHaveBeenCalledWith({ chainId: getExpectedChainId() });
     expect(mocks.mockGetSafeKit).toHaveBeenCalledWith(fixtureProvider, fixtureSafeAddress);
     expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
       abi: expect.any(Array),

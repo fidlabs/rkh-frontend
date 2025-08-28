@@ -48,7 +48,11 @@ describe('useGovernanceReview', () => {
       account: fixtureAccount,
     });
 
-    mocks.mockGovernanceReview.mockResolvedValue(undefined);
+    // Mock governanceReview to return a proper Response object
+    mocks.mockGovernanceReview.mockResolvedValue({
+      ok: true,
+      status: 200,
+    });
   });
 
   it('should call callbacks after mutateAsync is called', async () => {
