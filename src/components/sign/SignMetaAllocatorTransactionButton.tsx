@@ -64,7 +64,7 @@ export default function SignMetaAllocatorTransactionButton({
   application,
 }: SignMetaAllocatorTransactionButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { account } = useAccount();
+  const { account, selectedMetaAllocator } = useAccount();
   const { toast } = useToast();
   const { connector } = useAccountWagmi();
   const client = useFilecoinPublicClient();
@@ -118,7 +118,7 @@ export default function SignMetaAllocatorTransactionButton({
   const submitSafeTransaction = async () => {
     autoSwitchChain();
     const provider = await connector?.getProvider();
-    const safeKit = await getSafeKit(provider);
+    const safeKit = await getSafeKit(provider, selectedMetaAllocator?.ethSafeAddress);
 
     let txAddress = application.address;
 

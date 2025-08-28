@@ -5,6 +5,7 @@ import { MetaAllocatorSignTransactionDialog } from './MetaAllocatorSignTransacti
 import { createWrapper } from '@/test-utils';
 
 const mocks = vi.hoisted(() => ({
+  mockUseAccount: vi.fn(),
   mockUseAccountWagmi: vi.fn(),
   mockUseSwitchChain: vi.fn(),
   mockUseFilecoinPublicClient: vi.fn(),
@@ -34,6 +35,10 @@ const mocks = vi.hoisted(() => ({
     },
     transactionSerialize: vi.fn(() => 'mock-serialized-transaction'),
   },
+}));
+
+vi.mock('@/hooks/useAccount', () => ({
+  useAccount: mocks.mockUseAccount,
 }));
 
 vi.mock('@zondax/filecoin-signing-tools/js', () => mocks.mockSigningTools);
@@ -70,6 +75,12 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    mocks.mockUseAccount.mockReturnValue({
+      selectedMetaAllocator: {
+        ethSafeAddress: '0x1234567890123456789012345678901234567890',
+      },
+    });
 
     mocks.mockUseAccountWagmi.mockReturnValue({
       connector: mocks.mockConnector,
