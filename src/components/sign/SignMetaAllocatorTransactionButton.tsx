@@ -159,7 +159,7 @@ export default function SignMetaAllocatorTransactionButton({
     });
 
     const safeTransactionData: MetaTransactionData = {
-      to: env.metaAllocatorContractAddress as `0x${string}`,
+      to: selectedMetaAllocator?.ethAddress as `0x${string}`,
       value: '0',
       data: data,
       operation: OperationType.Call,
