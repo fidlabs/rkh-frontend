@@ -97,4 +97,25 @@ describe('LedgerConnectionScreen', () => {
       variant: 'destructive',
     });
   });
+
+  it('should display role checking loading state when account is selected', async () => {
+    const user = userEvent.setup();
+    render(<LedgerConnectionScreen onConnect={mocks.mockOnConnect} onError={mocks.mockOnError} />);
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Select Ledger Account' })).toBeInTheDocument(),
+    );
+
+    // Mock the connect function to simulate role checking delay
+    mocks.mockOnConnect.mockImplementation(() => new Promise(() => {}));
+
+    const connectButton = screen.getByRole('button', { name: 'Connect to 0x123' });
+    await user.click(connectButton);
+
+    // Should show role checking loading state
+    expect(screen.getByText('Checking account role...')).toBeInTheDocument();
+    expect(
+      screen.getByText('This may take a few seconds while we verify your permissions'),
+    ).toBeInTheDocument();
+  });
 });
