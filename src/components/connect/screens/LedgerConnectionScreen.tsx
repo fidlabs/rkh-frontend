@@ -20,6 +20,7 @@ interface LedgerConnectionScreenProps {
 
 export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionScreenProps) => {
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isCheckingRole, setIsCheckingRole] = useState(false);
   const [ledgerAccounts, setLedgerAccounts] = useState<LedgerAccount[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -63,6 +64,7 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
   };
 
   const handleLedgerAccountSelect = async (selectedAccount: LedgerAccount) => {
+    setIsCheckingRole(true);
     try {
       await connect('ledger', selectedAccount.index);
     } catch (error) {
@@ -73,6 +75,8 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
         variant: 'destructive',
       });
       onError();
+    } finally {
+      setIsCheckingRole(false);
     }
   };
 
@@ -86,6 +90,18 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
       <div className="flex flex-col items-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin" />
         <p>Connecting to Ledger...</p>
+      </div>
+    );
+  }
+
+  if (isCheckingRole) {
+    return (
+      <div className="flex flex-col items-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p>Checking account role...</p>
+        <p className="text-sm text-gray-500 text-center">
+          This may take a few seconds while we verify your permissions
+        </p>
       </div>
     );
   }
@@ -118,6 +134,7 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
               size="sm"
               aria-label={`Connect to ${account.address}`}
               onClick={() => handleLedgerAccountSelect(account)}
+              disabled={isCheckingRole}
             >
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -127,7 +144,7 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
       <div className="flex justify-between mt-4">
         <Button
           onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-          disabled={currentPage === 0}
+          disabled={currentPage === 0 || isCheckingRole}
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
           Previous
@@ -138,7 +155,7 @@ export const LedgerConnectionScreen = ({ onConnect, onError }: LedgerConnectionS
               Math.min(Math.ceil(ledgerAccounts.length / accountsPerPage) - 1, prev + 1),
             )
           }
-          disabled={(currentPage + 1) * accountsPerPage >= ledgerAccounts.length}
+          disabled={(currentPage + 1) * accountsPerPage >= ledgerAccounts.length || isCheckingRole}
         >
           Next
           <ChevronRight className="h-4 w-4 ml-2" />
