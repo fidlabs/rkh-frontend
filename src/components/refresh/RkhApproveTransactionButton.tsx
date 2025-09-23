@@ -19,7 +19,7 @@ export function RkhApproveTransactionButton({
 
   return (
     <>
-      <Button onClick={() => setIsDialogOpen(true)}>
+      <Button className="w-[150px]" onClick={() => setIsDialogOpen(true)}>
         <span className="sm:whitespace-nowrap">RKH Approve</span>
       </Button>
       <RkhApproveTransactionDialog

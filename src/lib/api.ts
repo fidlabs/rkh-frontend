@@ -1,12 +1,21 @@
 import { env, testApplications } from '@/config/environment';
 import { AccountRole } from '@/types/account';
 import { ApplicationsResponse } from '@/types/application';
+import { SignatureType } from '@/types/governance-review';
 import { MaAddressesResponse } from '@/types/ma';
 
 /**
  * API base URL for fetching applications.
  */
 const API_BASE_URL = env.apiBaseUrl;
+const approveGovernanceReviewUrlFactory = {
+  [SignatureType.ApproveGovernanceReview]: (id: string) =>
+    `${API_BASE_URL}/applications/${id}/approveGovernanceReview`,
+  [SignatureType.RefreshReview]: (id: string) => `${API_BASE_URL}/refreshes/${id}/review`,
+  [SignatureType.KycOverride]: (id: string) =>
+    `${API_BASE_URL}/applications/${id}/approveKycOverride`,
+  [SignatureType.KycRevoke]: (id: string) => `${API_BASE_URL}/applications/${id}/approveKycRevoke`,
+};
 
 /**
  * Fetches applications based on search criteria and pagination.
@@ -147,8 +156,12 @@ export async function overrideKYC(id: string, payload: any): Promise<Response> {
   }
 }
 
-export async function governanceReview(id: string, payload: any): Promise<Response> {
-  const url = `${API_BASE_URL}/applications/${id}/approveGovernanceReview`;
+export async function governanceReview(
+  signatureType: SignatureType,
+  id: string,
+  payload: any,
+): Promise<Response> {
+  const url = approveGovernanceReviewUrlFactory[signatureType](id);
 
   try {
     const response = await fetch(url, {

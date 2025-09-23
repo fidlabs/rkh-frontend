@@ -37,7 +37,7 @@ export const testNetSafeContracts: SafeContractAddresses = {
 const environments: { [key: string]: Environment } = {
   development: {
     apiBaseUrl: 'http://localhost:3001/api/v1',
-    useTestData: false,
+    useTestData: true,
     testNetChainId: 31415926,
     useTestnet: true,
     rpcUrl: 'http://localhost:3001/api/v1/rpc',
@@ -67,7 +67,7 @@ const environments: { [key: string]: Environment } = {
   },
 };
 
-const currentEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'production';
+const currentEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'development';
 console.log(`Current environment: ${currentEnv}`);
 
 export const env: Environment = environments[currentEnv];

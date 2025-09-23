@@ -9,31 +9,37 @@ import { AccountRole } from '@/types/account';
 import { useAccount } from '@/hooks';
 import {
   isAllocated,
+  isWaitingForGovernanceReview,
   isWaitingForMAApprove,
   isWaitingForRkhApprove,
   isWaitingForRkhSign,
 } from './table.utils';
 
+import { RefreshGovernanceReviewButton } from '@/components/governance-review/RefreshGovernanceReviewButton';
+
 export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
   const { account, selectedMetaAllocator } = useAccount();
 
+  const { role } = account || { role: AccountRole.ADMIN };
+
   switch (true) {
-    case isAllocated(row):
-      return (
-        <Link
-          variant="filled"
-          href={createFilfoxMessageUrl(row.original.transactionCid!)}
-          target="_blank"
-        >
-          View on Filfox
-        </Link>
-      );
-    case (account?.role === AccountRole.ROOT_KEY_HOLDER ||
-      account?.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
+    case (role === AccountRole.GOVERNANCE_TEAM || role === AccountRole.ADMIN) &&
+      isWaitingForGovernanceReview(row):
+      return <RefreshGovernanceReviewButton refresh={row.original} />;
+    case (role === AccountRole.ROOT_KEY_HOLDER ||
+      role === AccountRole.INDIRECT_ROOT_KEY_HOLDER ||
+      role === AccountRole.ADMIN) &&
       isWaitingForRkhSign(row):
-      return <RkhSignTransactionButton address={row.original.msigAddress} />;
-    case (account?.role === AccountRole.ROOT_KEY_HOLDER ||
-      account?.role === AccountRole.INDIRECT_ROOT_KEY_HOLDER) &&
+      return (
+        <RkhSignTransactionButton
+          dataCap={row.original.dataCap}
+          address={row.original.msigAddress}
+        />
+      );
+
+    case (role === AccountRole.ROOT_KEY_HOLDER ||
+      role === AccountRole.INDIRECT_ROOT_KEY_HOLDER ||
+      role === AccountRole.ADMIN) &&
       isWaitingForRkhApprove(row):
       return (
         <RkhApproveTransactionButton
@@ -43,16 +49,27 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
           fromAccount={row.original.rkhPhase?.approvals?.at(0) as string}
         />
       );
-    case account?.role === AccountRole.METADATA_ALLOCATOR &&
-      isWaitingForMAApprove(row) &&
-      selectedMetaAllocator?.ethAddress === row.original.maAddress:
+    case (role === AccountRole.METADATA_ALLOCATOR || role === AccountRole.ADMIN) &&
+      isWaitingForMAApprove(row):
+      //  &&      selectedMetaAllocator?.ethAddress === row.original.maAddress:
       return (
         <MetaAllocatorSignTransactionButton
+          dataCap={row.original.dataCap}
           address={row.original.msigAddress}
           maAddress={row.original.maAddress}
         />
       );
-
+    case isAllocated(row):
+      return (
+        <Link
+          className="w-[150px]"
+          variant="filled"
+          href={createFilfoxMessageUrl(row.original.transactionCid!)}
+          target="_blank"
+        >
+          View on Filfox
+        </Link>
+      );
     default:
       return null;
   }

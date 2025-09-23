@@ -9,9 +9,11 @@ import {
   DialogErrorCard,
   DialogLoadingCard,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
-import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
-import { RefreshAllocatorSuccessStep, SignTransactionFormStep } from '@/components/refresh/steps';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ApproveTransactionDetailsStep,
+  RefreshAllocatorSuccessStep,
+} from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useMetaAllocatorTransaction } from '@/hooks';
 
@@ -19,6 +21,7 @@ interface MetaAllocatorSignTransactionDialogProps {
   open: boolean;
   address: string;
   maAddress: `0x${string}`;
+  dataCap: number;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -27,6 +30,7 @@ export function MetaAllocatorSignTransactionDialog({
   open,
   address,
   maAddress,
+  dataCap,
 }: MetaAllocatorSignTransactionDialogProps) {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
@@ -63,14 +67,18 @@ export function MetaAllocatorSignTransactionDialog({
     },
   });
 
-  const onSubmit = async ({ dataCap }: FormFields) =>
-    submitSafeTransaction({ address, datacap: dataCap, metaAllocatorContractAddress: maAddress });
+  const onSubmit = useCallback(
+    async () =>
+      submitSafeTransaction({ address, datacap: dataCap, metaAllocatorContractAddress: maAddress }),
+    [address, submitSafeTransaction, dataCap, maAddress],
+  );
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
-      <SignTransactionFormStep
+      <ApproveTransactionDetailsStep
         toAddress={address}
         fromAddress={maAddress}
+        dataCap={dataCap}
         onSubmit={onSubmit}
         onCancel={() => onOpenChange(false)}
       />
