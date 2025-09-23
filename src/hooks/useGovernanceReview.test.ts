@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { useGovernanceReview } from './useGovernanceReview';
 import { GovernanceReviewFormValues } from '@/components/governance-review/GovernanceReviewForm';
 import { createWrapper } from '@/test-utils/query-client';
+import { SignatureType } from '@/types/governance-review';
 
 const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
@@ -59,6 +60,7 @@ describe('useGovernanceReview', () => {
     const { result } = renderHook(
       () =>
         useGovernanceReview({
+          signatureType: SignatureType.ApproveGovernanceReview,
           onSignaturePending: mocks.mockOnSignaturePending,
           onReviewPending: mocks.mockOnReviewPending,
           onSuccess: mocks.mockOnSuccess,
@@ -78,6 +80,7 @@ describe('useGovernanceReview', () => {
     const { result } = renderHook(
       () =>
         useGovernanceReview({
+          signatureType: SignatureType.ApproveGovernanceReview,
           onSignaturePending: mocks.mockOnSignaturePending,
           onReviewPending: mocks.mockOnReviewPending,
           onSuccess: mocks.mockOnSuccess,
@@ -91,18 +94,22 @@ describe('useGovernanceReview', () => {
     expect(mocks.mockSignStateMessage).toHaveBeenCalledWith(
       `Governance approve test-app-123 100 ${fixtureFormData.allocatorType}`,
     );
-    expect(mocks.mockGovernanceReview).toHaveBeenCalledWith('test-app-123', {
-      result: 'approve',
-      details: {
-        finalDataCap: fixtureFormData.dataCap,
-        allocatorType: fixtureFormData.allocatorType,
-        isMDMAAllocator: fixtureFormData.isMDMAAllocatorChecked,
-        reason: fixtureFormData.reason,
-        reviewerAddress: fixtureAccount.address,
-        reviewerPublicKey: fixtureAccount.wallet.getPubKey(),
+    expect(mocks.mockGovernanceReview).toHaveBeenCalledWith(
+      SignatureType.ApproveGovernanceReview,
+      'test-app-123',
+      {
+        result: 'approve',
+        details: {
+          finalDataCap: fixtureFormData.dataCap,
+          allocatorType: fixtureFormData.allocatorType,
+          isMDMAAllocator: fixtureFormData.isMDMAAllocatorChecked,
+          reason: fixtureFormData.reason,
+          reviewerAddress: fixtureAccount.address,
+          reviewerPublicKey: fixtureAccount.wallet.getPubKey(),
+        },
+        signature: 'test-signature',
       },
-      signature: 'test-signature',
-    });
+    );
   });
 
   it('should handle errors correctly', async () => {
@@ -112,6 +119,7 @@ describe('useGovernanceReview', () => {
     const { result } = renderHook(
       () =>
         useGovernanceReview({
+          signatureType: SignatureType.ApproveGovernanceReview,
           onSignaturePending: mocks.mockOnSignaturePending,
           onReviewPending: mocks.mockOnReviewPending,
           onSuccess: mocks.mockOnSuccess,

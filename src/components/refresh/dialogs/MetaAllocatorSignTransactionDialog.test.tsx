@@ -68,6 +68,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
   const wrapper = createWrapper();
   const mockProps = {
     open: true,
+    dataCap: 1000,
     address: '0x1234567890123456789012345678901234567890',
     maAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
     onOpenChange: vi.fn(),
@@ -130,9 +131,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
-
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       const successHeader = await screen.findByTestId('success-header');
@@ -149,7 +148,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       const successHeader = await screen.findByTestId('success-header');
@@ -172,7 +171,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -187,7 +186,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -201,7 +200,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -212,14 +211,14 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
 
       await user.click(screen.getByRole('button', { name: /go back/i }));
 
-      expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
     });
 
     it('should close dialog from error step', async () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -241,7 +240,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
 
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
@@ -263,7 +262,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...propsWithFilecoinAddress} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
@@ -280,7 +279,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
@@ -298,7 +297,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
@@ -311,6 +310,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
 
   describe('Dialog state management', () => {
     it('should reset state when dialog opens', async () => {
+      const user = userEvent.setup();
       const { rerender } = render(
         <MetaAllocatorSignTransactionDialog {...mockProps} open={false} />,
         { wrapper },
@@ -320,8 +320,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
 
       rerender(<MetaAllocatorSignTransactionDialog {...mockProps} open={true} />);
 
-      const user = userEvent.setup();
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -331,7 +330,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       rerender(<MetaAllocatorSignTransactionDialog {...mockProps} open={false} />);
       rerender(<MetaAllocatorSignTransactionDialog {...mockProps} open={true} />);
 
-      expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
     });
 
@@ -339,14 +338,14 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '500');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
         expect(mocks.mockEncodeFunctionData).toHaveBeenCalledWith({
           abi: expect.any(Array),
           functionName: 'addAllowance',
-          args: [mockProps.address, BigInt(500 * 1_125_899_906_842_624)],
+          args: [mockProps.address, BigInt(1000 * 1_125_899_906_842_624)],
         });
       });
     });
@@ -368,7 +367,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...propsWithFilecoinAddress} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       const successHeader = await screen.findByTestId('success-header');
@@ -396,7 +395,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<MetaAllocatorSignTransactionDialog {...propsWithFilecoinContract} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       const successHeader = await screen.findByTestId('success-header');

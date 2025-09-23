@@ -17,12 +17,13 @@ describe('table.utils', () => {
   describe('isWaitingForRkhSign', () => {
     it.each`
       refreshStatus                  | metapathwayType         | expected | description
-      ${RefreshStatus.PENDING}       | ${MetapathwayType.RKH}  | ${true}  | ${'RKH pending refresh'}
-      ${RefreshStatus.PENDING}       | ${MetapathwayType.MDMA} | ${false} | ${'non-RKH refresh'}
+      ${RefreshStatus.APPROVED}      | ${MetapathwayType.RKH}  | ${true}  | ${'RKH pending refresh'}
+      ${RefreshStatus.APPROVED}      | ${MetapathwayType.MDMA} | ${false} | ${'non-RKH refresh'}
       ${RefreshStatus.SIGNED_BY_RKH} | ${MetapathwayType.RKH}  | ${false} | ${'non-pending RKH refresh'}
-      ${RefreshStatus.PENDING}       | ${undefined}            | ${false} | ${'null metapathwayType'}
+      ${RefreshStatus.APPROVED}      | ${undefined}            | ${false} | ${'null metapathwayType'}
       ${undefined}                   | ${MetapathwayType.RKH}  | ${false} | ${'undefined refreshStatus'}
       ${undefined}                   | ${undefined}            | ${false} | ${'undefined statuses'}
+      ${RefreshStatus.PENDING}       | ${MetapathwayType.RKH}  | ${false} | ${'non-APPROVED refresh'}
     `(
       'should return $expected for $description',
       ({ refreshStatus, metapathwayType, expected }) => {
@@ -64,14 +65,15 @@ describe('table.utils', () => {
   describe('isWaitingForMAApprove', () => {
     it.each`
       refreshStatus                 | metapathwayType         | expected | description
-      ${RefreshStatus.PENDING}      | ${MetapathwayType.MDMA} | ${true}  | ${'MDMA pending refresh'}
-      ${RefreshStatus.PENDING}      | ${MetapathwayType.RKH}  | ${false} | ${'non-MDMA refresh'}
+      ${RefreshStatus.APPROVED}     | ${MetapathwayType.MDMA} | ${true}  | ${'MDMA pending refresh'}
+      ${RefreshStatus.APPROVED}     | ${MetapathwayType.RKH}  | ${false} | ${'non-MDMA refresh'}
       ${RefreshStatus.DC_ALLOCATED} | ${MetapathwayType.MDMA} | ${false} | ${'non-pending MDMA refresh'}
-      ${RefreshStatus.PENDING}      | ${MetapathwayType.ORMA} | ${true}  | ${'ORMA pending refresh'}
-      ${RefreshStatus.PENDING}      | ${MetapathwayType.AMA}  | ${true}  | ${'AMA pending refresh'}
-      ${RefreshStatus.PENDING}      | ${undefined}            | ${false} | ${'undefined metapathwayType'}
+      ${RefreshStatus.APPROVED}     | ${MetapathwayType.ORMA} | ${true}  | ${'ORMA pending refresh'}
+      ${RefreshStatus.APPROVED}     | ${MetapathwayType.AMA}  | ${true}  | ${'AMA pending refresh'}
+      ${RefreshStatus.APPROVED}     | ${undefined}            | ${false} | ${'undefined metapathwayType'}
       ${undefined}                  | ${MetapathwayType.MDMA} | ${false} | ${'undefined refreshStatus'}
       ${undefined}                  | ${undefined}            | ${false} | ${'undefined statuses'}
+      ${RefreshStatus.PENDING}      | ${MetapathwayType.MDMA} | ${false} | ${'non-APPROVED refresh'}
     `(
       'should return $expected for $description',
       ({ refreshStatus, metapathwayType, expected }) => {

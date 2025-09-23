@@ -42,6 +42,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
   const mockProps = {
     open: true,
     address: 'f1234567890abcdef',
+    dataCap: 1000,
     onOpenChange: vi.fn(),
   };
   const mockStateWaitResponse: ApiStateWaitMsgResponse = {
@@ -84,10 +85,11 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
     expect(dialog).toHaveTextContent('Signing a RKH transaction to refresh DataCap');
   });
 
-  it('should display toAddress in form step', () => {
+  it('should display all details in form step', () => {
     render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
     expect(screen.getByTestId('to-address')).toHaveTextContent('To:f1234567890abcdef');
+    expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
   });
 
   describe('Success flow', () => {
@@ -100,12 +102,9 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-      expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
-
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
-      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(mockProps.address, '1000');
+      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(mockProps.address, 1000);
 
       const successHeader = await screen.findByTestId('success-header');
       expect(successHeader).toHaveTextContent('Success!');
@@ -121,7 +120,6 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       const successHeader = await screen.findByTestId('success-header');
@@ -142,7 +140,6 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -154,7 +151,6 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -163,7 +159,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
       await user.click(screen.getByRole('button', { name: /go back/i }));
 
-      expect(screen.getByRole('textbox', { name: /datacap/i })).toBeInTheDocument();
+      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
       expect(screen.getByTestId('to-address')).toHaveTextContent('To:f1234567890abcdef');
     });
   });
@@ -180,7 +176,6 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
@@ -196,7 +191,6 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
-      await user.type(screen.getByRole('textbox', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
