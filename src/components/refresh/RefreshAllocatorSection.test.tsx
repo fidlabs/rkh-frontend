@@ -6,16 +6,6 @@ import { createWrapper } from '@/test-utils';
 
 const mocks = vi.hoisted(() => ({
   mockProposeUseRKHTransaction: vi.fn(),
-  mockSigningTools: {
-    default: {
-      generateMnemonic: vi.fn(() => 'test mnemonic'),
-      generateKeyPair: vi.fn(() => ({
-        privateKey: 'test-private-key',
-        publicKey: 'test-public-key',
-      })),
-    },
-    transactionSerialize: vi.fn(() => 'mock-serialized-transaction'),
-  },
 }));
 
 vi.mock('@/hooks/useProposeRKHTransaction', () => ({
@@ -23,8 +13,6 @@ vi.mock('@/hooks/useProposeRKHTransaction', () => ({
     proposeTransaction: vi.fn(),
   }),
 }));
-
-vi.mock('@zondax/filecoin-signing-tools/js', () => mocks.mockSigningTools);
 
 describe('RefreshAllocatorSection', () => {
   const wrapper = createWrapper();

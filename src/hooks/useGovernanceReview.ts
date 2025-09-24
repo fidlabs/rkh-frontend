@@ -3,8 +3,11 @@ import { useAccount } from './useAccount';
 import { useCallback } from 'react';
 import { governanceReview } from '@/lib/api';
 import { GovernanceReviewFormValues } from '@/components/governance-review/GovernanceReviewForm';
+import { SignStateMessageMethodFactory } from '@/lib/factories/sign-state-message-factory';
+import { SignatureType } from '@/types/governance-review';
 
 interface UseGovernanceReviewProps {
+  signatureType: SignatureType;
   onSignaturePending?: () => void;
   onReviewPending?: () => void;
   onSuccess?: () => void;
@@ -12,6 +15,7 @@ interface UseGovernanceReviewProps {
 }
 
 export const useGovernanceReview = ({
+  signatureType,
   onSignaturePending,
   onReviewPending,
   onSuccess,
@@ -24,7 +28,12 @@ export const useGovernanceReview = ({
       try {
         onSignaturePending?.();
         const signature = await signStateMessage(
-          `Governance ${data.intent} ${id} ${data.dataCap} ${data.allocatorType}`,
+          SignStateMessageMethodFactory.create(signatureType as SignatureType)({
+            result: data.intent,
+            id,
+            finalDataCap: data.dataCap,
+            allocatorType: data.allocatorType,
+          }),
         );
 
         const pubKey =
@@ -47,7 +56,7 @@ export const useGovernanceReview = ({
         onReviewPending?.();
 
         // Make the API call and handle the response
-        const response = await governanceReview(id, reviewData);
+        const response = await governanceReview(signatureType, id, reviewData);
 
         // Check if the response was successful
         if (response.ok) {
@@ -71,6 +80,7 @@ export const useGovernanceReview = ({
       onReviewPending,
       onSuccess,
       onError,
+      signatureType,
     ],
   );
 

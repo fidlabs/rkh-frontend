@@ -8,6 +8,7 @@ interface RefreshStatusBadgeProps {
 }
 
 const phaseColors: Record<RefreshStatus, string> = {
+  APPROVED: 'bg-blue-600',
   DC_ALLOCATED: 'bg-green-600',
   PENDING: 'bg-gray-600',
   SIGNED_BY_RKH: 'bg-orange-600',
@@ -15,6 +16,7 @@ const phaseColors: Record<RefreshStatus, string> = {
 };
 
 const phaseNames: Record<RefreshStatus, string> = {
+  APPROVED: 'Approved',
   DC_ALLOCATED: 'DC Allocated',
   PENDING: 'Pending',
   SIGNED_BY_RKH: 'Signed by RKH',

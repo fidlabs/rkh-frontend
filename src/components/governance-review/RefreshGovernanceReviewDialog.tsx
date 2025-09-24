@@ -12,15 +12,16 @@ import {
   DialogSuccessCard,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Application } from '@/types/application';
-import { GovernanceReviewForm, GovernanceReviewFormValues } from './GovernanceReviewForm';
+import { Refresh } from '@/types/refresh';
+import { RefreshGovernanceReviewFormValues } from './RefreshGovernanceReviewForm';
 import { withFormProvider } from '@/lib/hocs/withFormProvider';
 import { useGovernanceReview } from '@/hooks/useGovernanceReview';
 import { useToast } from '@/components/ui/use-toast';
+import { RefreshGovernanceReviewForm } from './RefreshGovernanceReviewForm';
 import { SignatureType } from '@/types/governance-review';
 
 interface ApproveGovernanceReviewDialogProps {
-  application: Application;
+  refresh: Refresh;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -32,8 +33,8 @@ enum GovApproveSteps {
   ERROR = 'ERROR',
 }
 
-const ApproveGovernanceReviewDialog = ({
-  application,
+const RefreshGovernanceReviewDialog = ({
+  refresh,
   open,
   onOpenChange,
 }: ApproveGovernanceReviewDialogProps) => {
@@ -43,7 +44,7 @@ const ApproveGovernanceReviewDialog = ({
   const { toast } = useToast();
 
   const { mutateAsync: governanceReview, reset } = useGovernanceReview({
-    signatureType: SignatureType.ApproveGovernanceReview,
+    signatureType: SignatureType.RefreshReview,
     onSignaturePending: () => {
       setStep(GovApproveSteps.LOADING);
       setLoadingMessage('Signing message, please check your Ledger...');
@@ -54,21 +55,17 @@ const ApproveGovernanceReviewDialog = ({
     },
     onSuccess: () => {
       setStep(GovApproveSteps.SUCCESS);
-      // Show success toast
+
       toast({
         title: 'Success',
         description: 'Governance review submitted successfully!',
         variant: 'default',
       });
-      // Auto-close dialog after a short delay
-      setTimeout(() => {
-        onOpenChange(false);
-      }, 1500);
     },
     onError: error => {
       setStep(GovApproveSteps.ERROR);
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
-      // Show error toast
+
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to submit governance review',
@@ -76,6 +73,20 @@ const ApproveGovernanceReviewDialog = ({
       });
     },
   });
+
+  const handleCloseWithDelay = useCallback(() => {
+    if (step === GovApproveSteps.SUCCESS) {
+      return setTimeout(() => {
+        onOpenChange(false);
+      }, 1500);
+    }
+  }, [onOpenChange, step]);
+
+  useEffect(() => {
+    const timeout = handleCloseWithDelay();
+
+    return () => timeout && clearTimeout(timeout);
+  }, [handleCloseWithDelay]);
 
   useEffect(() => {
     if (open) {
@@ -87,13 +98,22 @@ const ApproveGovernanceReviewDialog = ({
   }, [open, reset]);
 
   const submitReview = useCallback(
-    (data: GovernanceReviewFormValues) => governanceReview({ id: application.id, payload: data }),
-    [governanceReview, application.id],
+    (data: RefreshGovernanceReviewFormValues) =>
+      governanceReview({
+        id: refresh.githubIssueId.toString(),
+        payload: {
+          ...data,
+          allocatorType: refresh.metapathwayType || '',
+          reason: '',
+          isMDMAAllocatorChecked: false,
+        },
+      }),
+    [governanceReview, refresh.githubIssueId, refresh.metapathwayType],
   );
 
   const steps: Record<GovApproveSteps, React.ReactNode> = {
     [GovApproveSteps.FORM]: (
-      <GovernanceReviewForm application={application} onSubmit={submitReview} />
+      <RefreshGovernanceReviewForm refresh={refresh} onSubmit={submitReview} />
     ),
     [GovApproveSteps.LOADING]: <DialogLoadingCard loadingMessage={loadingMessage} />,
     [GovApproveSteps.SUCCESS]: (
@@ -114,10 +134,8 @@ const ApproveGovernanceReviewDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Approve Application</DialogTitle>
-          <DialogDescription>
-            Approve Application on behalf of the Governance Team.
-          </DialogDescription>
+          <DialogTitle>Approve Refresh</DialogTitle>
+          <DialogDescription>Approve Refresh on behalf of the Governance Team.</DialogDescription>
         </DialogHeader>
         {steps[step]}
       </DialogContent>
@@ -125,4 +143,4 @@ const ApproveGovernanceReviewDialog = ({
   );
 };
 
-export default withFormProvider(ApproveGovernanceReviewDialog);
+export default withFormProvider(RefreshGovernanceReviewDialog);

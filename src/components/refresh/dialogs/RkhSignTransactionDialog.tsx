@@ -10,14 +10,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useCallback, useEffect, useState } from 'react';
-import { FormFields } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
-import { RefreshAllocatorSuccessStep, SignTransactionFormStep } from '@/components/refresh/steps';
+import {
+  ApproveTransactionDetailsStep,
+  RefreshAllocatorSuccessStep,
+} from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useProposeRKHTransaction, useStateWaitMsg } from '@/hooks';
 
 interface RkhSignTransactionDialogProps {
   open: boolean;
   address: string;
+  dataCap: number;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -25,6 +28,7 @@ export function RkhSignTransactionDialog({
   onOpenChange,
   open,
   address,
+  dataCap,
 }: RkhSignTransactionDialogProps) {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
@@ -56,11 +60,11 @@ export function RkhSignTransactionDialog({
   });
 
   const onSubmit = useCallback(
-    async ({ dataCap }: FormFields) =>
+    async () =>
       proposeTransaction({ address, datacap: dataCap }).catch(error => {
         console.error('Error proposing verifier:', error);
       }),
-    [address, proposeTransaction],
+    [address, proposeTransaction, dataCap],
   );
 
   const getBlockNumber = () => {
@@ -69,8 +73,9 @@ export function RkhSignTransactionDialog({
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
-      <SignTransactionFormStep
+      <ApproveTransactionDetailsStep
         toAddress={address}
+        dataCap={dataCap}
         onSubmit={onSubmit}
         onCancel={() => onOpenChange(false)}
       />

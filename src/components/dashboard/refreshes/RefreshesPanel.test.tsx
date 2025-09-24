@@ -12,6 +12,10 @@ const mocks = vi.hoisted(() => ({
   mockUseProposeRKHTransaction: vi.fn(),
 }));
 
+vi.mock('@/hooks/useAccount', () => ({
+  useAccount: mocks.mockUseAccount,
+}));
+
 vi.mock('@/hooks', () => ({
   useGetRefreshes: mocks.mockUseGetRefreshes,
   useAccount: mocks.mockUseAccount,
@@ -26,27 +30,48 @@ vi.mock('@/hooks', () => ({
 }));
 
 describe('RefreshesPanel', () => {
-  const mockRefresh: Refresh = {
-    githubIssueId: 1,
-    title: 'Test Refresh',
-    creator: { userId: 1, name: 'testuser' },
-    assignees: null,
-    labels: null,
-    state: 'open',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    closedAt: null,
-    jsonNumber: '1',
-    refreshStatus: RefreshStatus.PENDING,
-    dataCap: 100,
-    msigAddress: 'f1testaddress',
-    maAddress: '0xtestmaaddress' as `0x${string}`,
-    metapathwayType: MetapathwayType.RKH,
+  const createFixtureRefresh = (overrides: Partial<Refresh>) => {
+    return {
+      githubIssueId: 1,
+      title: 'Test Refresh',
+      creator: { userId: 1, name: 'testuser' },
+      assignees: null,
+      labels: null,
+      state: 'open',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      closedAt: null,
+      jsonNumber: 'rec123',
+      refreshStatus: RefreshStatus.DC_ALLOCATED,
+      dataCap: 100,
+      msigAddress: 'f1testaddress',
+      maAddress: '0xtestmaaddress' as `0x${string}`,
+      metapathwayType: MetapathwayType.RKH,
+      githubIssueNumber: 100,
+      ...overrides,
+    };
   };
 
   const mockData = {
     data: {
-      results: [mockRefresh],
+      results: [
+        createFixtureRefresh({
+          refreshStatus: RefreshStatus.APPROVED,
+          githubIssueNumber: 100,
+          jsonNumber: 'rec1',
+          title: 'Test Refresh 1',
+          creator: { userId: 1, name: 'testuser1' },
+          dataCap: 100,
+        }),
+        createFixtureRefresh({
+          refreshStatus: RefreshStatus.PENDING,
+          githubIssueNumber: 101,
+          jsonNumber: 'rec2',
+          title: 'Test Refresh 2',
+          creator: { userId: 2, name: 'testuser2' },
+          dataCap: 200,
+        }),
+      ],
       pagination: {
         totalItems: 1,
         totalPages: 1,
@@ -99,14 +124,14 @@ describe('RefreshesPanel', () => {
   it('should render table data', () => {
     render(<RefreshesPanel searchTerm="" />, { wrapper });
 
-    expect(screen.getByRole('cell', { name: '#' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: '1' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'Test Refresh' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'testuser' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '#100' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'rec1' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Test Refresh 1' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'testuser1' })).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: '100 PiB' })).toBeInTheDocument();
   });
 
-  it('should render actions for logged in user', () => {
+  it('should render actions for logged in user as ROOT_KEY_HOLDER', () => {
     mocks.mockUseAccount.mockReturnValue({
       account: { role: AccountRole.ROOT_KEY_HOLDER },
       selectedMetaAllocator: null,
@@ -114,6 +139,16 @@ describe('RefreshesPanel', () => {
     render(<RefreshesPanel searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('button', { name: 'RKH Sign' })).toBeInTheDocument();
+  });
+
+  it('should render actions for logged in user as GOVERNANCE_TEAM', () => {
+    mocks.mockUseAccount.mockReturnValue({
+      account: { role: AccountRole.GOVERNANCE_TEAM },
+      selectedMetaAllocator: null,
+    });
+    render(<RefreshesPanel searchTerm="" />, { wrapper });
+
+    expect(screen.getByRole('button', { name: 'Review' })).toBeInTheDocument();
   });
 
   it('should show loading state', () => {

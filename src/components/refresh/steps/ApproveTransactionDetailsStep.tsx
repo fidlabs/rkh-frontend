@@ -23,21 +23,21 @@ export function ApproveTransactionDetailsStep({
     <>
       <div className="pt-4 pb-6">
         {fromAddress ? (
-          <div className="flex flex-col gap-2 pb-6">
+          <div data-testid="from-address" className="flex flex-col gap-2 pb-6">
             <span>From:</span>
             <span className="text-muted-foreground break-all">{fromAddress}</span>
           </div>
         ) : null}
 
         {toAddress ? (
-          <div className="flex flex-col gap-2 pb-6">
+          <div data-testid="to-address" className="flex flex-col gap-2 pb-6">
             <span>To:</span>
             <span className="text-muted-foreground break-all">{toAddress}</span>
           </div>
         ) : null}
 
         {dataCap ? (
-          <div className="flex flex-col gap-2 pb-6">
+          <div data-testid="data-cap" className="flex flex-col gap-2 pb-6">
             <span>DataCap:</span>
             <span className="text-muted-foreground break-all">{`${dataCap} PiB`}</span>
           </div>

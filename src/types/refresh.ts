@@ -5,6 +5,7 @@ export enum RefreshStatus {
   DC_ALLOCATED = 'DC_ALLOCATED',
   REJECTED = 'REJECTED',
   SIGNED_BY_RKH = 'SIGNED_BY_RKH',
+  APPROVED = 'APPROVED',
 }
 
 export enum MetapathwayType {
@@ -14,19 +15,17 @@ export enum MetapathwayType {
   RKH = 'RKH',
 }
 
+interface User {
+  userId: number;
+  name: string;
+}
+
 export interface Refresh {
   githubIssueId: number;
+  githubIssueNumber: number;
   title: string;
-  creator: {
-    userId: number;
-    name: string;
-  };
-  assignees:
-    | {
-        userId: number;
-        name: string;
-      }[]
-    | null;
+  creator: User;
+  assignees: User[] | null;
   labels: string[] | null;
   state: string;
   createdAt: Date | null;

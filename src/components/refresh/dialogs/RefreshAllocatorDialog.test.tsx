@@ -11,19 +11,7 @@ const mocks = vi.hoisted(() => ({
   mockGetStateWaitMsg: vi.fn(),
   mockUseToast: vi.fn(),
   mockToast: vi.fn(),
-  mockSigningTools: {
-    default: {
-      generateMnemonic: vi.fn(() => 'test mnemonic'),
-      generateKeyPair: vi.fn(() => ({
-        privateKey: 'test-private-key',
-        publicKey: 'test-public-key',
-      })),
-    },
-    transactionSerialize: vi.fn(() => 'mock-serialized-transaction'),
-  },
 }));
-
-vi.mock('@zondax/filecoin-signing-tools/js', () => mocks.mockSigningTools);
 
 vi.mock('@/lib/glif-api', () => ({
   getStateWaitMsg: mocks.mockGetStateWaitMsg,

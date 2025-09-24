@@ -83,6 +83,22 @@ describe('RefreshTableActions', () => {
     });
   });
 
+  describe('when user is GOVERNANCE_TEAM', () => {
+    beforeEach(() => {
+      mocks.mockUseAccount.mockReturnValue({
+        account: { role: AccountRole.GOVERNANCE_TEAM },
+        selectedMetaAllocator: null,
+      });
+    });
+
+    it('should render governance review button when waiting for governance review', () => {
+      const row = createMockRow({
+        refreshStatus: RefreshStatus.PENDING,
+        metapathwayType: MetapathwayType.RKH,
+      });
+    });
+  });
+
   describe('when user is ROOT_KEY_HOLDER', () => {
     beforeEach(() => {
       mocks.mockUseAccount.mockReturnValue({
@@ -93,7 +109,7 @@ describe('RefreshTableActions', () => {
 
     it('should render RKH sign button when waiting for RKH sign', () => {
       const row = createMockRow({
-        refreshStatus: RefreshStatus.PENDING,
+        refreshStatus: RefreshStatus.APPROVED,
         metapathwayType: MetapathwayType.RKH,
         msigAddress: 'f1rkhaddress',
       });
@@ -149,7 +165,7 @@ describe('RefreshTableActions', () => {
 
     it('should render MA approve button when waiting for MA approve', () => {
       const row = createMockRow({
-        refreshStatus: RefreshStatus.PENDING,
+        refreshStatus: RefreshStatus.APPROVED,
         metapathwayType: MetapathwayType.MDMA,
         msigAddress: 'f1maaddress',
         maAddress: '0xmaaddress' as `0x${string}`,

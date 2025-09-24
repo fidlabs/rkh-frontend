@@ -6,6 +6,7 @@ import { RefreshStatusBadge } from '../components/RefreshStatusBadge';
 import { TableSortableHeader } from '@/components/ui/table';
 import { Link } from '@/components/ui/link';
 import { RefreshTableActions } from './refresh-table-actions';
+import { createGithubAccountUrl } from '@/lib/factories/create-github-account-url';
 
 export const refreshesTableColumns: ColumnDef<Refresh>[] = [
   {
@@ -45,7 +46,7 @@ export const refreshesTableColumns: ColumnDef<Refresh>[] = [
     cell: ({ row }) => {
       const creator = row.getValue('creator') as Refresh['creator'];
 
-      return <Link href={`https://github.com/${creator.name}`}>{creator.name}</Link>;
+      return <Link href={createGithubAccountUrl(creator.name)}>{creator.name}</Link>;
     },
   },
   {
