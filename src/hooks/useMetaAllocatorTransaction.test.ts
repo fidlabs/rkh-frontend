@@ -13,16 +13,6 @@ const mocks = vi.hoisted(() => ({
   mockGetSafeKit: vi.fn(),
   mockIsFilecoinAddress: vi.fn(),
   mockEncodeFunctionData: vi.fn(),
-  mockSigningTools: {
-    default: {
-      generateMnemonic: vi.fn(() => 'test mnemonic'),
-      generateKeyPair: vi.fn(() => ({
-        privateKey: 'test-private-key',
-        publicKey: 'test-public-key',
-      })),
-    },
-    transactionSerialize: vi.fn(() => 'mock-serialized-transaction'),
-  },
   mockOnSubmitSafeTransaction: vi.fn(),
   mockOnSubmitSafeTransactionSuccess: vi.fn(),
   mockOnSubmitSafeTransactionError: vi.fn(),
@@ -46,8 +36,6 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/hooks/useAccount', () => ({
   useAccount: mocks.mockUseAccount,
 }));
-
-vi.mock('@zondax/filecoin-signing-tools/js', () => mocks.mockSigningTools);
 
 vi.mock('wagmi', () => ({
   useAccount: mocks.mockUseAccountWagmi,
