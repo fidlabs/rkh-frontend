@@ -72,6 +72,7 @@ describe('useGetRefreshes', () => {
         useGetRefreshes({
           searchTerm: 'test',
           currentPage: 2,
+          activeFilters: [],
         }),
       { wrapper },
     );
@@ -80,7 +81,7 @@ describe('useGetRefreshes', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetRefreshes).toHaveBeenCalledWith('test', 2, 10);
+    expect(mockGetRefreshes).toHaveBeenCalledWith('test', 2, 10, []);
     expect(result.current.data).toEqual(mockData);
   });
 
@@ -93,6 +94,7 @@ describe('useGetRefreshes', () => {
         useGetRefreshes({
           searchTerm: 'test',
           currentPage: 1,
+          activeFilters: [],
         }),
       { wrapper },
     );

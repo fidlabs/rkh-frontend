@@ -15,9 +15,10 @@ import { refreshesTableColumns } from './refreshes-table-columns';
 
 interface RefreshesPanelProps {
   searchTerm: string;
+  activeFilters: string[];
 }
 
-export function RefreshesPanel({ searchTerm }: RefreshesPanelProps) {
+export function RefreshesPanel({ searchTerm, activeFilters }: RefreshesPanelProps) {
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -25,6 +26,7 @@ export function RefreshesPanel({ searchTerm }: RefreshesPanelProps) {
   const { data, isLoading, isError } = useGetRefreshes({
     searchTerm,
     currentPage: paginationState.pageIndex + 1,
+    activeFilters,
   });
 
   const totalCount = data?.data?.pagination?.totalItems || 0;

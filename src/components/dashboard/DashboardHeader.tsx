@@ -17,6 +17,10 @@ const OPTIONS: Option[] = [
   { label: 'KYC', value: 'KYC' },
   { label: 'GOVERNANCE_REVIEW', value: 'GOVERNANCE_REVIEW' },
   { label: 'RKH_APPROVAL', value: 'RKH_APPROVAL' },
+  { label: 'PENDING', value: 'PENDING' },
+  { label: 'SIGNED_BY_RKH', value: 'SIGNED_BY_RKH' },
+  { label: 'DC_ALLOCATED', value: 'DC_ALLOCATED' },
+  { label: 'REJECTED', value: 'REJECTED' },
 ];
 
 const FILTER_LABELS: Record<string, string> = {
@@ -26,7 +30,9 @@ const FILTER_LABELS: Record<string, string> = {
   META_APPROVAL_PHASE: 'Meta Approval',
   APPROVED: 'Approved',
   REJECTED: 'Rejected',
+  SIGNED_BY_RKH: 'Signed by RKH',
   DC_ALLOCATED: 'DC Allocated',
+  PENDING: 'Pending',
 };
 
 interface DashboardHeaderProps {
