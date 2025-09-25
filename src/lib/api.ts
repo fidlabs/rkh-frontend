@@ -171,7 +171,7 @@ export async function getRefreshes(
   searchTerm: string,
   page: number,
   pageLimit: number,
-  activeFilters: string[],
+  activeFilters?: string[],
 ) {
   const params = new URLSearchParams({
     page: page.toString(),
@@ -182,7 +182,7 @@ export async function getRefreshes(
     params.append('search', searchTerm);
   }
 
-  activeFilters.forEach(filter => params.append('status[]', filter));
+  activeFilters?.forEach(filter => params.append('status[]', filter));
 
   const url = `${API_BASE_URL}/refreshes?${params.toString()}`;
 

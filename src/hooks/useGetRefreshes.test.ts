@@ -36,6 +36,7 @@ describe('useGetRefreshes', () => {
         useGetRefreshes({
           searchTerm: '',
           currentPage: 1,
+          activeFilters: [],
         }),
       { wrapper },
     );

@@ -20,7 +20,7 @@ interface UseGetRefreshesResponse {
 interface UseGetRefreshesProps {
   searchTerm: string;
   currentPage: number;
-  activeFilters: string[];
+  activeFilters?: string[];
 }
 
 export function useGetRefreshes({ searchTerm, currentPage, activeFilters }: UseGetRefreshesProps) {
