@@ -5,10 +5,12 @@ import { createFilfoxMessageUrl } from '@/lib/factories/create-filfox-message-ur
 import { Refresh } from '@/types/refresh';
 import { Row } from '@tanstack/react-table';
 import { Link } from '@/components/ui/link';
-import { AccountRole } from '@/types/account';
 import { useAccount } from '@/hooks';
 import {
   isAllocated,
+  isGovernanceTeamRole,
+  isMetaAllocatorRole,
+  isRkhRole,
   isWaitingForGovernanceReview,
   isWaitingForMAApprove,
   isWaitingForRkhApprove,
@@ -20,16 +22,10 @@ import { RefreshGovernanceReviewButton } from '@/components/governance-review/Re
 export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
   const { account, selectedMetaAllocator } = useAccount();
 
-  const { role } = account || { role: AccountRole.ADMIN };
-
   switch (true) {
-    case (role === AccountRole.GOVERNANCE_TEAM || role === AccountRole.ADMIN) &&
-      isWaitingForGovernanceReview(row):
+    case isGovernanceTeamRole(account?.role) && isWaitingForGovernanceReview(row):
       return <RefreshGovernanceReviewButton refresh={row.original} />;
-    case (role === AccountRole.ROOT_KEY_HOLDER ||
-      role === AccountRole.INDIRECT_ROOT_KEY_HOLDER ||
-      role === AccountRole.ADMIN) &&
-      isWaitingForRkhSign(row):
+    case isRkhRole(account?.role) && isWaitingForRkhSign(row):
       return (
         <RkhSignTransactionButton
           dataCap={row.original.dataCap}
@@ -37,10 +33,7 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
         />
       );
 
-    case (role === AccountRole.ROOT_KEY_HOLDER ||
-      role === AccountRole.INDIRECT_ROOT_KEY_HOLDER ||
-      role === AccountRole.ADMIN) &&
-      isWaitingForRkhApprove(row):
+    case isRkhRole(account?.role) && isWaitingForRkhApprove(row):
       return (
         <RkhApproveTransactionButton
           address={row.original.msigAddress}
@@ -49,9 +42,9 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
           fromAccount={row.original.rkhPhase?.approvals?.at(0) as string}
         />
       );
-    case (role === AccountRole.METADATA_ALLOCATOR || role === AccountRole.ADMIN) &&
-      isWaitingForMAApprove(row):
-      //  &&      selectedMetaAllocator?.ethAddress === row.original.maAddress:
+    case isMetaAllocatorRole(account?.role) &&
+      isWaitingForMAApprove(row) &&
+      selectedMetaAllocator?.ethAddress === row.original.maAddress:
       return (
         <MetaAllocatorSignTransactionButton
           dataCap={row.original.dataCap}

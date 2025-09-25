@@ -100,7 +100,7 @@ const RefreshGovernanceReviewDialog = ({
   const submitReview = useCallback(
     (data: RefreshGovernanceReviewFormValues) =>
       governanceReview({
-        id: refresh.githubIssueId.toString(),
+        id: String(refresh.githubIssueNumber),
         payload: {
           ...data,
           allocatorType: refresh.metapathwayType || '',
@@ -108,7 +108,7 @@ const RefreshGovernanceReviewDialog = ({
           isMDMAAllocatorChecked: false,
         },
       }),
-    [governanceReview, refresh.githubIssueId, refresh.metapathwayType],
+    [governanceReview, refresh.githubIssueNumber, refresh.metapathwayType],
   );
 
   const steps: Record<GovApproveSteps, React.ReactNode> = {

@@ -27,7 +27,8 @@ vi.mock('@/lib/api', () => ({
 
 describe('ApproveGovernanceReviewDialog', () => {
   const fixtureRefresh: Refresh = {
-    githubIssueId: 1,
+    githubIssueId: 123,
+    githubIssueNumber: 1,
     title: 'Test Refresh',
     creator: { userId: 1, name: 'testuser' },
     assignees: null,
