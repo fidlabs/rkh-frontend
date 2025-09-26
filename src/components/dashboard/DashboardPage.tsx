@@ -17,6 +17,7 @@ import { useAccountRole } from '@/hooks';
 import { CompletedApplicationsPanel } from './completed-applications/CompletedApplicationsPanel';
 import { NewApplicationsPanel } from './new-applications/NewApplicationsPanel';
 import { RefreshesPanel } from './refreshes/RefreshesPanel';
+import { useDebounce } from '@/components/ui/multiple-selector';
 
 /**
  * DashboardPage component
@@ -111,7 +112,7 @@ export function DashboardPage() {
               <CompletedApplicationsPanel searchTerm={searchTerm} activeFilters={activeFilters} />
             </TabsContent>
             <TabsContent value={DashboardTabs.REFRESHES}>
-              <RefreshesPanel searchTerm={searchTerm} />
+              <RefreshesPanel searchTerm={searchTerm} activeFilters={activeFilters} />
             </TabsContent>
           </Suspense>
         </Tabs>

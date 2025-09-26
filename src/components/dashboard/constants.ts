@@ -13,7 +13,7 @@ export const availableFilters: Record<DashboardTabs, string[]> = {
     'META_APPROVAL_PHASE',
   ],
   [DashboardTabs.COMPLETED_APPLICATIONS]: ['DC_ALLOCATED', 'REJECTED'], // FIXME backend typo
-  [DashboardTabs.REFRESHES]: [],
+  [DashboardTabs.REFRESHES]: ['DC_ALLOCATED', 'REJECTED', 'PENDING', 'SIGNED_BY_RKH', 'APPROVED'],
 };
 
 export const PAGE_SIZE = 10;

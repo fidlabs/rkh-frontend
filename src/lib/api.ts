@@ -180,7 +180,12 @@ export async function governanceReview(
   }
 }
 
-export async function getRefreshes(searchTerm: string, page: number, pageLimit: number) {
+export async function getRefreshes(
+  searchTerm: string,
+  page: number,
+  pageLimit: number,
+  activeFilters?: string[],
+) {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: pageLimit.toString(),
@@ -189,6 +194,8 @@ export async function getRefreshes(searchTerm: string, page: number, pageLimit: 
   if (searchTerm) {
     params.append('search', searchTerm);
   }
+
+  activeFilters?.forEach(filter => params.append('status[]', filter));
 
   const url = `${API_BASE_URL}/refreshes?${params.toString()}`;
 

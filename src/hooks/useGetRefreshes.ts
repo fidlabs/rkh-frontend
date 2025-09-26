@@ -20,12 +20,13 @@ interface UseGetRefreshesResponse {
 interface UseGetRefreshesProps {
   searchTerm: string;
   currentPage: number;
+  activeFilters?: string[];
 }
 
-export function useGetRefreshes({ searchTerm, currentPage }: UseGetRefreshesProps) {
+export function useGetRefreshes({ searchTerm, currentPage, activeFilters }: UseGetRefreshesProps) {
   return useQuery<UseGetRefreshesResponse>({
-    queryKey: ['refreshes', searchTerm, currentPage],
-    queryFn: () => getRefreshes(searchTerm, currentPage, PAGE_SIZE),
+    queryKey: ['refreshes', searchTerm, currentPage, activeFilters],
+    queryFn: () => getRefreshes(searchTerm, currentPage, PAGE_SIZE, activeFilters),
     refetchInterval: 1 * 1000 * 60,
   });
 }
