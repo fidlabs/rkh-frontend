@@ -44,7 +44,7 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
       );
     case isMetaAllocatorRole(account?.role) &&
       isWaitingForMAApprove(row) &&
-      selectedMetaAllocator?.ethAddress === row.original.maAddress:
+      selectedMetaAllocator?.filAddress === row.original.maAddress:
       return (
         <MetaAllocatorSignTransactionButton
           dataCap={row.original.dataCap}

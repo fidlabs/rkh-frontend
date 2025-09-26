@@ -158,7 +158,7 @@ describe('RefreshTableActions', () => {
       mocks.mockUseAccount.mockReturnValue({
         account: { role: AccountRole.METADATA_ALLOCATOR },
         selectedMetaAllocator: {
-          ethAddress: '0xmaaddress',
+          filAddress: 'f4maaddress',
         },
       });
     });
@@ -168,7 +168,7 @@ describe('RefreshTableActions', () => {
         refreshStatus: RefreshStatus.APPROVED,
         metapathwayType: MetapathwayType.MDMA,
         msigAddress: 'f1maaddress',
-        maAddress: '0xmaaddress' as `0x${string}`,
+        maAddress: 'f4maaddress' as `0x${string}`,
       });
 
       render(<RefreshTableActions row={row} />);

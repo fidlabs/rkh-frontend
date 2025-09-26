@@ -37,7 +37,7 @@ export const testNetSafeContracts: SafeContractAddresses = {
 const environments: { [key: string]: Environment } = {
   development: {
     apiBaseUrl: 'http://localhost:3001/api/v1',
-    useTestData: true,
+    useTestData: false,
     testNetChainId: 31415926,
     useTestnet: true,
     rpcUrl: 'http://localhost:3001/api/v1/rpc',
