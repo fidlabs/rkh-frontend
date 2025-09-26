@@ -1,3 +1,4 @@
+import { AccountRole } from '@/types/account';
 import { MetaAllocatorName } from '@/types/ma';
 import { Refresh, RefreshStatus } from '@/types/refresh';
 import { Row } from '@tanstack/react-table';
@@ -37,4 +38,26 @@ export const isAllocated = (row: Row<Refresh>): boolean => {
   const { refreshStatus, transactionCid } = row.original;
 
   return refreshStatus === RefreshStatus.DC_ALLOCATED && !!transactionCid;
+};
+
+export const isRkhRole = (stringRole?: string | null) => {
+  if (!stringRole) return false;
+
+  return [
+    AccountRole.ROOT_KEY_HOLDER,
+    AccountRole.INDIRECT_ROOT_KEY_HOLDER,
+    AccountRole.ADMIN,
+  ].includes(stringRole as AccountRole);
+};
+
+export const isMetaAllocatorRole = (stringRole?: string | null) => {
+  if (!stringRole) return false;
+
+  return [AccountRole.METADATA_ALLOCATOR, AccountRole.ADMIN].includes(stringRole as AccountRole);
+};
+
+export const isGovernanceTeamRole = (stringRole?: string | null) => {
+  if (!stringRole) return false;
+
+  return [AccountRole.GOVERNANCE_TEAM, AccountRole.ADMIN].includes(stringRole as AccountRole);
 };
