@@ -26,13 +26,6 @@ export async function checkMultisigRole(address: string): Promise<MultisigRoleRe
       console.warn(`Could not get ActorID for address ${address}:`, error);
     }
 
-    // Check if the address or ActorID is a direct signer of f080
-    if (f080Signers.includes(address) || (actorId && f080Signers.includes(actorId))) {
-      return {
-        role: AccountRole.ROOT_KEY_HOLDER,
-      };
-    }
-
     // Check if any of f080's signers are multisigs by examining their actor code
     // All multisigs share the same code CID so compare with F080
     const f080Code = await f080Client.getActorCode('f080');
@@ -73,6 +66,13 @@ export async function checkMultisigRole(address: string): Promise<MultisigRoleRe
         console.warn(`Could not fetch state for multisig ${multisigAddress}:`, error);
         continue;
       }
+    }
+
+    // Fallback check if the address or ActorID is a direct signer of f080
+    if (f080Signers.includes(address) || (actorId && f080Signers.includes(actorId))) {
+      return {
+        role: AccountRole.ROOT_KEY_HOLDER,
+      };
     }
 
     // If none of the above, return null to indicate we should use the default role fetching
