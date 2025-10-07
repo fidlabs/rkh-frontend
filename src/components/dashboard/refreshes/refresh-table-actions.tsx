@@ -20,7 +20,7 @@ import {
 import { RefreshGovernanceReviewButton } from '@/components/governance-review/RefreshGovernanceReviewButton';
 
 export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
-  const { account, selectedMetaAllocator } = useAccount();
+  const { account } = useAccount();
 
   switch (true) {
     case isGovernanceTeamRole(account?.role) && isWaitingForGovernanceReview(row):
@@ -42,14 +42,13 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
           fromAccount={row.original.rkhPhase?.approvals?.at(0) as string}
         />
       );
-    case isMetaAllocatorRole(account?.role) &&
-      isWaitingForMAApprove(row) &&
-      selectedMetaAllocator?.filAddress === row.original.maAddress:
+    case isMetaAllocatorRole(account?.role) && isWaitingForMAApprove(row):
       return (
         <MetaAllocatorSignTransactionButton
           dataCap={row.original.dataCap}
           address={row.original.msigAddress}
           maAddress={row.original.maAddress}
+          metapathwayType={row.original.metapathwayType!}
         />
       );
     case isAllocated(row):

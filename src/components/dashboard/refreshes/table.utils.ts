@@ -12,7 +12,10 @@ export const isWaitingForGovernanceReview = (row: Row<Refresh>): boolean => {
 export const isWaitingForRkhSign = (row: Row<Refresh>): boolean => {
   const { refreshStatus, metapathwayType } = row.original;
 
-  return metapathwayType === 'RKH' && refreshStatus === RefreshStatus.APPROVED;
+  return (
+    metapathwayType === 'RKH' &&
+    [RefreshStatus.APPROVED, RefreshStatus.PENDING].includes(refreshStatus)
+  );
 };
 
 export const isWaitingForRkhApprove = (row: Row<Refresh>): boolean => {
@@ -30,7 +33,7 @@ export const isWaitingForMAApprove = (row: Row<Refresh>): boolean => {
 
   return (
     Object.values(MetaAllocatorName).includes(metapathwayType as unknown as MetaAllocatorName) &&
-    refreshStatus === RefreshStatus.APPROVED
+    [RefreshStatus.APPROVED, RefreshStatus.PENDING].includes(refreshStatus)
   );
 };
 

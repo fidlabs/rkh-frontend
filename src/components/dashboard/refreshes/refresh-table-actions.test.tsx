@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   mockUseProposeRKHTransaction: vi.fn(),
   mockUseApproveRKHTransaction: vi.fn(),
   mockUseMetaAllocatorTransaction: vi.fn(),
+  mockUseGovernanceReview: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -31,6 +32,10 @@ vi.mock('@/hooks', () => ({
     submitSafeTransaction: vi.fn(),
     txHash: '',
     blockNumber: '',
+  }),
+  useGovernanceReview: mocks.mockUseGovernanceReview.mockReturnValue({
+    mutateAsync: vi.fn(),
+    reset: vi.fn(),
   }),
 }));
 
@@ -96,6 +101,10 @@ describe('RefreshTableActions', () => {
         refreshStatus: RefreshStatus.PENDING,
         metapathwayType: MetapathwayType.RKH,
       });
+
+      render(<RefreshTableActions row={row} />);
+
+      expect(screen.getByRole('button', { name: /review/i })).toBeInTheDocument();
     });
   });
 
@@ -107,17 +116,20 @@ describe('RefreshTableActions', () => {
       });
     });
 
-    it('should render RKH sign button when waiting for RKH sign', () => {
-      const row = createMockRow({
-        refreshStatus: RefreshStatus.APPROVED,
-        metapathwayType: MetapathwayType.RKH,
-        msigAddress: 'f1rkhaddress',
-      });
+    it.each([RefreshStatus.PENDING, RefreshStatus.APPROVED])(
+      'should render RKH sign button when waiting for RKH sign',
+      refreshStatus => {
+        const row = createMockRow({
+          refreshStatus,
+          metapathwayType: MetapathwayType.RKH,
+          msigAddress: 'f1rkhaddress',
+        });
 
-      render(<RefreshTableActions row={row} />);
+        render(<RefreshTableActions row={row} />);
 
-      expect(screen.getByRole('button', { name: /sign/i })).toBeInTheDocument();
-    });
+        expect(screen.getByRole('button', { name: /sign/i })).toBeInTheDocument();
+      },
+    );
 
     it('should render RKH approve button when waiting for RKH approve', () => {
       const row = createMockRow({
@@ -163,31 +175,21 @@ describe('RefreshTableActions', () => {
       });
     });
 
-    it('should render MA approve button when waiting for MA approve', () => {
-      const row = createMockRow({
-        refreshStatus: RefreshStatus.APPROVED,
-        metapathwayType: MetapathwayType.MDMA,
-        msigAddress: 'f1maaddress',
-        maAddress: 'f4maaddress' as `0x${string}`,
-      });
+    it.each([RefreshStatus.PENDING, RefreshStatus.APPROVED])(
+      'should render MA approve button when waiting for MA approve',
+      refreshStatus => {
+        const row = createMockRow({
+          refreshStatus,
+          metapathwayType: MetapathwayType.MDMA,
+          msigAddress: 'f1maaddress',
+          maAddress: 'f4maaddress' as `0x${string}`,
+        });
 
-      render(<RefreshTableActions row={row} />);
+        render(<RefreshTableActions row={row} />);
 
-      expect(screen.getByRole('button', { name: /approve/i })).toBeInTheDocument();
-    });
-
-    it('should not render MA approve button when not the selected MA', () => {
-      const row = createMockRow({
-        refreshStatus: RefreshStatus.PENDING,
-        metapathwayType: MetapathwayType.MDMA,
-        msigAddress: 'f1maaddress',
-        maAddress: '0xothermaaddress' as `0x${string}`,
-      });
-
-      const { container } = render(<RefreshTableActions row={row} />);
-
-      expect(container.firstChild).toBeNull();
-    });
+        expect(screen.getByRole('button', { name: /approve/i })).toBeInTheDocument();
+      },
+    );
 
     it.each`
       refreshStatus                  | metapathwayType         | description

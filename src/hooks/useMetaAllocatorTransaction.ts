@@ -194,7 +194,18 @@ export const useMetaAllocatorTransaction = ({
 
       setIsPending(false);
     },
-    [],
+    [
+      autoSwitchChain,
+      connector,
+      selectedMetaAllocator?.ethSafeAddress,
+      convertToEthAddress,
+      onSubmitSafeTransaction,
+      onSubmitSafeTransactionSuccess,
+      onSubmitSafeTransactionError,
+      onSignSafeTransaction,
+      onExecuteSafeTransaction,
+      handleFetchTransactionReceipt,
+    ],
   );
 
   return { submitSafeTransaction, isPending, txHash, blockNumber };
