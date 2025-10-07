@@ -1,11 +1,12 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Refresh, RefreshStatus } from '@/types/refresh';
+import { MetapathwayType, Refresh, RefreshStatus } from '@/types/refresh';
 import React from 'react';
 import { createAllocatorGovernanceIssueUrl, createAllocatorRegistryJsonUrl } from '@/lib/factories';
 import { RefreshStatusBadge } from '../components/RefreshStatusBadge';
 import { TableSortableHeader } from '@/components/ui/table';
 import { Link } from '@/components/ui/link';
 import { RefreshTableActions } from './refresh-table-actions';
+import { MetapathwayTypeBadge } from '../components/MetapathwayTypeBadge';
 import { createGithubAccountUrl } from '@/lib/factories/create-github-account-url';
 
 export const refreshesTableColumns: ColumnDef<Refresh>[] = [
@@ -47,6 +48,15 @@ export const refreshesTableColumns: ColumnDef<Refresh>[] = [
       const creator = row.getValue('creator') as Refresh['creator'];
 
       return <Link href={createGithubAccountUrl(creator.name)}>{creator.name}</Link>;
+    },
+  },
+  {
+    accessorKey: 'metapathwayType',
+    header: 'Metapathway',
+    cell: ({ row }) => {
+      const metapathwayType = row.getValue('metapathwayType') as MetapathwayType;
+
+      return metapathwayType ? <MetapathwayTypeBadge metapathwayType={metapathwayType} /> : null;
     },
   },
   {

@@ -14,3 +14,4 @@ export * from './useMyProposals';
 export * from './useSignerManagement';
 export * from './useProposalActions';
 export * from './useMaAddresses';
+export * from './useGovernanceReview';

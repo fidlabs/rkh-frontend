@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useAccount } from './useAccount';
+import { useAccount } from '@/hooks';
 import { useCallback } from 'react';
 import { governanceReview } from '@/lib/api';
 import { GovernanceReviewFormValues } from '@/components/governance-review/GovernanceReviewForm';

@@ -10,26 +10,29 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ApproveTransactionDetailsStep,
-  RefreshAllocatorSuccessStep,
-} from '@/components/refresh/steps';
+import { RefreshAllocatorSuccessStep } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useProposeRKHTransaction, useStateWaitMsg } from '@/hooks';
+import { MetapathwayType } from '@/types/refresh';
+import {
+  SetDatacapFormStep,
+  SetDatacapFormValues,
+} from '@/components/refresh/steps/SetDatacapFormStep';
+import { withFormProvider } from '@/lib/hocs/withFormProvider';
 
 interface RkhSignTransactionDialogProps {
   open: boolean;
   address: string;
-  dataCap: number;
+  dataCap?: number;
   onOpenChange: (open: boolean) => void;
 }
 
-export function RkhSignTransactionDialog({
+const RkhSignTransactionDialog = ({
   onOpenChange,
   open,
   address,
   dataCap,
-}: RkhSignTransactionDialogProps) {
+}: RkhSignTransactionDialogProps) => {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -60,11 +63,11 @@ export function RkhSignTransactionDialog({
   });
 
   const onSubmit = useCallback(
-    async () =>
+    async ({ dataCap }: SetDatacapFormValues) =>
       proposeTransaction({ address, datacap: dataCap }).catch(error => {
         console.error('Error proposing verifier:', error);
       }),
-    [address, proposeTransaction, dataCap],
+    [address, proposeTransaction],
   );
 
   const getBlockNumber = () => {
@@ -73,9 +76,10 @@ export function RkhSignTransactionDialog({
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
-      <ApproveTransactionDetailsStep
-        toAddress={address}
+      <SetDatacapFormStep
+        metapathwayType={MetapathwayType.RKH}
         dataCap={dataCap}
+        toAddress={address}
         onSubmit={onSubmit}
         onCancel={() => onOpenChange(false)}
       />
@@ -118,4 +122,6 @@ export function RkhSignTransactionDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default withFormProvider(RkhSignTransactionDialog);

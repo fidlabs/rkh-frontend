@@ -10,28 +10,30 @@ import {
   DialogLoadingCard,
 } from '@/components/ui/dialog';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ApproveTransactionDetailsStep,
-  RefreshAllocatorSuccessStep,
-} from '@/components/refresh/steps';
+import { RefreshAllocatorSuccessStep, SetDatacapFormStep } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
 import { useMetaAllocatorTransaction } from '@/hooks';
+import { MetapathwayType } from '@/types/refresh';
+import { withFormProvider } from '@/lib/hocs/withFormProvider';
+import { SetDatacapFormValues } from '@/components/refresh/steps/SetDatacapFormStep';
 
 interface MetaAllocatorSignTransactionDialogProps {
+  metapathwayType: MetapathwayType;
   open: boolean;
   address: string;
   maAddress: `0x${string}`;
-  dataCap: number;
+  dataCap?: number;
   onOpenChange: (open: boolean) => void;
 }
 
-export function MetaAllocatorSignTransactionDialog({
+const MetaAllocatorSignTransactionDialog = ({
+  metapathwayType,
   onOpenChange,
   open,
   address,
   maAddress,
   dataCap,
-}: MetaAllocatorSignTransactionDialogProps) {
+}: MetaAllocatorSignTransactionDialogProps) => {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -68,16 +70,15 @@ export function MetaAllocatorSignTransactionDialog({
   });
 
   const onSubmit = useCallback(
-    async () =>
+    async ({ dataCap }: SetDatacapFormValues) =>
       submitSafeTransaction({ address, datacap: dataCap, metaAllocatorContractAddress: maAddress }),
-    [address, submitSafeTransaction, dataCap, maAddress],
+    [address, submitSafeTransaction, maAddress],
   );
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
-      <ApproveTransactionDetailsStep
-        toAddress={address}
-        fromAddress={maAddress}
+      <SetDatacapFormStep
+        metapathwayType={metapathwayType}
         dataCap={dataCap}
         onSubmit={onSubmit}
         onCancel={() => onOpenChange(false)}
@@ -121,4 +122,6 @@ export function MetaAllocatorSignTransactionDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default withFormProvider(MetaAllocatorSignTransactionDialog);

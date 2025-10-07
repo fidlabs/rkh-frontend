@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { RkhSignTransactionDialog } from '@/components/refresh/dialogs';
+import RkhSignTransactionDialog from '@/components/refresh/dialogs/RkhSignTransactionDialog';
 
 interface RkhSignTransactionButtonProps {
   address: string;
