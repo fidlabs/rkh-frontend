@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RkhSignTransactionDialog } from './RkhSignTransactionDialog';
+import RkhSignTransactionDialog from './RkhSignTransactionDialog';
 import { createWrapper } from '@/test-utils';
 import { ApiStateWaitMsgResponse } from '@/types/filecoin-client';
 
@@ -30,7 +30,6 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
   const mockProps = {
     open: true,
     address: 'f1234567890abcdef',
-    dataCap: 1000,
     onOpenChange: vi.fn(),
   };
   const mockStateWaitResponse: ApiStateWaitMsgResponse = {
@@ -77,7 +76,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
     render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
     expect(screen.getByTestId('to-address')).toHaveTextContent('To:f1234567890abcdef');
-    expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
+    expect(screen.getByRole('spinbutton', { name: /datacap/i })).toBeInTheDocument();
   });
 
   describe('Success flow', () => {
@@ -90,9 +89,10 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
-      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(mockProps.address, 1000);
+      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(mockProps.address, '1000');
 
       const successHeader = await screen.findByTestId('success-header');
       expect(successHeader).toHaveTextContent('Success!');
@@ -108,6 +108,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       const successHeader = await screen.findByTestId('success-header');
@@ -128,6 +129,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -139,6 +141,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() => {
@@ -147,7 +150,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
       await user.click(screen.getByRole('button', { name: /go back/i }));
 
-      expect(screen.getByTestId('data-cap')).toHaveTextContent('DataCap:1000 PiB');
+      expect(screen.getByRole('spinbutton', { name: /datacap/i })).toHaveValue(1000);
       expect(screen.getByTestId('to-address')).toHaveTextContent('To:f1234567890abcdef');
     });
   });
@@ -164,6 +167,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>
@@ -179,6 +183,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       await waitFor(() =>

@@ -23,7 +23,8 @@ describe('table.utils', () => {
       ${RefreshStatus.APPROVED}      | ${undefined}            | ${false} | ${'null metapathwayType'}
       ${undefined}                   | ${MetapathwayType.RKH}  | ${false} | ${'undefined refreshStatus'}
       ${undefined}                   | ${undefined}            | ${false} | ${'undefined statuses'}
-      ${RefreshStatus.PENDING}       | ${MetapathwayType.RKH}  | ${false} | ${'non-APPROVED refresh'}
+      ${RefreshStatus.PENDING}       | ${MetapathwayType.RKH}  | ${true}  | ${'non-APPROVED refresh'}
+      ${RefreshStatus.PENDING}       | ${MetapathwayType.MDMA} | ${false} | ${'non-APPROVED refresh'}
     `(
       'should return $expected for $description',
       ({ refreshStatus, metapathwayType, expected }) => {
@@ -73,7 +74,8 @@ describe('table.utils', () => {
       ${RefreshStatus.APPROVED}     | ${undefined}            | ${false} | ${'undefined metapathwayType'}
       ${undefined}                  | ${MetapathwayType.MDMA} | ${false} | ${'undefined refreshStatus'}
       ${undefined}                  | ${undefined}            | ${false} | ${'undefined statuses'}
-      ${RefreshStatus.PENDING}      | ${MetapathwayType.MDMA} | ${false} | ${'non-APPROVED refresh'}
+      ${RefreshStatus.PENDING}      | ${MetapathwayType.MDMA} | ${true}  | ${'non-APPROVED refresh'}
+      ${RefreshStatus.PENDING}      | ${MetapathwayType.RKH}  | ${false} | ${'uncorrect metapathwayType'}
     `(
       'should return $expected for $description',
       ({ refreshStatus, metapathwayType, expected }) => {

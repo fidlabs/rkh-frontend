@@ -3,12 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { RefreshAllocatorSuccessStep } from './RefreshAllocatorSuccessStep';
 
-const mockToast = vi.fn();
+const mocks = vi.hoisted(() => ({
+  mockUseToast: vi.fn(),
+  mockToast: vi.fn(),
+}));
 
 vi.mock('@/components/ui/use-toast', () => ({
-  useToast: () => ({
-    toast: mockToast,
-  }),
+  useToast: mocks.mockUseToast,
 }));
 
 describe('RefreshAllocatorSuccessStep', () => {
@@ -22,6 +23,10 @@ describe('RefreshAllocatorSuccessStep', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    mocks.mockUseToast.mockReturnValue({
+      toast: mocks.mockToast,
+    });
   });
 
   it('should render success message', () => {
@@ -61,7 +66,7 @@ describe('RefreshAllocatorSuccessStep', () => {
 
     const clipboardText = await navigator.clipboard.readText();
     expect(clipboardText).toBe(props.messageId);
-    expect(mockToast).toHaveBeenCalledWith({
+    expect(mocks.mockToast).toHaveBeenCalledWith({
       title: 'Copied to clipboard',
       description: 'TxID has been copied to your clipboard.',
     });
@@ -76,7 +81,7 @@ describe('RefreshAllocatorSuccessStep', () => {
 
     const clipboardText = await navigator.clipboard.readText();
     expect(clipboardText).toBe(String(props.blockNumber));
-    expect(mockToast).toHaveBeenCalledWith({
+    expect(mocks.mockToast).toHaveBeenCalledWith({
       title: 'Copied to clipboard',
       description: 'Block number has been copied to your clipboard.',
     });

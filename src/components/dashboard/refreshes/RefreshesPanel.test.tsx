@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
   mockUseStateWaitMsg: vi.fn(),
   mockUseProposeRKHTransaction: vi.fn(),
+  mockUseGovernanceReview: vi.fn(),
 }));
 
 vi.mock('@/hooks/useAccount', () => ({
@@ -26,6 +27,10 @@ vi.mock('@/hooks', () => ({
   useProposeRKHTransaction: mocks.mockUseProposeRKHTransaction.mockReturnValue({
     proposeTransaction: vi.fn(),
     messageId: '',
+  }),
+  useGovernanceReview: mocks.mockUseGovernanceReview.mockReturnValue({
+    mutateAsync: vi.fn(),
+    reset: vi.fn(),
   }),
 }));
 
@@ -56,7 +61,7 @@ describe('RefreshesPanel', () => {
     data: {
       results: [
         createFixtureRefresh({
-          refreshStatus: RefreshStatus.APPROVED,
+          refreshStatus: RefreshStatus.PENDING,
           githubIssueNumber: 100,
           jsonNumber: 'rec1',
           title: 'Test Refresh 1',
@@ -64,7 +69,7 @@ describe('RefreshesPanel', () => {
           dataCap: 100,
         }),
         createFixtureRefresh({
-          refreshStatus: RefreshStatus.PENDING,
+          refreshStatus: RefreshStatus.DC_ALLOCATED,
           githubIssueNumber: 101,
           jsonNumber: 'rec2',
           title: 'Test Refresh 2',
@@ -100,7 +105,7 @@ describe('RefreshesPanel', () => {
   });
 
   it('should render header, table and pagination', () => {
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Refreshes' })).toBeInTheDocument();
     expect(screen.getByTestId('refresh-table-description')).toHaveTextContent(
@@ -111,7 +116,7 @@ describe('RefreshesPanel', () => {
   });
 
   it('should render table columns', () => {
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('columnheader', { name: 'Issue ▼' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'AllocatorJson ▼' })).toBeInTheDocument();
@@ -122,7 +127,7 @@ describe('RefreshesPanel', () => {
   });
 
   it('should render table data', () => {
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('cell', { name: '#100' })).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: 'rec1' })).toBeInTheDocument();
@@ -136,7 +141,7 @@ describe('RefreshesPanel', () => {
       account: { role: AccountRole.ROOT_KEY_HOLDER },
       selectedMetaAllocator: null,
     });
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('button', { name: 'RKH Sign' })).toBeInTheDocument();
   });
@@ -146,7 +151,7 @@ describe('RefreshesPanel', () => {
       account: { role: AccountRole.GOVERNANCE_TEAM },
       selectedMetaAllocator: null,
     });
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('button', { name: 'Review' })).toBeInTheDocument();
   });
@@ -157,7 +162,7 @@ describe('RefreshesPanel', () => {
       isLoading: true,
     } as any);
 
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Refreshes' })).toBeInTheDocument();
     expect(screen.getByTestId('table-spinner')).toBeInTheDocument();
@@ -169,7 +174,7 @@ describe('RefreshesPanel', () => {
       isLoading: false,
     } as any);
 
-    render(<RefreshesPanel searchTerm="" />, { wrapper });
+    render(<RefreshesPanel activeFilters={[]} searchTerm="" />, { wrapper });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Refreshes' })).toBeInTheDocument();
     expect(screen.getByRole('navigation')).toBeInTheDocument();
