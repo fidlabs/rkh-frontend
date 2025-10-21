@@ -38,6 +38,7 @@ export function SignerManagementPanel({}: SignerManagementPanelProps) {
       }
 
       const result = await proposeRemoveSigner({
+        wrappedTx: true, // Real RKH actions are always wrapped in an msig
         proposalId: signerAddress,
         msigAddress: accountContext.account.parentMsigAddress,
         accountContext,

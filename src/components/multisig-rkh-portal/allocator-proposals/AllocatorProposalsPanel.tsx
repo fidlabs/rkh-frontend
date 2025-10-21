@@ -48,10 +48,10 @@ export function AllocatorProposalsPanel({}: AllocatorProposalsPanelProps) {
 
     try {
       if (dialogAction === 'approve') {
-        const result = await approveProposal(proposalId, selectedProposal.method);
+        const result = await approveProposal(true, proposalId, selectedProposal.method);
         return result;
       } else if (dialogAction === 'reject') {
-        const result = await rejectProposal(proposalId, selectedProposal.method);
+        const result = await rejectProposal(true, proposalId, selectedProposal.method);
         return result;
       }
       return { success: false, message: 'Unknown action', error: 'Unknown action' };

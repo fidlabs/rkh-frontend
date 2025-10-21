@@ -25,6 +25,7 @@ export function useProposalActions() {
   const accountContext = useAccount();
 
   const approveProposal = async (
+    wrappedTx: boolean,
     proposalId: number,
     method: number,
   ): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
@@ -32,6 +33,7 @@ export function useProposalActions() {
     try {
       // All approval methods use the same generic function since they all call f080.Method3 (Approve)
       const result = await approvePendingTransaction({
+        wrappedTx,
         proposalId,
         msigAddress: accountContext.account?.parentMsigAddress || '',
         accountContext,
@@ -53,6 +55,7 @@ export function useProposalActions() {
   };
 
   const rejectProposal = async (
+    wrappedTx: boolean,
     proposalId: number,
     method: number,
   ): Promise<{ success: boolean; message: string; txHash?: string; error?: string }> => {
@@ -60,6 +63,7 @@ export function useProposalActions() {
     try {
       // All rejection methods use the same generic function since they all call f080.Method4 (Cancel)
       const result = await cancelPendingTransaction({
+        wrappedTx,
         proposalId,
         msigAddress: accountContext.account?.parentMsigAddress || '',
         accountContext,

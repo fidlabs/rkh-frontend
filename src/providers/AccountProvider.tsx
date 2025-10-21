@@ -199,7 +199,6 @@ export const AccountProvider: React.FC<{
         return messageId;
       } else {
         // Go the multisig way - requires some torture to get the message in the right shape
-        //FIXME need to get this from some ind of setting
         const msigAddress = account.parentMsigAddress;
 
         if (!msigAddress) {

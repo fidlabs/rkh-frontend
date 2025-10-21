@@ -50,18 +50,33 @@ export function useAllocatorProposals(
         const processedProposals: AllocatorProposal[] = [];
 
         for (const tx of pendingTransactions) {
+          let decodedParams;
+          let realTo;
+          let realMethod;
           try {
-            // First decode the outer params (the proposal to the multisig)
-            // Use the actual method from the transaction, not hardcoded 2
-            const decodedParams = await client.decodeParams(tx.To, tx.Method, tx.Params);
-            // For multisig proposals, the outer params contain an inner message
-            // We need to decode the inner message's params to get the actual proposal details
+            if (msigAddress === 'f080') {
+              // For multisig proposals to f080, the outer params contain an inner message
+              // We need to decode the inner message's params to get the actual proposal details
+              console.log('RKH path!')
+              console.log(tx)
+              decodedParams = await client.decodeParams(tx.To, tx.Method, tx.Params);
+              realTo = tx.To;
+              realMethod = tx.Method;
+            } else {
+              console.log('my msig path!')
+              console.log(tx)
+              const innerTx = await client.decodeParams(tx.To, tx.Method, tx.Params);
+              console.log(innerTx)
+              decodedParams = await client.decodeParams(innerTx.To, innerTx.Method, innerTx.Params);
+              realTo = innerTx.To;
+              realMethod = innerTx.Method;
+            }
 
             processedProposals.push({
               id: tx.ID,
-              to: tx.To,
+              to: realTo,
               value: tx.Value,
-              method: tx.Method,
+              method: realMethod,
               params: tx.Params,
               approved: tx.Approved,
               decodedParams: decodedParams, // Prefer inner params if available
