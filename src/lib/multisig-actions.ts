@@ -245,8 +245,7 @@ export async function cancelPendingTransaction({
         Method: 2, // we are PROPOSING to our msig, the CANCEL is in the inner params
         Params: OuterParamsB64,
       };
-    }
-    else {
+    } else {
       const OuterParamsB64 = await client.encodeParams(f080Code, 4, { ID: proposalId });
       msg = {
         To: msigAddress,

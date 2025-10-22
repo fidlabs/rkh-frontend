@@ -53,7 +53,7 @@ export function useAllocatorProposals(
           try {
             const txs = await f080Client.getPendingTransactions();
             rkhPending = new Map(txs.map(item => [item.ID, item]));
-          }catch (rpcError) {
+          } catch (rpcError) {
             console.error('useAllocatorProposals: RPC call to f080 failed:', rpcError);
             console.error('Params will not decode properly without this data.');
             throw rpcError;
@@ -79,15 +79,15 @@ export function useAllocatorProposals(
               // reference f080 pending proposals by number (if approving/rejecting one that's
               // already in the f080 list), or it might actually have params (if it's a fresh
               // proposal-to-propose something) so we first need to check which case we're in.
-              if(tx.To === 'f080' || tx.To === 't080') {
+              if (tx.To === 'f080' || tx.To === 't080') {
                 const innerTx = await client.decodeParams(tx.To, tx.Method, tx.Params);
-                console.log(innerTx)
+                console.log(innerTx);
 
                 // If it has an ID field, it's referencing an existing f080 proposal
-                if(innerTx.ID) {
+                if (innerTx.ID) {
                   // Look up the referenced f080 transaction for friendly params
                   const rkhTx = rkhPending.get(innerTx.ID);
-                  if(!rkhTx) {
+                  if (!rkhTx) {
                     throw new Error(`Referenced RKH proposal ID ${innerTx.ID} not found`);
                   }
                   decodedParams = await client.decodeParams(rkhTx.To, rkhTx.Method, rkhTx.Params);
@@ -96,10 +96,14 @@ export function useAllocatorProposals(
                   realMethod = tx.Method;
                 } else {
                   // Otherwise it's a fresh proposal, so decode directly
-                  if(!innerTx.To || !innerTx.Method) {
+                  if (!innerTx.To || !innerTx.Method) {
                     throw new Error('Unhandled transaction format in inner proposal');
                   }
-                  decodedParams = await client.decodeParams(innerTx.To, innerTx.Method, innerTx.Params);
+                  decodedParams = await client.decodeParams(
+                    innerTx.To,
+                    innerTx.Method,
+                    innerTx.Params,
+                  );
                   realTo = innerTx.To;
                   realMethod = innerTx.Method;
                 }
