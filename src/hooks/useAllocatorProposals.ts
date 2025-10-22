@@ -46,22 +46,81 @@ export function useAllocatorProposals(
           throw rpcError;
         }
 
+        // Fetch and cache pending transactions for RKH
+        let rkhPending: Map<number, PendingTransaction> = new Map();
+        if (msigAddress !== 'f080' && msigAddress !== 't080') {
+          const f080Client = createFilecoinRpcProxyClient('f080');
+          try {
+            const txs = await f080Client.getPendingTransactions();
+            rkhPending = new Map(txs.map(item => [item.ID, item]));
+          } catch (rpcError) {
+            console.error('useAllocatorProposals: RPC call to f080 failed:', rpcError);
+            console.error('Params will not decode properly without this data.');
+            throw rpcError;
+          }
+        }
+
         // Process and decode each pending transaction
         const processedProposals: AllocatorProposal[] = [];
 
         for (const tx of pendingTransactions) {
+          let decodedParams = null;
+          let realTo = '';
+          let realMethod = 0;
           try {
-            // First decode the outer params (the proposal to the multisig)
-            // Use the actual method from the transaction, not hardcoded 2
-            const decodedParams = await client.decodeParams(tx.To, tx.Method, tx.Params);
-            // For multisig proposals, the outer params contain an inner message
-            // We need to decode the inner message's params to get the actual proposal details
+            if (msigAddress === 'f080' || msigAddress === 't080') {
+              // For multisig proposals to f080, the outer params contain an inner message
+              // We need to decode the inner message's params to get the actual proposal details
+              decodedParams = await client.decodeParams(tx.To, tx.Method, tx.Params);
+              realTo = tx.To;
+              realMethod = tx.Method;
+            } else {
+              // For the member msigs it's a bit more complex: the proposals and rejections might
+              // reference f080 pending proposals by number (if approving/rejecting one that's
+              // already in the f080 list), or it might actually have params (if it's a fresh
+              // proposal-to-propose something) so we first need to check which case we're in.
+              if (tx.To === 'f080' || tx.To === 't080') {
+                const innerTx = await client.decodeParams(tx.To, tx.Method, tx.Params);
+                console.log(innerTx);
+
+                // If it has an ID field, it's referencing an existing f080 proposal
+                if (innerTx.ID) {
+                  // Look up the referenced f080 transaction for friendly params
+                  const rkhTx = rkhPending.get(innerTx.ID);
+                  if (!rkhTx) {
+                    throw new Error(`Referenced RKH proposal ID ${innerTx.ID} not found`);
+                  }
+                  decodedParams = await client.decodeParams(rkhTx.To, rkhTx.Method, rkhTx.Params);
+                  decodedParams.ID = innerTx.ID; // For display and x-ref only
+                  realTo = tx.To;
+                  realMethod = tx.Method;
+                } else {
+                  // Otherwise it's a fresh proposal, so decode directly
+                  if (!innerTx.To || !innerTx.Method) {
+                    throw new Error('Unhandled transaction format in inner proposal');
+                  }
+                  decodedParams = await client.decodeParams(
+                    innerTx.To,
+                    innerTx.Method,
+                    innerTx.Params,
+                  );
+                  realTo = innerTx.To;
+                  realMethod = innerTx.Method;
+                }
+              } else {
+                // In this case we're looking at a direct proposal to our own msig,
+                // or some other destination that we can't (necessarily) resolve further.
+                decodedParams = await client.decodeParams(tx.To, tx.Method, tx.Params);
+                realTo = tx.To;
+                realMethod = tx.Method;
+              }
+            }
 
             processedProposals.push({
               id: tx.ID,
-              to: tx.To,
+              to: realTo,
               value: tx.Value,
-              method: tx.Method,
+              method: realMethod,
               params: tx.Params,
               approved: tx.Approved,
               decodedParams: decodedParams, // Prefer inner params if available

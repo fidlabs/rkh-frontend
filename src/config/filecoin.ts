@@ -2,7 +2,7 @@ import { env } from '@/config/environment';
 
 export const filecoinConfig = {
   // Default multisig address - can be overridden per component
-  defaultMsigAddress: 't080',
+  defaultMsigAddress: 'f080',
 
   // Lotus RPC configuration
   lotus: {

@@ -1,8 +1,8 @@
 import { AccountContextType } from '@/contexts/AccountContext';
 import { createFilecoinRpcProxyClient } from './filecoin-rpc-proxy';
-import { filecoinConfig } from '@/config/filecoin';
 
 export interface MultisigActionParams {
+  wrappedTx: boolean;
   proposalId: number | string;
   msigAddress: string;
   accountContext: AccountContextType;
@@ -151,6 +151,7 @@ function hexToBytes(hex: string): Uint8Array {
  * Approve any pending transaction proposal
  */
 export async function approvePendingTransaction({
+  wrappedTx,
   proposalId,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
@@ -162,24 +163,35 @@ export async function approvePendingTransaction({
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcProxyClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
-    const msigCode = await client.getActorCode(msigAddress);
 
     // Method 3 is "Approve" for multisig
-    const InnerParamsB64 = await client.encodeParams(f080Code, 3, { ID: proposalId });
-    const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
-      To: 'f080',
-      Method: 3,
-      Value: '0',
-      Params: InnerParamsB64,
-    });
+    let msg: FilecoinMessage;
+    if (wrappedTx) {
+      const InnerParamsB64 = await client.encodeParams(f080Code, 3, { ID: proposalId });
+      const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
+        To: 'f080',
+        Method: 3,
+        Value: '0',
+        Params: InnerParamsB64,
+      });
 
-    const msg: FilecoinMessage = {
-      To: msigAddress,
-      From: accountContext.account?.address || '',
-      Value: '0',
-      Method: 2, // we are PROPOSING to our msig, the APPROVE is in the inner params
-      Params: OuterParamsB64,
-    };
+      msg = {
+        To: msigAddress,
+        From: accountContext.account?.address || '',
+        Value: '0',
+        Method: 2, // we are PROPOSING to our msig, the APPROVE is in the inner params
+        Params: OuterParamsB64,
+      };
+    } else {
+      const OuterParamsB64 = await client.encodeParams(f080Code, 3, { ID: proposalId });
+      msg = {
+        To: msigAddress,
+        From: accountContext.account?.address || '',
+        Value: '0',
+        Method: 3,
+        Params: OuterParamsB64,
+      };
+    }
 
     const txHash = await sendMsigMsg(msg, accountContext);
 
@@ -202,6 +214,7 @@ export async function approvePendingTransaction({
  * Cancel any pending transaction proposal
  */
 export async function cancelPendingTransaction({
+  wrappedTx,
   proposalId,
   accountContext,
 }: MultisigActionParams): Promise<MultisigActionResult> {
@@ -213,24 +226,35 @@ export async function cancelPendingTransaction({
     const msigAddress = accountContext.account?.parentMsigAddress || '';
     const client = createFilecoinRpcProxyClient(msigAddress);
     const f080Code = await client.getActorCode('f080');
-    const msigCode = await client.getActorCode(msigAddress);
 
     // Method 4 is "Cancel" for multisig
-    const InnerParamsB64 = await client.encodeParams(f080Code, 4, { ID: proposalId });
-    const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
-      To: 'f080',
-      Method: 4,
-      Value: '0',
-      Params: InnerParamsB64,
-    });
+    let msg: FilecoinMessage;
+    if (wrappedTx) {
+      const InnerParamsB64 = await client.encodeParams(f080Code, 4, { ID: proposalId });
+      const OuterParamsB64 = await client.encodeParams(f080Code, 2, {
+        To: 'f080',
+        Method: 4,
+        Value: '0',
+        Params: InnerParamsB64,
+      });
 
-    const msg: FilecoinMessage = {
-      To: msigAddress,
-      From: accountContext.account?.address || '',
-      Value: '0',
-      Method: 2, // we are PROPOSING to our msig, the CANCEL is in the inner params
-      Params: OuterParamsB64,
-    };
+      msg = {
+        To: msigAddress,
+        From: accountContext.account?.address || '',
+        Value: '0',
+        Method: 2, // we are PROPOSING to our msig, the CANCEL is in the inner params
+        Params: OuterParamsB64,
+      };
+    } else {
+      const OuterParamsB64 = await client.encodeParams(f080Code, 4, { ID: proposalId });
+      msg = {
+        To: msigAddress,
+        From: accountContext.account?.address || '',
+        Value: '0',
+        Method: 4,
+        Params: OuterParamsB64,
+      };
+    }
 
     const txHash = await sendMsigMsg(msg, accountContext);
 
@@ -275,7 +299,6 @@ export async function proposeAddSigner({
       Value: '0',
       Params: innerParamsB64,
     });
-    const outerParamsHex = '0x' + Buffer.from(outerParamsB64, 'base64').toString('hex');
     const messageParams = await client.encodeParams(msigCode, 2, {
       To: 'f080',
       Method: 2,

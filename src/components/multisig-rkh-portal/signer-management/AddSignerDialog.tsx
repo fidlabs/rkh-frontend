@@ -49,6 +49,7 @@ export function AddSignerDialog({ isOpen, onClose, onSuccess }: AddSignerDialogP
       setSuccess(null);
 
       const result = await proposeAddSigner({
+        wrappedTx: true, // Real RKH actions are always wrapped in an msig
         proposalId: newSignerAddress, // The signer address is passed as proposalId
         msigAddress: accountContext.account?.parentMsigAddress || '',
         accountContext,

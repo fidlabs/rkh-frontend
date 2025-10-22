@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAccount } from '@/hooks/useAccount';
 import { useMyProposals } from '@/hooks/useMyProposals';
 import { createAllocatorProposalsTableColumns } from '../allocator-proposals/allocator-proposals-table-columns';
 import { ProposalActionDialog } from '../allocator-proposals/ProposalActionDialog';
@@ -21,6 +22,7 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
   const [dialogAction, setDialogAction] = useState<'approve' | 'reject' | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const accountContext = useAccount();
   const { proposals, totalCount, isLoading, isError } = useMyProposals();
   const { approveProposal, rejectProposal } = useProposalActions();
 
@@ -48,10 +50,10 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
 
     try {
       if (dialogAction === 'approve') {
-        const result = await approveProposal(proposalId, selectedProposal.method);
+        const result = await approveProposal(false, proposalId, selectedProposal.method);
         return result;
       } else if (dialogAction === 'reject') {
-        const result = await rejectProposal(proposalId, selectedProposal.method);
+        const result = await rejectProposal(false, proposalId, selectedProposal.method);
         return result;
       }
       return { success: false, message: 'Unknown action', error: 'Unknown action' };
@@ -64,11 +66,12 @@ export function MyProposalsPanel({}: MyProposalsPanelProps) {
     }
   };
 
+  const fullTitle = `Open Proposals for msig ${accountContext.account?.parentMsigAddress || '<unknown>'}`;
   return (
     <>
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>My Proposals</CardTitle>
+          <CardTitle>{fullTitle}</CardTitle>
           <CardDescription>Manage outstanding proposals for your RKH Org multisig.</CardDescription>
         </CardHeader>
         <CardContent>

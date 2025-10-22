@@ -21,9 +21,12 @@ export interface PendingTransaction {
 }
 
 export interface DecodedParams {
-  To: string;
-  Method: number;
-  Params: any;
+  ID?: number;
+  To?: string;
+  Value?: string;
+  Method?: number;
+  Params?: any;
+  ProposalHash?: string;
 }
 
 export class FilecoinRpcClient {
