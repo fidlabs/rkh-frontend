@@ -15,7 +15,6 @@ describe('SetDatacapFormStep', () => {
     const methods = useForm<SetDatacapFormValues>({
       defaultValues: {
         dataCap: fixtureDataCap,
-        intent: 'approve',
       },
     });
     return <FormProvider {...methods}>{children}</FormProvider>;

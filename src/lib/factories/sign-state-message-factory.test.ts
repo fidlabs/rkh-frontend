@@ -15,6 +15,7 @@ describe('SignStateMessageMethodFactory', () => {
     ${SignatureType.ApproveGovernanceReview} | ${'Governance Approved 123 1024 RKH'}
     ${SignatureType.KycOverride}             | ${'KYC Override for 123'}
     ${SignatureType.KycRevoke}               | ${'KYC Revoke for 123'}
+    ${SignatureType.MetaAllocatorReject}     | ${'Meta Allocator reject 123 RKH'}
   `('returns the correct message for $signatureType', ({ signatureType, expectedMessage }) => {
     const messageFactory = SignStateMessageMethodFactory.create(signatureType);
     expect(messageFactory(props)).toBe(expectedMessage);

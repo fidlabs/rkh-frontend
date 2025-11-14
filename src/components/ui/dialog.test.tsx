@@ -1,7 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { DialogErrorCard, DialogLoadingCard, DialogSuccessCard } from './dialog';
+import {
+  DialogConfirmationCard,
+  DialogErrorCard,
+  DialogLoadingCard,
+  DialogSuccessCard,
+} from './dialog';
 
 describe('DialogErrorCard', () => {
   const mockProps = {
@@ -73,5 +78,25 @@ describe('dialog success card', () => {
     expect(screen.getByTestId('success-header')).toHaveTextContent('Success');
     expect(screen.getByText('test')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+  });
+});
+
+describe('dialog confirmation card', () => {
+  it('should render confirmation content with default message', () => {
+    const message = 'Are you sure you want to reject this MetaAllocator transaction?';
+    const mockOnConfirm = vi.fn();
+    const mockOnGoBack = vi.fn();
+    render(
+      <DialogConfirmationCard
+        message={message}
+        onConfirm={mockOnConfirm}
+        onGoBack={mockOnGoBack}
+      />,
+    );
+
+    expect(screen.getByTestId('confirmation-header')).toBeInTheDocument();
+    expect(screen.getByText(message)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument();
   });
 });

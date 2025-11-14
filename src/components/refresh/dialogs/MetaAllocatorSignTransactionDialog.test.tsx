@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MetaAllocatorSignTransactionDialog from './MetaAllocatorSignTransactionDialog';
 import { createWrapper } from '@/test-utils';
 import { MetapathwayType } from '@/types/refresh';
+import { SignatureType } from '@/types/governance-review';
 
 const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
@@ -26,6 +27,7 @@ const mocks = vi.hoisted(() => ({
     executeTransaction: vi.fn(),
   },
   mockProvider: {},
+  mockGovernanceReview: vi.fn(),
 }));
 
 vi.mock('@/hooks/useAccount', () => ({
@@ -53,9 +55,14 @@ vi.mock('viem/utils', () => ({
   encodeFunctionData: mocks.mockEncodeFunctionData,
 }));
 
+vi.mock('@/lib/api', () => ({
+  governanceReview: mocks.mockGovernanceReview,
+}));
+
 describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
   const wrapper = createWrapper();
   const mockProps = {
+    githubIssueNumber: 123,
     open: true,
     address: '0x1234567890123456789012345678901234567890',
     metapathwayType: MetapathwayType.MDMA,
@@ -93,6 +100,10 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
     mocks.mockSafeKit.executeTransaction.mockResolvedValue({
       hash: '0xabcdef123456789',
       status: 'success',
+    });
+    mocks.mockGovernanceReview.mockResolvedValue({
+      ok: true,
+      status: 200,
     });
   });
 
@@ -219,6 +230,79 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       await user.click(screen.getAllByRole('button', { name: /close/i })[0]);
 
       expect(mockProps.onOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('Reject flow', () => {
+    it('should show rejection confirmation step when dataCap is 0', async () => {
+      const user = userEvent.setup();
+      render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
+
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '0');
+      await user.click(screen.getByRole('button', { name: /reject/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('confirmation-message')).toHaveTextContent(
+          'Are you sure you want to reject this MetaAllocator transaction?',
+        );
+      });
+
+      await user.click(screen.getByRole('button', { name: /confirm/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('success-header')).toHaveTextContent('Success!');
+      });
+      expect(mocks.mockGovernanceReview).toHaveBeenCalledWith(
+        SignatureType.MetaAllocatorReject,
+        '123',
+        {
+          result: 'reject',
+          details: {
+            finalDataCap: '0',
+            allocatorType: 'MDMA',
+            isMDMAAllocator: false,
+            reason: 'No reason given',
+            reviewerAddress: '0x0000000000000000000000000000000000000000',
+            reviewerPublicKey: '0x0000000000000000000000000000000000000000',
+          },
+          signature: 'Meta Allocator reject 123 MDMA',
+        },
+      );
+    });
+
+    it('should show error message when governance review fails', async () => {
+      mocks.mockGovernanceReview.mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+      const user = userEvent.setup();
+      render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
+
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '0');
+      await user.click(screen.getByRole('button', { name: /reject/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('confirmation-message')).toHaveTextContent(
+          'Are you sure you want to reject this MetaAllocator transaction?',
+        );
+      });
+
+      await user.click(screen.getByRole('button', { name: /confirm/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('error-message')).toHaveTextContent(
+          'Failed to submit MetaAllocator reject, status: 500',
+        );
+      });
+    });
+
+    it('should show generic error message for unknown errors', async () => {
+      mocks.mockGovernanceReview.mockRejectedValue(new Error('Unknown error'));
+      const user = userEvent.setup();
+      render(<MetaAllocatorSignTransactionDialog {...mockProps} />, { wrapper });
+
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '0');
+      await user.click(screen.getByRole('button', { name: /reject/i }));
     });
   });
 
