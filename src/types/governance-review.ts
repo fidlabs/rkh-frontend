@@ -3,4 +3,5 @@ export enum SignatureType {
   ApproveGovernanceReview = 'ApproveGovernanceReview',
   KycOverride = 'KycOverride',
   KycRevoke = 'KycRevoke',
+  MetaAllocatorReject = 'MetaAllocatorReject',
 }

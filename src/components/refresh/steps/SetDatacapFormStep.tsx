@@ -1,19 +1,20 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 import { ControlledFormItem } from '@/components/ui/form-item';
 import { Input } from '@/components/ui/input';
-import { MetapathwayType, Refresh } from '@/types/refresh';
+import { MetapathwayType } from '@/types/refresh';
 import { Button } from '@/components/ui/button';
 import { validationRules } from '@/components/refresh/dialogs/RefreshAllocatorValidationRules';
 import { Label } from '@/components/ui/label';
 import { MetapathwayTypeBadge } from '@/components/dashboard/components/MetapathwayTypeBadge';
+import { RejectableFormLegend } from './components/RejectableFormLegend';
 
 export interface SetDatacapFormValues {
   dataCap: number;
-  intent: 'approve' | 'reject';
 }
 
 interface SetDatacapFormStepProps {
+  rejectable?: boolean;
   metapathwayType: MetapathwayType;
   dataCap?: number;
   toAddress?: string;
@@ -22,6 +23,7 @@ interface SetDatacapFormStepProps {
 }
 
 export const SetDatacapFormStep = ({
+  rejectable,
   metapathwayType,
   dataCap,
   toAddress,
@@ -30,10 +32,13 @@ export const SetDatacapFormStep = ({
 }: SetDatacapFormStepProps) => {
   const { control, handleSubmit } = useFormContext<SetDatacapFormValues>();
   const dataCapValidationRules = validationRules.dataCap();
+  const datacap = useWatch({ name: 'dataCap' });
 
   return (
     <form role="form" className="flex flex-col px-4 gap-4" onSubmit={handleSubmit(onSubmit)}>
       <fieldset className="flex flex-col gap-2 my-4">
+        {rejectable ? <RejectableFormLegend /> : null}
+
         {toAddress ? (
           <div data-testid="to-address" className="flex flex-col gap-2 pb-6">
             <span>To:</span>
@@ -66,9 +71,9 @@ export const SetDatacapFormStep = ({
 
       <div className="flex justify-center gap-2">
         <Button type="submit" className="w-[150px]">
-          APPROVE
+          {datacap === '0' ? 'REJECT' : 'APPROVE'}
         </Button>
-        <Button type="submit" className="w-[150px]" onClick={onCancel}>
+        <Button className="w-[150px]" onClick={onCancel}>
           CANCEL
         </Button>
       </div>

@@ -27,6 +27,8 @@ export class SignStateMessageMethodFactory {
       }: MessageFactoryProps) => `Governance ${result} ${id} ${finalDataCap} ${allocatorType}`,
       [SignatureType.KycOverride]: ({ id }: MessageFactoryProps) => `KYC Override for ${id}`,
       [SignatureType.KycRevoke]: ({ id }: MessageFactoryProps) => `KYC Revoke for ${id}`,
+      [SignatureType.MetaAllocatorReject]: ({ id, allocatorType }: MessageFactoryProps) =>
+        `Meta Allocator reject ${id} ${allocatorType}`,
     }[type];
   }
 }

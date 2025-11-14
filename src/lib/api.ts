@@ -8,6 +8,7 @@ import { MaAddressesResponse } from '@/types/ma';
  * API base URL for fetching applications.
  */
 const API_BASE_URL = env.apiBaseUrl;
+
 const approveGovernanceReviewUrlFactory = {
   [SignatureType.ApproveGovernanceReview]: (id: string) =>
     `${API_BASE_URL}/applications/${id}/approveGovernanceReview`,
@@ -15,6 +16,7 @@ const approveGovernanceReviewUrlFactory = {
   [SignatureType.KycOverride]: (id: string) =>
     `${API_BASE_URL}/applications/${id}/approveKycOverride`,
   [SignatureType.KycRevoke]: (id: string) => `${API_BASE_URL}/applications/${id}/approveKycRevoke`,
+  [SignatureType.MetaAllocatorReject]: (id: string) => `${API_BASE_URL}/ma/${id}/reject`,
 };
 
 /**

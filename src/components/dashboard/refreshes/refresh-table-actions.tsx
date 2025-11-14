@@ -18,6 +18,7 @@ import {
 } from './table.utils';
 
 import { RefreshGovernanceReviewButton } from '@/components/governance-review/RefreshGovernanceReviewButton';
+import { AccountRole } from '@/types/account';
 
 export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
   const { account } = useAccount();
@@ -45,6 +46,7 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
     case isMetaAllocatorRole(account?.role) && isWaitingForMAApprove(row):
       return (
         <MetaAllocatorSignTransactionButton
+          githubIssueNumber={row.original.githubIssueNumber}
           dataCap={row.original.dataCap}
           address={row.original.msigAddress}
           maAddress={row.original.maAddress}

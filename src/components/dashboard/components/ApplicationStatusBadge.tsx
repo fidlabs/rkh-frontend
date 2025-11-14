@@ -43,7 +43,6 @@ const phaseNames: Record<ApplicationStatus, string> = {
 };
 
 const phaseLabel = (application: Application) => {
-  console.log(application);
   if (application.status === 'META_APPROVAL_PHASE') {
     // Pathway shouldn't change so 1st instruction should always be right
     const firstInstruction = application.applicationInstructions?.[0];

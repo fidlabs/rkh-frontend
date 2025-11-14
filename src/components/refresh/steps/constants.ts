@@ -1,6 +1,8 @@
 export enum RefreshAllocatorSteps {
-  FORM = 'FORM',
+  FORM = 'form',
   LOADING = 'loading',
-  SUCCESS = 'proposed',
+  SUCCESS = 'success',
+  REJECTION_CONFIRMATION = 'rejection_confirmation',
+  REJECTION_SUCCESS = 'rejection_success',
   ERROR = 'error',
 }

@@ -8,6 +8,7 @@ interface MetaAllocatorSignTransactionButtonProps {
   maAddress: `0x${string}`;
   dataCap: number;
   metapathwayType: MetapathwayType;
+  githubIssueNumber: number;
 }
 
 export function MetaAllocatorSignTransactionButton({
@@ -15,6 +16,7 @@ export function MetaAllocatorSignTransactionButton({
   maAddress,
   dataCap,
   metapathwayType,
+  githubIssueNumber,
 }: MetaAllocatorSignTransactionButtonProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -24,6 +26,7 @@ export function MetaAllocatorSignTransactionButton({
         <span className="sm:whitespace-nowrap">Approve</span>
       </Button>
       <MetaAllocatorSignTransactionDialog
+        githubIssueNumber={githubIssueNumber}
         metapathwayType={metapathwayType}
         address={address}
         maAddress={maAddress}
