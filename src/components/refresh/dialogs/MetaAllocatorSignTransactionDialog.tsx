@@ -91,7 +91,7 @@ const MetaAllocatorSignTransactionDialog = ({
       });
     },
     onError: error => {
-          setStep(MetaAllocatorSignSteps.ERROR);
+      setStep(MetaAllocatorSignSteps.ERROR);
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
 
       toast({
