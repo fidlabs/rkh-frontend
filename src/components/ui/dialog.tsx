@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { CircleCheck, CircleXIcon, Loader2, X } from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleXIcon, Loader2, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from './button';
@@ -106,6 +106,12 @@ interface DialogSuccessCardProps {
   children: React.ReactNode;
 }
 
+interface DialogConfirmationCardProps {
+  message: string;
+  onConfirm: () => void;
+  onGoBack: () => void;
+}
+
 function DialogLoadingCard({ loadingMessage }: DialogLoadingCardProps) {
   const message = loadingMessage || 'Loading...';
 
@@ -164,9 +170,32 @@ function DialogErrorCard({ onGoBack, onClose, errorMessage }: DialogErrorProps) 
   );
 }
 
-DialogLoadingCard.displayName = 'DialogLoadingCard';
-DialogSuccessCard.displayName = 'DialogSuccessCard';
-DialogErrorCard.displayName = 'DialogErrorCard';
+function DialogConfirmationCard({ message, onConfirm, onGoBack }: DialogConfirmationCardProps) {
+  return (
+    <>
+      <div
+        data-testid="confirmation-header"
+        className="flex flex-col items-center pt-4 pb-4 min-w-48 text-xl text-blue-500"
+      >
+        <CircleAlert size="60px" />
+      </div>
+
+      <div data-testid="confirmation-message" className="text-sm pb-4 text-center">
+        {message}
+      </div>
+
+      <DialogFooter className="gap-2">
+        <Button variant="outline" onClick={onGoBack}>
+          Go back
+        </Button>
+        <Button variant="outline" onClick={onConfirm}>
+          Confirm
+        </Button>
+      </DialogFooter>
+    </>
+  );
+}
+DialogConfirmationCard.displayName = 'DialogConfirmationCard';
 
 export {
   Dialog,
@@ -182,4 +211,5 @@ export {
   DialogLoadingCard,
   DialogErrorCard,
   DialogSuccessCard,
+  DialogConfirmationCard,
 };

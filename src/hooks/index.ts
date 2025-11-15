@@ -15,3 +15,4 @@ export * from './useSignerManagement';
 export * from './useProposalActions';
 export * from './useMaAddresses';
 export * from './useGovernanceReview';
+export * from './useMetaAllocatorReject';

@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   mockUseApproveRKHTransaction: vi.fn(),
   mockUseMetaAllocatorTransaction: vi.fn(),
   mockUseGovernanceReview: vi.fn(),
+  mockUseMetaAllocatorReject: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -34,6 +35,10 @@ vi.mock('@/hooks', () => ({
     blockNumber: '',
   }),
   useGovernanceReview: mocks.mockUseGovernanceReview.mockReturnValue({
+    mutateAsync: vi.fn(),
+    reset: vi.fn(),
+  }),
+  useMetaAllocatorReject: mocks.mockUseMetaAllocatorReject.mockReturnValue({
     mutateAsync: vi.fn(),
     reset: vi.fn(),
   }),
