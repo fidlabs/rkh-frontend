@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshAllocatorSuccessStep, SetDatacapFormStep } from '@/components/refresh/steps';
-import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
+import { MetaAllocatorSignSteps } from '@/components/refresh/steps/constants';
 import { useMetaAllocatorTransaction, useMetaAllocatorReject } from '@/hooks';
 import { MetapathwayType } from '@/types/refresh';
 import { withFormProvider } from '@/lib/hocs/withFormProvider';
@@ -40,49 +40,49 @@ const MetaAllocatorSignTransactionDialog = ({
   maAddress,
   dataCap,
 }: MetaAllocatorSignTransactionDialogProps) => {
-  const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
+  const [step, setStep] = useState(MetaAllocatorSignSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { submitSafeTransaction, txHash, blockNumber } = useMetaAllocatorTransaction({
     onSubmitSafeTransaction: () => {
-      setStep(RefreshAllocatorSteps.LOADING);
+      setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Signing transaction. Please wait...');
     },
     onConvertingAddress: () => {
-      setStep(RefreshAllocatorSteps.LOADING);
+      setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Converting address to ETH adress. Please wait...');
     },
     onSignSafeTransaction: () => {
-      setStep(RefreshAllocatorSteps.LOADING);
+      setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Signing transaction. Please check your MetaMask.');
     },
     onExecuteSafeTransaction: () => {
-      setStep(RefreshAllocatorSteps.LOADING);
+      setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Executing transaction. Please confrim on your MetaMask.');
     },
     onFetchTransactionReceipt: () => {
-      setStep(RefreshAllocatorSteps.LOADING);
+      setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Fetching transaction receipt. Please wait...');
     },
     onSubmitSafeTransactionError: error => {
-      setStep(RefreshAllocatorSteps.ERROR);
+      setStep(MetaAllocatorSignSteps.ERROR);
       setErrorMessage(
         error instanceof Error ? error.message : 'Unknown error. Please try again later.',
       );
     },
     onSubmitSafeTransactionSuccess: () => {
-      setStep(RefreshAllocatorSteps.SUCCESS);
+      setStep(MetaAllocatorSignSteps.SUCCESS);
     },
   });
 
   const { mutateAsync: reject } = useMetaAllocatorReject({
     signatureType: SignatureType.MetaAllocatorReject,
     onReviewPending: () => {
-      setStep(RefreshAllocatorSteps.LOADING);
+      setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Submitting reject...');
     },
     onSuccess: () => {
-      setStep(RefreshAllocatorSteps.REJECTION_SUCCESS);
+      setStep(MetaAllocatorSignSteps.REJECTION_SUCCESS);
 
       toast({
         title: 'Success',
@@ -91,7 +91,7 @@ const MetaAllocatorSignTransactionDialog = ({
       });
     },
     onError: error => {
-      setStep(RefreshAllocatorSteps.ERROR);
+          setStep(MetaAllocatorSignSteps.ERROR);
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
 
       toast({
@@ -106,7 +106,7 @@ const MetaAllocatorSignTransactionDialog = ({
   const onMetaAllocatorSubmit = useCallback(
     async ({ dataCap }: SetDatacapFormValues) => {
       if (Number(dataCap) === 0) {
-        setStep(RefreshAllocatorSteps.REJECTION_CONFIRMATION);
+        setStep(MetaAllocatorSignSteps.REJECTION_CONFIRMATION);
       } else {
         submitSafeTransaction({
           address,
@@ -132,7 +132,7 @@ const MetaAllocatorSignTransactionDialog = ({
   }, [githubIssueNumber, metapathwayType, reject]);
 
   const handleCloseWithDelay = useCallback(() => {
-    if ([RefreshAllocatorSteps.REJECTION_SUCCESS, RefreshAllocatorSteps.SUCCESS].includes(step)) {
+    if ([MetaAllocatorSignSteps.REJECTION_SUCCESS, MetaAllocatorSignSteps.SUCCESS].includes(step)) {
       return setTimeout(() => onOpenChange(false), 1500);
     }
   }, [onOpenChange, step]);
@@ -144,7 +144,7 @@ const MetaAllocatorSignTransactionDialog = ({
   }, [handleCloseWithDelay]);
 
   const stepsConfig = {
-    [RefreshAllocatorSteps.FORM]: (
+    [MetaAllocatorSignSteps.FORM]: (
       <SetDatacapFormStep
         rejectable
         metapathwayType={metapathwayType}
@@ -153,30 +153,30 @@ const MetaAllocatorSignTransactionDialog = ({
         onCancel={() => onOpenChange(false)}
       />
     ),
-    [RefreshAllocatorSteps.REJECTION_CONFIRMATION]: (
+    [MetaAllocatorSignSteps.REJECTION_CONFIRMATION]: (
       <DialogConfirmationCard
         message="Are you sure you want to reject this MetaAllocator transaction?"
         onConfirm={onMetaAllocatorReject}
-        onGoBack={() => setStep(RefreshAllocatorSteps.FORM)}
+        onGoBack={() => setStep(MetaAllocatorSignSteps.FORM)}
       />
     ),
-    [RefreshAllocatorSteps.REJECTION_SUCCESS]: (
+    [MetaAllocatorSignSteps.REJECTION_SUCCESS]: (
       <DialogSuccessCard onClose={() => onOpenChange(false)}>
         <p>Refresh rejected successfully!</p>
       </DialogSuccessCard>
     ),
-    [RefreshAllocatorSteps.LOADING]: <DialogLoadingCard loadingMessage={loadingMessage} />,
-    [RefreshAllocatorSteps.SUCCESS]: (
+    [MetaAllocatorSignSteps.LOADING]: <DialogLoadingCard loadingMessage={loadingMessage} />,
+    [MetaAllocatorSignSteps.SUCCESS]: (
       <RefreshAllocatorSuccessStep
         blockNumber={blockNumber}
         messageId={txHash}
         onClose={() => onOpenChange(false)}
       />
     ),
-    [RefreshAllocatorSteps.ERROR]: (
+    [MetaAllocatorSignSteps.ERROR]: (
       <DialogErrorCard
         errorMessage={errorMessage}
-        onGoBack={() => setStep(RefreshAllocatorSteps.FORM)}
+        onGoBack={() => setStep(MetaAllocatorSignSteps.FORM)}
         onClose={() => onOpenChange(false)}
       />
     ),
@@ -184,7 +184,7 @@ const MetaAllocatorSignTransactionDialog = ({
 
   useEffect(() => {
     if (open) {
-      setStep(RefreshAllocatorSteps.FORM);
+      setStep(MetaAllocatorSignSteps.FORM);
       setLoadingMessage(null);
       setErrorMessage(null);
     }
