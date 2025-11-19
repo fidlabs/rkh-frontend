@@ -35,7 +35,7 @@ describe('useGovernanceReview', () => {
   const fixtureAccount = {
     address: '0x9876543210987654321098765432109876543210',
     wallet: {
-      getPubKey: vi.fn(() => 'test-public-key'),
+      getPubKey: vi.fn(() => Buffer.from('test-public-key')),
     },
   };
 
@@ -46,6 +46,7 @@ describe('useGovernanceReview', () => {
 
     mocks.mockUseAccount.mockReturnValue({
       account: fixtureAccount,
+      signStateMessage: mocks.mockSignStateMessage.mockResolvedValue('test-signature'),
     });
 
     mocks.mockGovernanceReview.mockResolvedValue({
@@ -59,6 +60,7 @@ describe('useGovernanceReview', () => {
       () =>
         useMetaAllocatorReject({
           signatureType: SignatureType.MetaAllocatorReject,
+          onSignaturePending: mocks.mockOnSignaturePending,
           onReviewPending: mocks.mockOnReviewPending,
           onSuccess: mocks.mockOnSuccess,
           onError: mocks.mockOnError,
@@ -68,6 +70,10 @@ describe('useGovernanceReview', () => {
 
     await result.current.mutateAsync({ id: 'test-app-123', payload: fixtureFormData });
 
+    expect(mocks.mockOnSignaturePending).toHaveBeenCalledTimes(1);
+    expect(mocks.mockSignStateMessage).toHaveBeenCalledWith(
+      `Meta Allocator reject test-app-123 MDMA`,
+    );
     expect(mocks.mockOnReviewPending).toHaveBeenCalledTimes(1);
     expect(mocks.mockOnSuccess).toHaveBeenCalledTimes(1);
   });
@@ -77,6 +83,7 @@ describe('useGovernanceReview', () => {
       () =>
         useMetaAllocatorReject({
           signatureType: SignatureType.MetaAllocatorReject,
+          onSignaturePending: mocks.mockOnSignaturePending,
           onReviewPending: mocks.mockOnReviewPending,
           onSuccess: mocks.mockOnSuccess,
           onError: mocks.mockOnError,
@@ -86,6 +93,8 @@ describe('useGovernanceReview', () => {
 
     await result.current.mutateAsync({ id: '123', payload: fixtureFormData });
 
+    expect(mocks.mockOnSignaturePending).toHaveBeenCalledTimes(1);
+    expect(mocks.mockOnReviewPending).toHaveBeenCalledTimes(1);
     expect(mocks.mockGovernanceReview).toHaveBeenCalledWith(
       SignatureType.MetaAllocatorReject,
       '123',
@@ -97,9 +106,9 @@ describe('useGovernanceReview', () => {
           isMDMAAllocator: fixtureFormData.isMDMAAllocatorChecked,
           reason: fixtureFormData.reason,
           reviewerAddress: fixtureAccount.address,
-          reviewerPublicKey: '0x0000000000000000000000000000000000000000',
+          reviewerPublicKey: Buffer.from('0x0').toString('base64'),
         },
-        signature: 'Meta Allocator reject 123 MDMA',
+        signature: 'test-signature',
       },
     );
   });
@@ -112,6 +121,7 @@ describe('useGovernanceReview', () => {
       () =>
         useMetaAllocatorReject({
           signatureType: SignatureType.MetaAllocatorReject,
+          onSignaturePending: mocks.mockOnSignaturePending,
           onReviewPending: mocks.mockOnReviewPending,
           onSuccess: mocks.mockOnSuccess,
           onError: mocks.mockOnError,

@@ -6,6 +6,7 @@ import {
   useConnect as useWagmiConnect,
   useDisconnect as useWagmiDisconnect,
 } from 'wagmi';
+import { stringToHex } from 'viem';
 
 import { AccountContext } from '@/contexts/AccountContext';
 import * as cbor from 'cbor';
@@ -45,6 +46,10 @@ type Msg = {
   Params: string; // base64
 };
 
+type Eip1193Provider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
 export const AccountProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
@@ -70,7 +75,7 @@ export const AccountProvider: React.FC<{
 
       const setupSafe = async () => {
         try {
-          const provider = await wagmiConnector?.getProvider();
+          const provider = (await wagmiConnector?.getProvider()) as Eip1193Provider | undefined;
           const safeKit = await getSafeKit(provider, selectedMetaAllocator?.ethSafeAddress);
           const maOwners = await safeKit.getOwners();
 
@@ -84,15 +89,21 @@ export const AccountProvider: React.FC<{
             wallet: {
               type: 'metamask',
               sign: async (_message: any, _indexAccount: number) => '0x00',
-              signArbitrary: async (message: string, indexAccount: number) => {
-                throw new Error('Not implemented');
+              signArbitrary: async (message: string) => {
+                if (!provider || !wagmiAddress) {
+                  throw new Error('MetaMask not ready or not connected');
+                }
+
+                const hexMessage = stringToHex(message);
+                return provider.request({
+                  method: 'personal_sign',
+                  params: [hexMessage, wagmiAddress],
+                }) as Promise<string>;
               },
               getPubKey: () => {
-                throw new Error('Not implemented');
+                throw new Error('getPubKey is not implemented for MetaMask');
               },
-              getAccounts: async () => {
-                return [wagmiAddress];
-              },
+              getAccounts: async () => [wagmiAddress],
             },
           });
         } catch (error) {
@@ -128,6 +139,7 @@ export const AccountProvider: React.FC<{
             }).then(() => {
               setSelectedMetaAllocator(ma || null);
             });
+            setCurrentConnector(injected() as unknown as Connector);
             break;
           case 'ledger':
             const ledgerConnector = new LedgerConnector(accountIndex);

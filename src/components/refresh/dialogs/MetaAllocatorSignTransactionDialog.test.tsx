@@ -28,6 +28,7 @@ const mocks = vi.hoisted(() => ({
   },
   mockProvider: {},
   mockGovernanceReview: vi.fn(),
+  mockSignStateMessage: vi.fn(),
 }));
 
 vi.mock('@/hooks/useAccount', () => ({
@@ -77,7 +78,9 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
       selectedMetaAllocator: {
         ethSafeAddress: '0x1234567890123456789012345678901234567890',
       },
+      signStateMessage: mocks.mockSignStateMessage,
     });
+    mocks.mockSignStateMessage.mockResolvedValue('test-signature');
 
     mocks.mockUseAccountWagmi.mockReturnValue({
       connector: mocks.mockConnector,
@@ -263,9 +266,9 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
             isMDMAAllocator: false,
             reason: 'No reason given',
             reviewerAddress: '0x0000000000000000000000000000000000000000',
-            reviewerPublicKey: '0x0000000000000000000000000000000000000000',
+            reviewerPublicKey: Buffer.from('0x0').toString('base64'),
           },
-          signature: 'Meta Allocator reject 123 MDMA',
+          signature: 'test-signature',
         },
       );
     });
