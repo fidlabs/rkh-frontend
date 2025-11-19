@@ -77,6 +77,10 @@ const MetaAllocatorSignTransactionDialog = ({
 
   const { mutateAsync: reject } = useMetaAllocatorReject({
     signatureType: SignatureType.MetaAllocatorReject,
+    onSignaturePending: () => {
+      setStep(MetaAllocatorSignSteps.LOADING);
+      setLoadingMessage('Signing message, please check your MetaMask...');
+    },
     onReviewPending: () => {
       setStep(MetaAllocatorSignSteps.LOADING);
       setLoadingMessage('Submitting reject...');

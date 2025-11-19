@@ -8,43 +8,52 @@ import { SignatureType } from '@/types/governance-review';
 
 interface UseMetaAllocatorRejectProps {
   signatureType: SignatureType;
+  onSignaturePending?: () => void;
   onReviewPending?: () => void;
   onSuccess?: () => void;
   onError?: (error: Error) => void;
 }
 
 /**
- * use case hook to reject refresh as metaallocator
- * TODO: add siging method to the signature (currently not implemented as it should be)
- * @returns
+ * use case hook to reject refresh as metaallocator using EVM signature
  */
 export const useMetaAllocatorReject = ({
   signatureType,
+  onSignaturePending,
   onReviewPending,
   onSuccess,
   onError,
 }: UseMetaAllocatorRejectProps) => {
-  const { account } = useAccount();
+  const { account, signStateMessage } = useAccount();
 
   const handleMetaAllocatorReject = useCallback(
     async (id: string, data: GovernanceReviewFormValues) => {
       try {
+        onSignaturePending?.();
+        const signature = await signStateMessage(
+          SignStateMessageMethodFactory.create(signatureType as SignatureType)({
+            result: 'reject',
+            id,
+            finalDataCap: 0,
+            allocatorType: data.allocatorType,
+          }),
+        );
+        const pubKeyBuffer = account?.wallet?.getPubKey();
+        const reviewerPublicKey =
+          pubKeyBuffer && pubKeyBuffer.length > 0 ? pubKeyBuffer.toString('base64') : '';
+
         const reviewData = {
           result: 'reject',
           details: {
             finalDataCap: '0',
             allocatorType: data.allocatorType,
             reason: data.reason || 'No reason given',
-            reviewerAddress: account?.address || '0x0000000000000000000000000000000000000000',
-            reviewerPublicKey: '0x0000000000000000000000000000000000000000',
+            reviewerAddress:
+              account?.address?.toLowerCase() || '0x0000000000000000000000000000000000000000',
+            reviewerPublicKey,
             isMDMAAllocator: data.isMDMAAllocatorChecked,
           },
-          signature: SignStateMessageMethodFactory.create(signatureType as SignatureType)({
-            result: 'reject',
-            id,
-            finalDataCap: 0,
-            allocatorType: data.allocatorType,
-          }),
+          signature: signature,
         };
 
         onReviewPending?.();
