@@ -106,7 +106,7 @@ describe('useGovernanceReview', () => {
           isMDMAAllocator: fixtureFormData.isMDMAAllocatorChecked,
           reason: fixtureFormData.reason,
           reviewerAddress: fixtureAccount.address,
-          reviewerPublicKey: Buffer.from('test-public-key').toString('base64'),
+          reviewerPublicKey: Buffer.from('0x0').toString('base64'),
         },
         signature: 'test-signature',
       },

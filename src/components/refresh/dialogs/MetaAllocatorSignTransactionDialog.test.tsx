@@ -266,7 +266,7 @@ describe('MetaAllocatorSignTransactionDialog Integration Tests', () => {
             isMDMAAllocator: false,
             reason: 'No reason given',
             reviewerAddress: '0x0000000000000000000000000000000000000000',
-            reviewerPublicKey: '',
+            reviewerPublicKey: Buffer.from('0x0').toString('base64'),
           },
           signature: 'test-signature',
         },

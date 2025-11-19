@@ -81,7 +81,6 @@ export const AccountProvider: React.FC<{
 
           setAccount({
             address: wagmiAddress,
-            evmAddress: wagmiAddress,
             index: 0,
             isConnected: true,
             role: maOwners.includes(wagmiAddress)
@@ -101,7 +100,9 @@ export const AccountProvider: React.FC<{
                   params: [hexMessage, wagmiAddress],
                 }) as Promise<string>;
               },
-              getPubKey: () => Buffer.from('0x0000000000000000000000000000000000000000'),
+              getPubKey: () => {
+                throw new Error('getPubKey is not implemented for MetaMask');
+              },
               getAccounts: async () => [wagmiAddress],
             },
           });

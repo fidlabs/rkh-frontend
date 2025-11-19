@@ -38,9 +38,6 @@ export const useMetaAllocatorReject = ({
             allocatorType: data.allocatorType,
           }),
         );
-        const pubKeyBuffer = account?.wallet?.getPubKey();
-        const reviewerPublicKey =
-          pubKeyBuffer && pubKeyBuffer.length > 0 ? pubKeyBuffer.toString('base64') : '';
 
         const reviewData = {
           result: 'reject',
@@ -50,7 +47,7 @@ export const useMetaAllocatorReject = ({
             reason: data.reason || 'No reason given',
             reviewerAddress:
               account?.address?.toLowerCase() || '0x0000000000000000000000000000000000000000',
-            reviewerPublicKey,
+            reviewerPublicKey: Buffer.from('0x0').toString('base64'),
             isMDMAAllocator: data.isMDMAAllocatorChecked,
           },
           signature: signature,
