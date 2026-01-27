@@ -133,7 +133,7 @@ export default function Home() {
                 ))}
               </ul>
               <Link
-                href="https://airtable.com/appVmASv3V2GIds6v/pagI08VGIVczU97wK/form"
+                href="https://airtable.com/appVmASv3V2GIds6v/paggCBxyJ3fSd3eQl/form"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-8"
