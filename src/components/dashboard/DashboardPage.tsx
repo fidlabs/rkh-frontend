@@ -67,7 +67,7 @@ export function DashboardPage() {
         <Button variant="outline">
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             <Link
-              href="https://airtable.com/appVmASv3V2GIds6v/pagI08VGIVczU97wK/form"
+              href="https://airtable.com/appVmASv3V2GIds6v/paggCBxyJ3fSd3eQl/form"
               target="_blank"
             >
               Apply To Become An Allocator
