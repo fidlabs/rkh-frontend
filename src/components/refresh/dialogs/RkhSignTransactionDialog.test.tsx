@@ -7,6 +7,7 @@ import { ApiStateWaitMsgResponse } from '@/types/filecoin-client';
 
 const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
+  mockUseGetVerifierDataCap: vi.fn(),
   mockProposeAddVerifier: vi.fn(),
   mockGetStateWaitMsg: vi.fn(),
   mockUseToast: vi.fn(),
@@ -21,6 +22,10 @@ vi.mock('@/hooks/useAccount', () => ({
   useAccount: mocks.mockUseAccount,
 }));
 
+vi.mock('@/hooks/useGetVerifierDataCap', () => ({
+  useGetVerifierDataCap: mocks.mockUseGetVerifierDataCap,
+}));
+
 vi.mock('@/components/ui/use-toast', () => ({
   useToast: mocks.mockUseToast,
 }));
@@ -31,6 +36,7 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
     open: true,
     address: 'f1234567890abcdef',
     onOpenChange: vi.fn(),
+    actorId: 'f012345',
   };
   const mockStateWaitResponse: ApiStateWaitMsgResponse = {
     data: {
@@ -53,6 +59,8 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
     success: true,
   };
 
+  const mockDataCap = 10n ** 18n;
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -62,6 +70,13 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
 
     mocks.mockUseToast.mockReturnValue({
       toast: mocks.mockToast,
+    });
+
+    mocks.mockUseGetVerifierDataCap.mockReturnValue({
+      data: { datacap: mockDataCap, verifier: 'f012345' },
+      isLoading: false,
+      isError: false,
+      error: null,
     });
   });
 
@@ -85,11 +100,35 @@ describe('RkhSignTransactionDialog Integration Tests', () => {
       mocks.mockGetStateWaitMsg.mockResolvedValue(mockStateWaitResponse);
     });
 
-    it('should go through complete success flow', async () => {
+    it('should go through complete success flow and add datacap', async () => {
       const user = userEvent.setup();
       render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
 
       await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
+      await user.click(screen.getByRole('button', { name: /approve/i }));
+
+      expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(
+        mockProps.address,
+        '1000',
+        mockDataCap,
+      );
+
+      const successHeader = await screen.findByTestId('success-header');
+      expect(successHeader).toHaveTextContent('Success!');
+
+      const transactionIdSection = screen.getByTestId('transaction-id-section');
+      expect(transactionIdSection).toHaveTextContent('Transaction IDmessage-id-123');
+
+      const blockNumberSection = screen.getByTestId('block-number-section');
+      expect(blockNumberSection).toHaveTextContent('Block number12345');
+    });
+
+    it('should go through complete success flow and set datacap', async () => {
+      const user = userEvent.setup();
+      render(<RkhSignTransactionDialog {...mockProps} />, { wrapper });
+
+      await user.type(screen.getByRole('spinbutton', { name: /datacap/i }), '1000');
+      await user.click(screen.getByRole('radio', { name: /set/i }));
       await user.click(screen.getByRole('button', { name: /approve/i }));
 
       expect(mocks.mockProposeAddVerifier).toHaveBeenCalledWith(mockProps.address, '1000');

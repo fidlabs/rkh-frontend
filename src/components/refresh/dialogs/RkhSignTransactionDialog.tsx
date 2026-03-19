@@ -9,21 +9,22 @@ import {
   DialogLoadingCard,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshAllocatorSuccessStep } from '@/components/refresh/steps';
 import { RefreshAllocatorSteps } from '@/components/refresh/steps/constants';
-import { useProposeRKHTransaction, useStateWaitMsg } from '@/hooks';
+import { useProposeRKHTransaction, useStateWaitMsg, useGetVerifierDataCap } from '@/hooks';
 import { MetapathwayType } from '@/types/refresh';
 import {
-  SetDatacapFormStep,
-  SetDatacapFormValues,
-} from '@/components/refresh/steps/SetDatacapFormStep';
+  ChangeDatacapFormStep,
+  ChangeDatacapFormValues,
+} from '@/components/refresh/steps/ChangeDatacapFormStep';
 import { withFormProvider } from '@/lib/hocs/withFormProvider';
 
 interface RkhSignTransactionDialogProps {
   open: boolean;
   address: string;
   dataCap?: number;
+  actorId: string;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -32,6 +33,7 @@ const RkhSignTransactionDialog = ({
   open,
   address,
   dataCap,
+  actorId,
 }: RkhSignTransactionDialogProps) => {
   const [step, setStep] = useState(RefreshAllocatorSteps.FORM);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
@@ -62,12 +64,38 @@ const RkhSignTransactionDialog = ({
     onProposeTransactionSuccess: (messageId: string) => checkTransactionState(messageId),
   });
 
+  const { data: verifierData } = useGetVerifierDataCap(actorId, {
+    enabled: !!actorId && open,
+  });
+
+  const datacapInPib = useMemo(() => {
+    if (!verifierData?.datacap) return '0';
+    return (Number(verifierData?.datacap) / 1_125_899_906_842_624).toFixed(2);
+  }, [verifierData?.datacap]);
+
   const onSubmit = useCallback(
-    async ({ dataCap }: SetDatacapFormValues) =>
-      proposeTransaction({ address, datacap: dataCap }).catch(error => {
-        console.error('Error proposing verifier:', error);
-      }),
-    [address, proposeTransaction],
+    async ({ dataCap, method }: ChangeDatacapFormValues) => {
+      if (method === 'add') {
+        if (verifierData === undefined) {
+          setStep(RefreshAllocatorSteps.ERROR);
+          setErrorMessage('Verifier data not found');
+          return;
+        }
+
+        proposeTransaction({
+          address,
+          datacap: dataCap,
+          additionalDataCap: verifierData?.datacap,
+        }).catch(error => {
+          console.error('Error proposing verifier:', error);
+        });
+      } else {
+        proposeTransaction({ address, datacap: dataCap }).catch(error => {
+          console.error('Error proposing verifier:', error);
+        });
+      }
+    },
+    [address, proposeTransaction, verifierData],
   );
 
   const getBlockNumber = () => {
@@ -76,8 +104,9 @@ const RkhSignTransactionDialog = ({
 
   const stepsConfig = {
     [RefreshAllocatorSteps.FORM]: (
-      <SetDatacapFormStep
+      <ChangeDatacapFormStep
         metapathwayType={MetapathwayType.RKH}
+        verifierDataCap={datacapInPib}
         dataCap={dataCap}
         toAddress={address}
         onSubmit={onSubmit}

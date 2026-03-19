@@ -180,7 +180,7 @@ export const AccountProvider: React.FC<{
   }, [account, currentConnector]);
 
   const proposeAddVerifier = useCallback(
-    async (verifierAddress: string, datacap: number) => {
+    async (verifierAddress: string, datacap: number, additionalDataCap: bigint = 0n) => {
       if (!account?.wallet) {
         throw new Error('Wallet not connected');
       }
@@ -194,7 +194,7 @@ export const AccountProvider: React.FC<{
       );
 
       // 1PiB is 2^50
-      const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
+      const fullDataCap = BigInt(datacap * 1_125_899_906_842_624) + additionalDataCap;
       let verifierAccountId = verifierAddress;
       if (verifierAccountId.length < 12) {
         verifierAccountId = await api.actorKey(verifierAccountId);
@@ -380,6 +380,30 @@ export const AccountProvider: React.FC<{
     [account, currentConnector],
   );
 
+  const checkActorDataCap = useCallback(
+    async (actorId: string) => {
+      if (!account?.wallet) {
+        throw new Error('Wallet not connected');
+      }
+
+      const api = new VerifyAPI(
+        VerifyAPI.browserProvider(env.rpcUrl, {
+          token: async () => 'dummy-token',
+        }),
+        account.wallet,
+        env.useTestnet,
+      );
+
+      const datacap = await (api as any).client.stateVerifierStatus(actorId, null);
+
+      return {
+        datacap: BigInt(datacap),
+        verifier: actorId,
+      };
+    },
+    [account],
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <AccountContext.Provider
@@ -393,6 +417,7 @@ export const AccountProvider: React.FC<{
           acceptVerifierProposal,
           loadPersistedAccount,
           selectedMetaAllocator,
+          checkActorDataCap,
         }}
       >
         {children}

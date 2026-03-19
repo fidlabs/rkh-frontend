@@ -31,6 +31,7 @@ export const RefreshTableActions = ({ row }: { row: Row<Refresh> }) => {
         <RkhSignTransactionButton
           dataCap={row.original.dataCap}
           address={row.original.msigAddress}
+          actorId={row.original.actorId}
         />
       );
 

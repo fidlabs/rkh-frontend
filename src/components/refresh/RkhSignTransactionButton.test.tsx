@@ -6,10 +6,12 @@ import { createWrapper } from '@/test-utils';
 
 const mocks = vi.hoisted(() => ({
   mockUseAccount: vi.fn(),
+  mockUseGetVerifierDataCap: vi.fn(),
 }));
 
 vi.mock('@/hooks/useAccount', () => ({
   useAccount: mocks.mockUseAccount,
+  useGetVerifierDataCap: mocks.mockUseGetVerifierDataCap,
 }));
 
 describe('RkhSignTransactionButton', () => {
@@ -17,6 +19,7 @@ describe('RkhSignTransactionButton', () => {
   const defaultProps = {
     address: 'f1abc',
     dataCap: 1024,
+    actorId: 'f1abc',
   };
 
   beforeEach(() => {
@@ -24,6 +27,12 @@ describe('RkhSignTransactionButton', () => {
 
     mocks.mockUseAccount.mockReturnValue({
       account: null,
+    });
+
+    mocks.mockUseGetVerifierDataCap.mockReturnValue({
+      data: {
+        datacap: 50,
+      },
     });
   });
 

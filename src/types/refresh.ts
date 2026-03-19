@@ -21,6 +21,7 @@ interface User {
 }
 
 export interface Refresh {
+  actorId: string;
   githubIssueId: number;
   githubIssueNumber: number;
   title: string;

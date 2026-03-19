@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   mockUseMetaAllocatorTransaction: vi.fn(),
   mockUseGovernanceReview: vi.fn(),
   mockUseMetaAllocatorReject: vi.fn(),
+  mockUseGetVerifierDataCap: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -42,12 +43,18 @@ vi.mock('@/hooks', () => ({
     mutateAsync: vi.fn(),
     reset: vi.fn(),
   }),
+  useGetVerifierDataCap: mocks.mockUseGetVerifierDataCap.mockReturnValue({
+    data: null,
+    isLoading: false,
+    error: null,
+  }),
 }));
 
 describe('RefreshTableActions', () => {
   const createMockRow = (refresh: Partial<Refresh>): Row<Refresh> =>
     ({
       original: {
+        actorId: 100,
         githubIssueId: 1,
         title: 'Test Refresh',
         creator: { userId: 1, name: 'Test User' },

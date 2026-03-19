@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   mockUseStateWaitMsg: vi.fn(),
   mockUseProposeRKHTransaction: vi.fn(),
   mockUseGovernanceReview: vi.fn(),
+  mockUseGetVerifierDataCap: vi.fn(),
 }));
 
 vi.mock('@/hooks/useAccount', () => ({
@@ -31,6 +32,11 @@ vi.mock('@/hooks', () => ({
   useGovernanceReview: mocks.mockUseGovernanceReview.mockReturnValue({
     mutateAsync: vi.fn(),
     reset: vi.fn(),
+  }),
+  useGetVerifierDataCap: mocks.mockUseGetVerifierDataCap.mockReturnValue({
+    data: null,
+    isLoading: false,
+    error: null,
   }),
 }));
 

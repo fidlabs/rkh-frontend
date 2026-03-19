@@ -1,4 +1,5 @@
 import { useFormContext, useWatch } from 'react-hook-form';
+import { useMemo, useEffect } from 'react';
 
 import { ControlledFormItem } from '@/components/ui/form-item';
 import { Input } from '@/components/ui/input';
@@ -8,31 +9,41 @@ import { validationRules } from '@/components/refresh/dialogs/RefreshAllocatorVa
 import { Label } from '@/components/ui/label';
 import { MetapathwayTypeBadge } from '@/components/dashboard/components/MetapathwayTypeBadge';
 import { RejectableFormLegend } from './components/RejectableFormLegend';
+import { Switcher } from '@/components/ui/switcher';
 
-export interface SetDatacapFormValues {
+export interface ChangeDatacapFormValues {
   dataCap: number;
+  method: 'add' | 'set';
 }
 
-interface SetDatacapFormStepProps {
+interface ChangeDatacapFormStepProps {
   rejectable?: boolean;
   metapathwayType: MetapathwayType;
+  verifierDataCap?: string;
   dataCap?: number;
   toAddress?: string;
-  onSubmit: (data: SetDatacapFormValues) => void;
+  onSubmit: (data: ChangeDatacapFormValues) => void;
   onCancel: () => void;
 }
 
-export const SetDatacapFormStep = ({
+export const ChangeDatacapFormStep = ({
   rejectable,
   metapathwayType,
+  verifierDataCap,
   dataCap,
   toAddress,
   onSubmit,
   onCancel,
-}: SetDatacapFormStepProps) => {
-  const { control, handleSubmit } = useFormContext<SetDatacapFormValues>();
+}: ChangeDatacapFormStepProps) => {
+  const { control, handleSubmit } = useFormContext<ChangeDatacapFormValues>();
   const dataCapValidationRules = validationRules.dataCap();
   const datacap = useWatch({ name: 'dataCap' });
+  const methodOptions = useMemo(() => {
+    return [
+      { label: 'Add', value: 'add' },
+      { label: 'Set', value: 'set' },
+    ];
+  }, []);
 
   return (
     <form role="form" className="flex flex-col px-4 gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -45,10 +56,28 @@ export const SetDatacapFormStep = ({
             <span className="text-muted-foreground break-all">{toAddress}</span>
           </div>
         ) : null}
-        <div data-testid="allocator-type" className="flex flex-row justify-between">
+
+        <div data-testid="allocator-type" className="flex flex-row justify-between mb-2">
           <Label>Allocator Type:</Label>
           <MetapathwayTypeBadge metapathwayType={metapathwayType} />
         </div>
+
+        {verifierDataCap ? (
+          <div data-testid="allocator-type" className="flex flex-row justify-between mb-2">
+            <Label>Allocator Datacap:</Label>
+            <span>{verifierDataCap} PiB</span>
+          </div>
+        ) : null}
+
+        <ControlledFormItem
+          className="w-full"
+          name="method"
+          defaultValue="add"
+          label="Method"
+          control={control}
+        >
+          <Switcher className="w-full" options={methodOptions} />
+        </ControlledFormItem>
 
         <ControlledFormItem
           className="w-full"

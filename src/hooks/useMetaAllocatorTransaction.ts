@@ -65,6 +65,27 @@ const addAllowanceContractAbi = [
   },
 ];
 
+const setAllowanceContractAbi = [
+  {
+    type: 'function',
+    name: 'setAllowance',
+    inputs: [
+      {
+        name: 'allocator',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'amount',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+];
+
 interface MetaAllocatorTransaction {
   onSubmitSafeTransaction?: () => void;
   onSubmitSafeTransactionSuccess?: (
@@ -82,6 +103,7 @@ interface SubmitSafeTransactionParams {
   address: string;
   datacap: number;
   metaAllocatorContractAddress: `0x${string}`;
+  method: 'add' | 'set';
 }
 
 export const useMetaAllocatorTransaction = ({
@@ -134,7 +156,12 @@ export const useMetaAllocatorTransaction = ({
   }, []);
 
   const submitSafeTransaction = useCallback(
-    async ({ address, datacap, metaAllocatorContractAddress }: SubmitSafeTransactionParams) => {
+    async ({
+      address,
+      datacap,
+      metaAllocatorContractAddress,
+      method,
+    }: SubmitSafeTransactionParams) => {
       setIsPending(true);
       onSubmitSafeTransaction?.();
 
@@ -160,8 +187,8 @@ export const useMetaAllocatorTransaction = ({
 
         const fullDataCap = BigInt(datacap * 1_125_899_906_842_624);
         const data = encodeFunctionData({
-          abi: addAllowanceContractAbi,
-          functionName: 'addAllowance',
+          abi: method === 'add' ? addAllowanceContractAbi : setAllowanceContractAbi,
+          functionName: method === 'add' ? 'addAllowance' : 'setAllowance',
           args: [txAddress as `0x${string}`, fullDataCap],
         });
 

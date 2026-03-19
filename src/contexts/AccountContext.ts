@@ -16,13 +16,20 @@ export interface AccountContextType {
   signStateMessage: (message: string) => Promise<string>;
 
   // Root Key Holder
-  proposeAddVerifier: (verifierAddress: string, datacap: number) => Promise<string>;
+  proposeAddVerifier: (
+    verifierAddress: string,
+    datacap: number,
+    additionalDataCap?: bigint,
+  ) => Promise<string>;
   acceptVerifierProposal: (
     verifierAddress: string,
     datacap: number,
     fromAccount: string,
     transactionId: number,
   ) => Promise<string>;
+
+  // Verifier
+  checkActorDataCap: (actorId: string) => Promise<{ datacap: bigint; verifier: string }>;
 }
 
 export const AccountContext = createContext<AccountContextType | undefined>(undefined);

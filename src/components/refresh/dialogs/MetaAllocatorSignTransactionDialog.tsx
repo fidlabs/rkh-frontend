@@ -12,12 +12,12 @@ import {
   DialogSuccessCard,
 } from '@/components/ui/dialog';
 import { useCallback, useEffect, useState } from 'react';
-import { RefreshAllocatorSuccessStep, SetDatacapFormStep } from '@/components/refresh/steps';
+import { RefreshAllocatorSuccessStep, ChangeDatacapFormStep } from '@/components/refresh/steps';
 import { MetaAllocatorSignSteps } from '@/components/refresh/steps/constants';
 import { useMetaAllocatorTransaction, useMetaAllocatorReject } from '@/hooks';
 import { MetapathwayType } from '@/types/refresh';
 import { withFormProvider } from '@/lib/hocs/withFormProvider';
-import { SetDatacapFormValues } from '@/components/refresh/steps/SetDatacapFormStep';
+import { ChangeDatacapFormValues } from '@/components/refresh/steps/ChangeDatacapFormStep';
 import { SignatureType } from '@/types/governance-review';
 import { toast } from '@/components/ui/use-toast';
 
@@ -108,7 +108,7 @@ const MetaAllocatorSignTransactionDialog = ({
   });
 
   const onMetaAllocatorSubmit = useCallback(
-    async ({ dataCap }: SetDatacapFormValues) => {
+    async ({ dataCap, method }: ChangeDatacapFormValues) => {
       if (Number(dataCap) === 0) {
         setStep(MetaAllocatorSignSteps.REJECTION_CONFIRMATION);
       } else {
@@ -116,6 +116,7 @@ const MetaAllocatorSignTransactionDialog = ({
           address,
           datacap: dataCap,
           metaAllocatorContractAddress: maAddress,
+          method,
         });
       }
     },
@@ -149,7 +150,7 @@ const MetaAllocatorSignTransactionDialog = ({
 
   const stepsConfig = {
     [MetaAllocatorSignSteps.FORM]: (
-      <SetDatacapFormStep
+      <ChangeDatacapFormStep
         rejectable
         metapathwayType={metapathwayType}
         dataCap={dataCap}

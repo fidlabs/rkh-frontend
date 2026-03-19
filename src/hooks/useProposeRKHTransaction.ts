@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAccount } from '@/hooks';
-import { Application } from '@/types/application';
 import { useCallback } from 'react';
 
 interface UseProposeRKHTransactionProps {
@@ -12,6 +11,7 @@ interface UseProposeRKHTransactionProps {
 interface ProposeTransactionParams {
   address: string;
   datacap: number;
+  additionalDataCap?: bigint;
 }
 
 export function useProposeRKHTransaction({
@@ -23,9 +23,11 @@ export function useProposeRKHTransaction({
 
   const mutation = useMutation({
     mutationKey: ['proposeTransaction'],
-    mutationFn: async ({ address, datacap }: ProposeTransactionParams) => {
+    mutationFn: async ({ address, datacap, additionalDataCap }: ProposeTransactionParams) => {
       onProposeTransaction?.();
-      return proposeAddVerifier(address, datacap);
+      return additionalDataCap
+        ? proposeAddVerifier(address, datacap, additionalDataCap)
+        : proposeAddVerifier(address, datacap);
     },
     onSuccess: (messageId: string) => {
       onProposeTransactionSuccess?.(messageId);
@@ -44,10 +46,11 @@ export function useProposeRKHTransaction({
   });
 
   const proposeTransaction = useCallback(
-    async (params: Pick<Application, 'address' | 'datacap'>) =>
+    async (params: ProposeTransactionParams) =>
       mutation.mutateAsync({
         address: params.address,
         datacap: params.datacap,
+        additionalDataCap: params.additionalDataCap,
       }),
     [mutation],
   );

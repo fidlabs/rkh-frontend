@@ -4,10 +4,15 @@ import RkhSignTransactionDialog from '@/components/refresh/dialogs/RkhSignTransa
 
 interface RkhSignTransactionButtonProps {
   address: string;
+  actorId: string;
   dataCap: number;
 }
 
-export function RkhSignTransactionButton({ address, dataCap }: RkhSignTransactionButtonProps) {
+export function RkhSignTransactionButton({
+  address,
+  actorId,
+  dataCap,
+}: RkhSignTransactionButtonProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
@@ -17,6 +22,7 @@ export function RkhSignTransactionButton({ address, dataCap }: RkhSignTransactio
       </Button>
       <RkhSignTransactionDialog
         address={address}
+        actorId={actorId}
         dataCap={dataCap}
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}

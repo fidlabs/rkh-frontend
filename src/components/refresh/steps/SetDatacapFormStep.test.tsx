@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { FormProvider, useForm } from 'react-hook-form';
 import { WrapperBuilder } from '@/test-utils/wrapper-builder';
 import { createWrapper } from '@/test-utils';
-import { SetDatacapFormStep, type SetDatacapFormValues } from './SetDatacapFormStep';
+import { ChangeDatacapFormStep, type ChangeDatacapFormValues } from './ChangeDatacapFormStep';
 import { MetapathwayType, type Refresh, RefreshStatus } from '@/types/refresh';
 
 describe('SetDatacapFormStep', () => {
@@ -12,7 +12,7 @@ describe('SetDatacapFormStep', () => {
   const fixtureMetapathwayType = MetapathwayType.RKH;
 
   const TestFormProvider = ({ children }: { children: React.ReactNode }) => {
-    const methods = useForm<SetDatacapFormValues>({
+    const methods = useForm<ChangeDatacapFormValues>({
       defaultValues: {
         dataCap: fixtureDataCap,
       },
@@ -31,7 +31,7 @@ describe('SetDatacapFormStep', () => {
 
   it('renders allocator type, datacap input and action buttons', () => {
     render(
-      <SetDatacapFormStep
+      <ChangeDatacapFormStep
         metapathwayType={fixtureMetapathwayType}
         dataCap={fixtureDataCap}
         onSubmit={onSubmit}
@@ -51,7 +51,7 @@ describe('SetDatacapFormStep', () => {
 
   it('pre-fills datacap with refresh value', () => {
     render(
-      <SetDatacapFormStep
+      <ChangeDatacapFormStep
         metapathwayType={fixtureMetapathwayType}
         dataCap={fixtureDataCap}
         onSubmit={onSubmit}
@@ -70,7 +70,7 @@ describe('SetDatacapFormStep', () => {
     const user = userEvent.setup();
 
     render(
-      <SetDatacapFormStep
+      <ChangeDatacapFormStep
         metapathwayType={fixtureMetapathwayType}
         dataCap={fixtureDataCap}
         onSubmit={onSubmit}
@@ -91,7 +91,7 @@ describe('SetDatacapFormStep', () => {
     const user = userEvent.setup();
 
     render(
-      <SetDatacapFormStep
+      <ChangeDatacapFormStep
         metapathwayType={fixtureMetapathwayType}
         dataCap={fixtureDataCap}
         onSubmit={onSubmit}

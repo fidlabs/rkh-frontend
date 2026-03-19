@@ -142,6 +142,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: '0x1234567890123456789012345678901234567890',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -200,6 +201,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: 'f1abc123def456',
       datacap: 50,
       metaAllocatorContractAddress: 'f1def456abc123' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -243,6 +245,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: 'f1abc123def456',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -275,6 +278,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: 'f1abc123def456',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -305,6 +309,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: 'f1abc123def456',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -337,6 +342,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: '0x1234567890123456789012345678901234567890',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -367,6 +373,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: '0x1234567890123456789012345678901234567890',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -399,6 +406,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: '0x1234567890123456789012345678901234567890',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
@@ -428,6 +436,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: '0x1234567890123456789012345678901234567890',
       datacap: 5,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(() => useMetaAllocatorTransaction({}), { wrapper });
@@ -464,6 +473,7 @@ describe('useMetaAllocatorTransaction', () => {
       address: '0x1234567890123456789012345678901234567890',
       datacap: 100,
       metaAllocatorContractAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as `0x${string}`,
+      method: 'add' as const,
     };
 
     const { result } = renderHook(
